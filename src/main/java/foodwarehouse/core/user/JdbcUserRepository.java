@@ -60,16 +60,21 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        String query = String.format("SELECT * FROM `%s`", UserTable.NAME);
+        String query = String.format("SELECT * FROM \"%s\"", UserTable.NAME);
+        System.out.println(jdbcTemplate.query(query, USER_ROW_MAPPER));
         return jdbcTemplate.query(query, USER_ROW_MAPPER);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.EMAIL);
+        //jdbcTemplate.execute("INSERT INTO \"user\" VALUES (3,'Admin', 'admin3@example.com', '$2a$10$72gjyhX6JHLwHOcclgk0W.9suwe5lBhqGuCTnUFVmvCNRv1Hittz6')");
+        String query = String.format("SELECT * FROM \"%s\" WHERE %s = ?", UserTable.NAME, UserTable.Columns.EMAIL);
+        System.out.println(query);
         try {
+            System.out.println(Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email)));
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));
         } catch (EmptyResultDataAccessException e) {
+            System.out.println("error" + e.getMessage());
             return Optional.empty();
         }
     }

@@ -22,7 +22,7 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        Properties props = new Properties();
+/*        Properties props = new Properties();
         props.put("user", "java");
         props.put("password", "java");
         try {
@@ -38,21 +38,23 @@ public class Application {
             }
         } catch (SQLException e) {
             System.out.println("Failed to connect: " + e);
-        }
+        }*/
     }
 
     @Bean
     public DataSource mysqlDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://localhost:3306/university_management?serverTimezone=Europe/Warsaw");
-//        dataSource.setUsername("university_management");
-//        dataSource.setPassword("password");
+/*        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/university_management?serverTimezone=Europe/Warsaw");
+        dataSource.setUsername("university_management");
+        dataSource.setPassword("password");*/
 
-//        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
-//        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.37:1521/orcl");
-//        dataSource.setUsername("university_management");
-//        dataSource.setPassword("password");
+        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
+        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.110:1521/orcl");
+        dataSource.setSchema("university_management");
+        dataSource.setUsername("university_management");
+        dataSource.setPassword("password");
+        //dataSource.setFastConnectionFailoverEnabled(true);
 
 //        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
 //        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.37:1521/orcl");
