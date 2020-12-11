@@ -1,5 +1,6 @@
 package com.pl.projectjava.models;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,10 +13,11 @@ import javax.validation.constraints.*;
                 @UniqueConstraint(columnNames = "id"),
                 @UniqueConstraint(columnNames = "email")
         })
-public class Uzytkownik {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     private Long id;
 
     @NotBlank
@@ -25,18 +27,23 @@ public class Uzytkownik {
 
     @NotBlank
     @Size(max = 120)
-    private String haslo;
+    private String username;
 
     @NotBlank
-    private int poziomUprawnien;
+    @Size(max = 120)
+    private String password;
 
-    public Uzytkownik() {
+    @NotBlank
+    private Role role;
+
+    public User() {
     }
 
-    public Uzytkownik(String email, String haslo, int poziomUprawnien) {
+    public User(String email, String username, String password, Role role) {
         this.email = email;
-        this.haslo = haslo;
-        this.poziomUprawnien = poziomUprawnien;
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
     public String getEmail() {
@@ -47,20 +54,28 @@ public class Uzytkownik {
         this.email = email;
     }
 
-    public String getHaslo() {
-        return haslo;
+    public String getUsername() {
+        return username;
     }
 
-    public void setHaslo(String haslo) {
-        this.haslo = haslo;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public int getPoziomUprawnien() {
-        return poziomUprawnien;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPoziomUprawnien(int poziomUprawnien) {
-        this.poziomUprawnien = poziomUprawnien;
+    public void setPassword(String haslo) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(int roles) {
+        this.role = role;
     }
 
     public Long getId() {
