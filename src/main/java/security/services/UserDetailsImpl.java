@@ -1,15 +1,14 @@
 package security.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import com.pl.projectjava.models.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.pl.projectjava.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDetailsImpl implements UserDetails{
@@ -25,9 +24,26 @@ public class UserDetailsImpl implements UserDetails{
     @JsonIgnore
     private String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
+    Role role;
 
-    public UserDetailsImpl(Long id, String email, String password, String username,
+    private Collection<SimpleGrantedAuthority> authorities;
+
+    public UserDetailsImpl(Long id, String email, String password, String username, Role role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.role = role;
+        authorities = new ArrayList<>();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        authorities.add(new SimpleGrantedAuthority(role.getName()));
+        return authorities;
+    }
+
+/*    public UserDetailsImpl(Long id, String email, String password, String username,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
@@ -57,7 +73,7 @@ public class UserDetailsImpl implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
+    }*/
 
     public Long getId() {
         return id;
