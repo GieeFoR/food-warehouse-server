@@ -1,7 +1,7 @@
 package foodwarehouse.core.user.employee;
 
-import foodwarehouse.core.common.Address;
 import foodwarehouse.core.user.User;
+import org.apache.tomcat.jni.Address;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -9,9 +9,9 @@ import java.util.Set;
 public record Employee(
         int employeeId,
         User user,
-        Address address,
         Set<Position> positions,
         Set<Permission> permissions,
+        Address address,
         String firstName,
         String lastName,
         LocalDate birthDate,

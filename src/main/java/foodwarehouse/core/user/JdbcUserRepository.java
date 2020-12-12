@@ -22,7 +22,7 @@ import java.util.Optional;
 import static ch.qos.logback.core.joran.action.ActionConst.NULL;
 
 final class UserTable {
-    static final String NAME = "USER";
+    static final String NAME = "user";
 
     static final class Columns {
         static final String USER_ID = "USER_ID";
@@ -60,7 +60,6 @@ public class JdbcUserRepository implements UserRepository {
             String query = String.format("INSERT INTO `USER`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
                     UserTable.Columns.USERNAME, UserTable.Columns.PASSWORD,
                     UserTable.Columns.PERMISSION, UserTable.Columns.EMAIL);
-            System.out.println(query);
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -75,10 +74,8 @@ public class JdbcUserRepository implements UserRepository {
 
             BigInteger biguid = (BigInteger) keyHolder.getKey();
             int userId = biguid.intValue();
-            System.out.println(userId);
             return Optional.of(new User(userId, username, password, email, permission));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -95,7 +92,6 @@ public class JdbcUserRepository implements UserRepository {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
         } catch (EmptyResultDataAccessException e) {
-            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -106,7 +102,6 @@ public class JdbcUserRepository implements UserRepository {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));
         } catch (EmptyResultDataAccessException e) {
-            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }

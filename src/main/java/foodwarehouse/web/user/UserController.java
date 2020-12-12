@@ -21,6 +21,7 @@ public class UserController {
         this.userService = userService;
     }
 
+
     @PreAuthorize("hasRole('Admin')")
     @GetMapping
     public SuccessResponse<List<UserResponse>> getUsers() {
@@ -37,12 +38,10 @@ public class UserController {
     public SuccessResponse<UserResponse> createUser(@RequestBody CreateUserRequest request) {
         Optional<Permission> permission = Permission.from(request.permission());
 
-        System.out.println(permission.isPresent());
         if(permission.isEmpty()) {
             throw new RestException("Wrong permission name.");
         }
         else {
-            System.out.println(request);
             return userService
                     .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
                     .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
