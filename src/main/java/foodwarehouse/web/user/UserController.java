@@ -33,28 +33,20 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('Admin')")
-    @PostMapping("/employee")
-    public SuccessResponse<UserResponse> createEmploee(@RequestBody CreateUserRequest request) {
-        System.out.println(request);
-        return userService
-                .createUser(request.username(), request.password(), request.email(), Permission.EMPLOYEE)
-                .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
-                .orElseThrow(() -> new RestException("Unable to create a new user."));
-    }
-
-    @PreAuthorize("hasRole('Admin')")
-    @PostMapping("/user")
+    @PostMapping
     public SuccessResponse<UserResponse> createUser(@RequestBody CreateUserRequest request) {
-        Permission permission = Permission.from(request.permission()).get();
-        System.out.println(permission);
-        if(permission == null) {
-            new RestException("Unable to create a new user.");
+        Optional<Permission> permission = Permission.from(request.permission());
+
+        System.out.println(permission.isPresent());
+        if(permission.isEmpty()) {
+            throw new RestException("Wrong permission name.");
         }
-        System.out.println(request);
-        return userService
-                .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
-                .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
-                .orElseThrow(() -> new RestException("Unable to create a new user."));
-                //do sprawdzenia czy niepoprawny permission wyrzuca blad
+        else {
+            System.out.println(request);
+            return userService
+                    .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
+                    .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
+                    .orElseThrow(() -> new RestException("Unable to create a new user."));
+        }
     }
 }

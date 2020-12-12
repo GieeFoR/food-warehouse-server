@@ -76,14 +76,6 @@ public class JdbcUserRepository implements UserRepository {
             BigInteger biguid = (BigInteger) keyHolder.getKey();
             int userId = biguid.intValue();
             System.out.println(userId);
-//            MapSqlParameterSource map = new MapSqlParameterSource(Map.of(
-//                    UserTable.Columns.USERNAME, username,
-//                    UserTable.Columns.PASSWORD, password,
-//                    UserTable.Columns.PERMISSION, permission.value(),
-//                    UserTable.Columns.EMAIL, email));
-//            Number key = jdbcInsert.executeAndReturnKey(map);
-//            int userId = key.intValue();
-//            System.out.println("uid" + userId);
             return Optional.of(new User(userId, username, password, email, permission));
         } catch (Exception e) {
             System.out.println(e.getMessage());
