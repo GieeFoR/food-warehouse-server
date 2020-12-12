@@ -21,7 +21,7 @@ final class UserTable {
         static final String USERNAME = "USERNAME";
         static final String PASSWORD = "PASSWORD";
         static final String PERMISSION = "PERMISSION";
-        static final String EMAIL = "EMAIL";
+        static final String EMAIL = "E_MAIL";
     }
 }
 
@@ -64,14 +64,12 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public List<User> findAll() {
         String query = String.format("SELECT * FROM \"%s\"", UserTable.NAME);
-        System.out.println(jdbcTemplate.query(query, USER_ROW_MAPPER));
         return jdbcTemplate.query(query, USER_ROW_MAPPER);
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
         String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.USERNAME);
-        System.out.println(query);
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
         } catch (EmptyResultDataAccessException e) {
@@ -83,7 +81,6 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
         String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.EMAIL);
-        System.out.println(query);
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));
         } catch (EmptyResultDataAccessException e) {
