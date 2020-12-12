@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+//@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -22,8 +22,24 @@ public class UserController {
     }
 
 
+    @PostMapping("/register/username")
+    public SuccessResponse<CheckUsernameResponse> checkUsername(@RequestBody CheckUsernameRequest loginUsername) {
+        System.out.println(loginUsername.username());
+        boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
+        System.out.println(exists);
+        return new SuccessResponse<>(new CheckUsernameResponse(exists));
+    }
+
+    @PostMapping("/register/email")
+    public SuccessResponse<CheckEmailResponse> checkEmail(@RequestBody CheckEmailRequest loginEmail) {
+        System.out.println(loginEmail.email());
+        boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
+        System.out.println(exists);
+        return new SuccessResponse<>(new CheckEmailResponse(exists));
+    }
+
     @PreAuthorize("hasRole('Admin')")
-    @GetMapping
+    @GetMapping("/users")
     public SuccessResponse<List<UserResponse>> getUsers() {
         final var users = userService
                 .getUsers()
@@ -34,16 +50,16 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('Admin')")
-    @PostMapping
+    @PostMapping("/users")
     public SuccessResponse<UserResponse> createUser(@RequestBody CreateUserRequest request) {
-        Optional<Permission> permission = Permission.from(request.permission());
+        Optional<Permission> permission = Permission.from(request.account().permission());
 
         if(permission.isEmpty()) {
             throw new RestException("Wrong permission name.");
         }
         else {
             return userService
-                    .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
+                    .createUser(request.account().username(), request.account().password(), request.account().email(), Permission.from(request.account().permission()).get())
                     .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
                     .orElseThrow(() -> new RestException("Unable to create a new user."));
         }

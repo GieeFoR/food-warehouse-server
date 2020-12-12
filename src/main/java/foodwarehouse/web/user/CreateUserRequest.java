@@ -1,4 +1,7 @@
 package foodwarehouse.web.user;
 
-public record CreateUserRequest(String username, String password, String email, String permission) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record CreateUserRequest(
+        @JsonProperty("account") Account account) {
 }
