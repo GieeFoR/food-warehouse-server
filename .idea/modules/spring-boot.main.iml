@@ -15,8 +15,6 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-security:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-jdbc:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: com.auth0:java-jwt:3.4.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:ojdbc8:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.database.jdbc:ucp:19.3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-actuator-autoconfigure:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: io.micrometer:micrometer-core:1.6.1" level="project" />
@@ -31,12 +29,6 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-jdbc:5.3.1" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.11.3" level="project" />
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.15" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:ucp:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:oraclepki:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:osdt_cert:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:osdt_core:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:simplefan:19.3.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.oracle.ojdbc:ons:19.3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-autoconfigure:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-logging:2.4.0" level="project" />
@@ -65,6 +57,7 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-jcl:5.3.1" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.3" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.13.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: mysql:mysql-connector-java:8.0.22" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.latencyutils:LatencyUtils:2.0.3" level="project" />
   </component>
 </module>

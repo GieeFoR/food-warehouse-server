@@ -21,19 +21,18 @@ public class Application {
     }
 
     @Bean
-    public DataSource sqlDataSource() {
+    public DataSource mysqlDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
-        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.110:1521/orcl");
-        dataSource.setSchema("sbd");
-        dataSource.setUsername("sbd");
-        dataSource.setPassword("sbd");
-
 //        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
-//        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.37:1521/orcl");
-//        dataSource.setUsername("java");
-//        dataSource.setPassword("java");
+//        dataSource.setUrl("jdbc:oracle:thin:@//192.168.1.110:1521/orcl");
+//        dataSource.setSchema("sbd");
+//        dataSource.setUsername("sbd");
+//        dataSource.setPassword("sbd");
 
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/foodwarehouse?serverTimezone=Europe/Warsaw");
+        dataSource.setUsername("foodwarehouse");
+        dataSource.setPassword("pass");
 
         return dataSource;
     }

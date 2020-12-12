@@ -8,6 +8,7 @@ import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.RestException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,8 +33,24 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('Admin')")
-    @PostMapping
+    @PostMapping("/employee")
+    public SuccessResponse<UserResponse> createEmploee(@RequestBody CreateUserRequest request) {
+        System.out.println(request);
+        return userService
+                .createUser(request.username(), request.password(), request.email(), Permission.EMPLOYEE)
+                .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
+                .orElseThrow(() -> new RestException("Unable to create a new user."));
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    @PostMapping("/user")
     public SuccessResponse<UserResponse> createUser(@RequestBody CreateUserRequest request) {
+        Permission permission = Permission.from(request.permission()).get();
+        System.out.println(permission);
+        if(permission == null) {
+            new RestException("Unable to create a new user.");
+        }
+        System.out.println(request);
         return userService
                 .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
                 .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))

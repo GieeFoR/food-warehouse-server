@@ -6,12 +6,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static ch.qos.logback.core.joran.action.ActionConst.NULL;
 
 final class UserTable {
     static final String NAME = "USER";
@@ -49,27 +57,49 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> createUser(String username, String password, String email, Permission permission) {
         try {
-            Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(Map.of(
-                    UserTable.Columns.USERNAME, username,
-                    UserTable.Columns.PASSWORD, password,
-                    UserTable.Columns.EMAIL, email,
-                    UserTable.Columns.PERMISSION, permission.value())));
-            int userId = key.intValue();
+            String query = String.format("INSERT INTO `USER`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
+                    UserTable.Columns.USERNAME, UserTable.Columns.PASSWORD,
+                    UserTable.Columns.PERMISSION, UserTable.Columns.EMAIL);
+            System.out.println(query);
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, permission.value());
+                ps.setString(4, email);
+                return ps;
+            }, keyHolder);
+
+            BigInteger biguid = (BigInteger) keyHolder.getKey();
+            int userId = biguid.intValue();
+            System.out.println(userId);
+//            MapSqlParameterSource map = new MapSqlParameterSource(Map.of(
+//                    UserTable.Columns.USERNAME, username,
+//                    UserTable.Columns.PASSWORD, password,
+//                    UserTable.Columns.PERMISSION, permission.value(),
+//                    UserTable.Columns.EMAIL, email));
+//            Number key = jdbcInsert.executeAndReturnKey(map);
+//            int userId = key.intValue();
+//            System.out.println("uid" + userId);
             return Optional.of(new User(userId, username, password, email, permission));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
     public List<User> findAll() {
-        String query = String.format("SELECT * FROM \"%s\"", UserTable.NAME);
+        String query = String.format("SELECT * FROM `%s`", UserTable.NAME);
         return jdbcTemplate.query(query, USER_ROW_MAPPER);
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.USERNAME);
+        String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USERNAME);
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
         } catch (EmptyResultDataAccessException e) {
@@ -80,7 +110,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.EMAIL);
+        String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.EMAIL);
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));
         } catch (EmptyResultDataAccessException e) {

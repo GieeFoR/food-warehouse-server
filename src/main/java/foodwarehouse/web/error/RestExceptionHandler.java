@@ -14,6 +14,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestException.class)
     protected ResponseEntity<ErrorResponse> handleEntityNotFound(RestException e) {
-        return new ResponseEntity<>(new ErrorResponse(new RestError(e.getMessage())), HttpStatus.OK);
+        return new ResponseEntity<>(new ErrorResponse(new RestError(e.getMessage())), HttpStatus.BAD_REQUEST);
     }
 }
