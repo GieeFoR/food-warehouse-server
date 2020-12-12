@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -23,8 +22,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> createUser(UserType userType, String email, String password) {
+    public Optional<User> createUser(String username, String password, String email, Permission permission) {
         String encryptedPassword = bCryptPasswordEncoder.encode(password);
-        return userRepository.createUser(userType, email, encryptedPassword);
+        return userRepository.createUser(username, encryptedPassword, email, permission);
     }
 }

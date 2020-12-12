@@ -20,10 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
-                .findByEmail(email)
-                .map(user -> new User(user.email(), user.password(), List.of(new SimpleGrantedAuthority("ROLE_" + user.userType().value()))))
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+                .findByUsername(username)
+                .map(user -> new User(user.username(), user.password(), List.of(new SimpleGrantedAuthority("ROLE_" + user.permission().value()))))
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }

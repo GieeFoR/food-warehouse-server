@@ -1,4 +1,4 @@
 package foodwarehouse.core.user;
 
-public record User (int userId, UserType userType, String email, String password) {
+public record User (int userId, String username, String password, String email,  Permission permission) {
 }

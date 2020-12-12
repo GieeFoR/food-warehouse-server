@@ -5,9 +5,11 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    Optional<User> createUser(UserType userType, String email, String password);
+    Optional<User> createUser(String username, String email, String password, Permission permission);
 
     List<User> findAll();
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByUsername(String username);
 }

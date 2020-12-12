@@ -3,7 +3,7 @@ package foodwarehouse.web.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record UserResponse(
-        @JsonProperty("userType") String userType,
+        @JsonProperty("permission") String permission,
         @JsonProperty("userId") int userId,
-        @JsonProperty("email") String email) {
+        @JsonProperty("username") String username) {
 }

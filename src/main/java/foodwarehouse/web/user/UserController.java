@@ -3,7 +3,7 @@ package foodwarehouse.web.user;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import foodwarehouse.core.user.UserService;
-import foodwarehouse.core.user.UserType;
+import foodwarehouse.core.user.Permission;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.RestException;
 
@@ -26,7 +26,7 @@ public class UserController {
         final var users = userService
                 .getUsers()
                 .stream()
-                .map(user -> new UserResponse(user.userType().value(), user.userId(), user.email()))
+                .map(user -> new UserResponse(user.permission().value(), user.userId(), user.username()))
                 .collect(Collectors.toList());
         return new SuccessResponse<>(users);
     }
@@ -35,17 +35,9 @@ public class UserController {
     @PostMapping
     public SuccessResponse<UserResponse> createUser(@RequestBody CreateUserRequest request) {
         return userService
-                .createUser(UserType.ADMIN, request.email(), request.password())
-                .map(user -> new SuccessResponse<>(new UserResponse(user.userType().value(), user.userId(), user.email())))
-                .orElseThrow(() -> new RestException("Unable to create a user."));
-    }
-
-    @PreAuthorize("hasRole('Admin')")
-    @PostMapping("/employees")
-    public SuccessResponse<UserResponse> createEmployee(@RequestBody CreateUserRequest request) {
-        return userService
-                .createUser(UserType.EMPLOYEE, request.email(), request.password())
-                .map(user -> new SuccessResponse<>(new UserResponse(user.userType().value(), user.userId(), user.email())))
-                .orElseThrow(() -> new RestException("Unable to create a user."));
+                .createUser(request.username(), request.password(), request.email(), Permission.from(request.permission()).get())
+                .map(user -> new SuccessResponse<>(new UserResponse(user.permission().value(), user.userId(), user.username())))
+                .orElseThrow(() -> new RestException("Unable to create a new user."));
+                //do sprawdzenia czy niepoprawny permission wyrzuca blad
     }
 }

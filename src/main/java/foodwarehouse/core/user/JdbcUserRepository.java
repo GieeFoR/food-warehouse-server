@@ -14,13 +14,14 @@ import java.util.Map;
 import java.util.Optional;
 
 final class UserTable {
-    static final String NAME = "user";
+    static final String NAME = "USER";
 
     static final class Columns {
-        static final String USER_ID = "user_id";
-        static final String USER_TYPE = "user_type";
-        static final String EMAIL = "email";
-        static final String PASSWORD = "password";
+        static final String USER_ID = "USER_ID";
+        static final String USERNAME = "USERNAME";
+        static final String PASSWORD = "PASSWORD";
+        static final String PERMISSION = "PERMISSION";
+        static final String EMAIL = "EMAIL";
     }
 }
 
@@ -29,9 +30,10 @@ public class JdbcUserRepository implements UserRepository {
 
     private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> new User(
             rs.getInt(UserTable.Columns.USER_ID),
-            UserType.from(rs.getString(UserTable.Columns.USER_TYPE)).get(),
+            rs.getString(UserTable.Columns.USERNAME),
+            rs.getString(UserTable.Columns.PASSWORD),
             rs.getString(UserTable.Columns.EMAIL),
-            rs.getString(UserTable.Columns.PASSWORD));
+            Permission.from(rs.getString(UserTable.Columns.PERMISSION)).get());
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -45,14 +47,15 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> createUser(UserType userType, String email, String password) {
+    public Optional<User> createUser(String username, String password, String email, Permission permission) {
         try {
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(Map.of(
-                    UserTable.Columns.USER_TYPE, userType.value(),
+                    UserTable.Columns.USERNAME, username,
+                    UserTable.Columns.PASSWORD, password,
                     UserTable.Columns.EMAIL, email,
-                    UserTable.Columns.PASSWORD, password)));
+                    UserTable.Columns.PERMISSION, permission.value())));
             int userId = key.intValue();
-            return Optional.of(new User(userId, userType, email, password));
+            return Optional.of(new User(userId, username, password, email, permission));
         } catch (Exception e) {
             return Optional.empty();
         }
@@ -66,15 +69,25 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        //jdbcTemplate.execute("INSERT INTO \"user\" VALUES (3,'Admin', 'admin3@example.com', '$2a$10$72gjyhX6JHLwHOcclgk0W.9suwe5lBhqGuCTnUFVmvCNRv1Hittz6')");
-        String query = String.format("SELECT * FROM \"%s\" WHERE %s = ?", UserTable.NAME, UserTable.Columns.EMAIL);
+    public Optional<User> findByUsername(String username) {
+        String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.USERNAME);
         System.out.println(query);
         try {
-            System.out.println(Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email)));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        String query = String.format("SELECT * FROM \"%s\" WHERE \"%s\" = ?", UserTable.NAME, UserTable.Columns.EMAIL);
+        System.out.println(query);
+        try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));
         } catch (EmptyResultDataAccessException e) {
-            System.out.println("error" + e.getMessage());
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
