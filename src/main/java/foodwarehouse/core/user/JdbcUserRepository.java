@@ -246,7 +246,6 @@ public class JdbcUserRepository implements UserRepository {
                 EmployeeTable.Columns.POSITION,
                 EmployeeTable.Columns.SALARY);
         try {
-            System.out.println(query);
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
@@ -260,17 +259,15 @@ public class JdbcUserRepository implements UserRepository {
             }, keyHolder);
 
             BigInteger biguid = (BigInteger) keyHolder.getKey();
-            System.out.println(biguid);
             int employeeId = biguid.intValue();
             return Optional.of(new Employee(employeeId, user, name, surname, position, salary));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
-    public boolean updateUser(User user, String username, String password, String email, Permission permission) {
+    public boolean updateUser(int userId, String username, String password, String email, Permission permission) {
         String query = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
                 UserTable.NAME,
                 UserTable.Columns.USERNAME,
@@ -279,7 +276,7 @@ public class JdbcUserRepository implements UserRepository {
                 UserTable.Columns.EMAIL,
                 UserTable.Columns.USER_ID);
 
-        Object[] args = new Object[] {username, password, email, permission.value(), user.userId()};
+        Object[] args = new Object[] {username, password, email, permission.value(), userId};
         int update = jdbcTemplate.update(query, args);
 
         if(update == 1) {

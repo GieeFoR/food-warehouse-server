@@ -58,8 +58,8 @@ public class UserService {
         return userRepository.createEmployee(user, name, surname, position, salary);
     }
 
-    public boolean updateUser(User user, String username, String password, String email, Permission permission) {
-        return userRepository.updateUser(user, username, password, email, permission);
+    public boolean updateUser(int userId, String username, String password, String email, Permission permission) {
+        return userRepository.updateUser(userId, username, password, email, permission);
     }
 
     public boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {

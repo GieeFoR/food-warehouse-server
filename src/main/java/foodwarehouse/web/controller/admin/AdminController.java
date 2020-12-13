@@ -10,12 +10,8 @@ import foodwarehouse.core.user.employee.EmployeePersonalData;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.CreateEmployeeRequest;
-import foodwarehouse.web.request.CreateUserRequest;
-import foodwarehouse.web.response.CustomerResponse;
-import foodwarehouse.web.response.EmployeeResponse;
-import foodwarehouse.web.response.RegistrationResponse;
-import foodwarehouse.web.response.UserResponse;
+import foodwarehouse.web.request.EmployeeRequest;
+import foodwarehouse.web.response.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -142,16 +138,13 @@ public class AdminController {
 
     @PostMapping("/employee")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<UserResponse> createEmployee(@RequestBody CreateEmployeeRequest request) {
+    public SuccessResponse<UserResponse> createEmployee(@RequestBody EmployeeRequest request) {
         //check if database is reachable
         if(!userService.checkConnection()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
-
-        System.out.println(request.account());
-        System.out.println(request.employeePersonalData());
 
         //get permission from string
         Optional<Permission> permission = Permission.from(request.account().permission());
@@ -197,4 +190,63 @@ public class AdminController {
                         employee.get().user().username(),
                         employee.get().user().email()));
     }
+
+//    @PostMapping("/employee/update")
+//    @PreAuthorize("hasRole('Admin')")
+//    public SuccessResponse<UserResponse> updateEmployee(@RequestBody EmployeeRequest request) {
+//        //check if database is reachable
+//        if(!userService.checkConnection()) {
+//            String exceptionMessage = "Cannot connect to database.";
+//            System.out.println(exceptionMessage);
+//            throw new DatabaseException(exceptionMessage);
+//        }
+//
+//        System.out.println("sth");
+//
+//        //get permission from string
+//        Optional<Permission> permission = Permission.from(request.account().permission());
+//
+//        //when permission name was incorrect
+//        if(permission.isEmpty()) {
+//            throw new RestException("Wrong permission name.");
+//        }
+//
+//        //add user to database
+//        Optional<User> user = userService.updateUser(
+//                request.account().userId(),
+//                request.account().username(),
+//                request.account().password(),
+//                request.account().email(),
+//                Permission.from(request.account().permission()).get());
+//
+//        //when user was not added to database
+//        if(user.isEmpty()) {
+//            //response error
+//            throw new RestException("Unable to update an user.");
+//        }
+//
+//        //add employee to database
+//        Optional <Employee> employee = userService.updateEmployee(
+//                user.get(),
+//                request.employeePersonalData().name(),
+//                request.employeePersonalData().surname(),
+//                request.employeePersonalData().position(),
+//                request.employeePersonalData().salary());
+//
+//        //when employee was not added to database
+//        if(employee.isEmpty()) {
+//            //delete user from database
+//            userService.deleteUser(user.get());
+//            //response error
+//            throw new RestException("Unable to update an employee.");
+//        }
+//
+//        return null;
+////        return new SuccessResponse<>(
+////                new UserResponse(
+////                        employee.get().user().permission().value(),
+////                        employee.get().user().userId(),
+////                        employee.get().user().username(),
+////                        employee.get().user().email()));
+//    }
 }

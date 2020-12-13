@@ -17,7 +17,7 @@ public interface UserRepository {
 
     Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary);
 
-    boolean updateUser(User user, String username, String password, String email, Permission permission);
+    boolean updateUser(int userId, String username, String password, String email, Permission permission);
 
     boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber);
 

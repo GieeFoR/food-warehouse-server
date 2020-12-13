@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.user.Account;
 import foodwarehouse.core.user.employee.EmployeePersonalData;
 
-public record CreateEmployeeRequest(
+public record EmployeeRequest(
         @JsonProperty("account") Account account,
         @JsonProperty("personal_data") EmployeePersonalData employeePersonalData) {
 }
