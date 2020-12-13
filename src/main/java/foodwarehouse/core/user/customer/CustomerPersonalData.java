@@ -1,8 +1,8 @@
-package foodwarehouse.core.user;
+package foodwarehouse.core.user.customer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record PersonalData(
+public record CustomerPersonalData(
         @JsonProperty("name")           String name,
         @JsonProperty("surname")        String surname,
         @JsonProperty("phone_number")    String phoneNumber,

@@ -2,6 +2,7 @@ package foodwarehouse.core.user;
 
 import foodwarehouse.core.user.customer.Customer;
 import foodwarehouse.core.address.Address;
+import foodwarehouse.core.user.employee.Employee;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +23,16 @@ public interface UserRepository {
 
     boolean checkConnection();
 
-    List<User> findAll();
+    List<User> findAllUsers();
+    Optional<User> findUserById(int userId);
 
-    Optional<User> findByEmail(String email);
+    List<Employee> findAllEmployees();
 
-    Optional<User> findByUsername(String username);
+    List<Customer> findAllCustomers();
+
+    Optional<Address> findAddressById(int addressId);
+
+    Optional<User> findUserByEmail(String email);
+
+    Optional<User> findUserByUsername(String username);
 }

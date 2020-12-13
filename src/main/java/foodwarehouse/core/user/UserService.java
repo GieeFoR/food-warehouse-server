@@ -1,6 +1,7 @@
 package foodwarehouse.core.user;
 
 import foodwarehouse.core.user.customer.Customer;
+import foodwarehouse.core.user.employee.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,23 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllUsers();
+    }
+
+    public Optional<User> getUserById(int userId) {
+        return userRepository.findUserById(userId);
+    }
+
+    public List<Employee> getEmployees() {
+        return userRepository.findAllEmployees();
+    }
+
+    public List<Customer> getCustomers() {
+        return userRepository.findAllCustomers();
+    }
+
+    public Optional<Address> getAddressById(int addressId) {
+        return userRepository.findAddressById(addressId);
     }
 
     public Optional<User> createUser(String username, String password, String email, Permission permission) {
@@ -54,10 +71,10 @@ public class UserService {
     }
 
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findUserByUsername(username);
     }
 
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findUserByEmail(email);
     }
 }

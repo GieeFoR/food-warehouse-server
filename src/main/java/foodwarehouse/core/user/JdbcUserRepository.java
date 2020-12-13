@@ -1,6 +1,8 @@
 package foodwarehouse.core.user;
 
 import foodwarehouse.core.user.customer.Customer;
+import foodwarehouse.core.user.employee.Employee;
+import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -61,15 +63,73 @@ final class CustomerTable {
     }
 }
 
+final class EmployeeTable {
+    static final String NAME = "EMPLOYEE";
+
+    static final class Columns {
+        static final String EMPLOYEE_ID = "EMPLOYEE_ID";
+        static final String USER_ID = "USER_ID";
+        static final String NAME = "NAME";
+        static final String SURNAME = "SURNAME";
+        static final String POSITION = "POSITION";
+        static final String SALARY = "SALARY";
+    }
+}
+
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
-    private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> new User(
+    private final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> new User(
             rs.getInt(UserTable.Columns.USER_ID),
             rs.getString(UserTable.Columns.USERNAME),
             rs.getString(UserTable.Columns.PASSWORD),
             rs.getString(UserTable.Columns.EMAIL),
             Permission.from(rs.getString(UserTable.Columns.PERMISSION)).get());
+
+    private final RowMapper<Employee> EMPLOYEE_ROW_MAPPER = (rs, rowNum) ->  {
+        Optional <User> user = findUserById(rs.getInt(EmployeeTable.Columns.USER_ID));
+        if(user.isEmpty()) {
+            throw new RestException("Cannot find an Employee user account.");
+        }
+        return new Employee(
+                rs.getInt(EmployeeTable.Columns.EMPLOYEE_ID),
+                user.get(),
+                rs.getString(EmployeeTable.Columns.NAME),
+                rs.getString(EmployeeTable.Columns.SURNAME),
+                rs.getString(EmployeeTable.Columns.POSITION),
+                rs.getFloat(EmployeeTable.Columns.POSITION));
+    };
+
+    private final RowMapper<Customer> CUSTOMER_ROW_MAPPER = (rs, rowNum) ->  {
+        Optional <User> user = findUserById(rs.getInt(CustomerTable.Columns.USER_ID));
+        if(user.isEmpty()) {
+            throw new RestException("Cannot find an Employee user account.");
+        }
+
+        Optional <Address> address = findAddressById(rs.getInt(CustomerTable.Columns.ADDRESS_ID));
+        if(user.isEmpty()) {
+            throw new RestException("Cannot find an Employee user account.");
+        }
+        return new Customer(
+                rs.getInt(CustomerTable.Columns.CUSTOMER_ID),
+                user.get(),
+                address.get(),
+                rs.getString(CustomerTable.Columns.NAME),
+                rs.getString(CustomerTable.Columns.SURNAME),
+                rs.getString(CustomerTable.Columns.FIRMNAME),
+                rs.getString(CustomerTable.Columns.PHONE),
+                rs.getString(CustomerTable.Columns.TAX),
+                rs.getInt(CustomerTable.Columns.DISCOUNT));
+    };
+
+    private final RowMapper<Address> ADDRESS_ROW_MAPPER = (rs, rowNum) -> new Address(
+            rs.getInt(AddressTable.Columns.ADDRESS_ID),
+            rs.getString(AddressTable.Columns.COUNTRY),
+            rs.getString(AddressTable.Columns.TOWN),
+            rs.getString(AddressTable.Columns.POSTAL_CODE),
+            rs.getString(AddressTable.Columns.BUILDING_NUMBER),
+            rs.getString(AddressTable.Columns.STREET),
+            rs.getString(AddressTable.Columns.APARTMENT_NUMBER));
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -239,16 +299,47 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAllUsers() {
         String query = String.format("SELECT * FROM `%s`", UserTable.NAME);
         return jdbcTemplate.query(query, USER_ROW_MAPPER);
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findUserById(int userId) {
+        String query = String.format("SELECT * FROM `%s` where `%s` = ?", UserTable.NAME, UserTable.Columns.USER_ID);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, userId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Employee> findAllEmployees() {
+        String query = String.format("SELECT * FROM `%s`", EmployeeTable.NAME);
+        return jdbcTemplate.query(query, EMPLOYEE_ROW_MAPPER);
+    }
+
+    @Override
+    public List<Customer> findAllCustomers() {
+        String query = String.format("SELECT * FROM `%s`", CustomerTable.NAME);
+        return jdbcTemplate.query(query, CUSTOMER_ROW_MAPPER);
+    }
+
+    @Override
+    public Optional<Address> findAddressById(int addressId) {
+        String query = String.format("SELECT * FROM `%s` where `%s` = ?", AddressTable.NAME, AddressTable.Columns.ADDRESS_ID);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(query, ADDRESS_ROW_MAPPER, addressId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> findUserByUsername(String username) {
         String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USERNAME);
         try {
-
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -256,7 +347,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.EMAIL);
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email));

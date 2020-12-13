@@ -89,11 +89,11 @@ public class RegisterController {
         Optional <Customer> customer = userService.createCustomer(
                 user.get(),
                 address.get(),
-                createCustomerRequest.personalData().name(),
-                createCustomerRequest.personalData().surname(),
-                createCustomerRequest.personalData().firmName(),
-                createCustomerRequest.personalData().phoneNumber(),
-                createCustomerRequest.personalData().tax_id());
+                createCustomerRequest.customerPersonalData().name(),
+                createCustomerRequest.customerPersonalData().surname(),
+                createCustomerRequest.customerPersonalData().firmName(),
+                createCustomerRequest.customerPersonalData().phoneNumber(),
+                createCustomerRequest.customerPersonalData().tax_id());
 
         //when customer was not added to database
         if(customer.isEmpty()) {
