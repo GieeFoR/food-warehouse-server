@@ -1,4 +1,4 @@
-package foodwarehouse.core.common;
+package foodwarehouse.core.address;
 
 public record Address(
         int addressId,

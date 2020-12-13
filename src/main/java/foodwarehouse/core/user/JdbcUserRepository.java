@@ -1,28 +1,22 @@
 package foodwarehouse.core.user;
 
 import foodwarehouse.core.user.customer.Customer;
-import foodwarehouse.web.user.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import universitymanagement.core.common.Address;
+import foodwarehouse.core.address.Address;
 
 import javax.sql.DataSource;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
-import static ch.qos.logback.core.joran.action.ActionConst.NULL;
 
 final class UserTable {
     static final String NAME = "USER";
@@ -33,6 +27,20 @@ final class UserTable {
         static final String PASSWORD = "PASSWORD";
         static final String PERMISSION = "PERMISSION";
         static final String EMAIL = "E_MAIL";
+    }
+}
+
+final class AddressTable {
+    static final String NAME = "ADDRESS";
+
+    static final class Columns {
+        static final String ADDRESS_ID = "ADDRESS_ID";
+        static final String COUNTRY = "COUNTRY";
+        static final String TOWN = "TOWN";
+        static final String POSTAL_CODE = "POSTAL_CODE";
+        static final String BUILDING_NUMBER = "BUILDING_NUMBER";
+        static final String STREET = "STREET";
+        static final String APARTMENT_NUMBER = "APARTMENT_NUMBER";
     }
 }
 
@@ -103,6 +111,39 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
+        try {
+            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
+                    AddressTable.NAME,
+                    AddressTable.Columns.COUNTRY,
+                    AddressTable.Columns.TOWN,
+                    AddressTable.Columns.POSTAL_CODE,
+                    AddressTable.Columns.BUILDING_NUMBER,
+                    AddressTable.Columns.STREET,
+                    AddressTable.Columns.APARTMENT_NUMBER);
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, country);
+                ps.setString(2, town);
+                ps.setString(3, postalCode);
+                ps.setString(4, buildingNumber);
+                ps.setString(5, street);
+                ps.setString(6, apartmentNumber);
+                return ps;
+            }, keyHolder);
+
+            BigInteger biguid = (BigInteger) keyHolder.getKey();
+            int addressId = biguid.intValue();
+            return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
         try {
             String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
@@ -123,9 +164,9 @@ public class JdbcUserRepository implements UserRepository {
                 ps.setInt(2, address.addressId());
                 ps.setString(3, name);
                 ps.setString(4, surname);
-                ps.setString(4, firmName);
-                ps.setString(4, phoneNumber);
-                ps.setString(4, taxId);
+                ps.setString(5, firmName);
+                ps.setString(6, phoneNumber);
+                ps.setString(7, taxId);
                 return ps;
             }, keyHolder);
 

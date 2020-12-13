@@ -1,7 +1,7 @@
 package foodwarehouse.core.user.customer;
 
 import foodwarehouse.core.user.User;
-import universitymanagement.core.common.Address;
+import foodwarehouse.core.address.Address;
 
 public record Customer(
         int customerId,

@@ -1,5 +1,7 @@
 package foodwarehouse.web.user;
 
+import foodwarehouse.core.user.User;
+import foodwarehouse.core.user.customer.Customer;
 import foodwarehouse.web.request.CheckEmailRequest;
 import foodwarehouse.web.request.CheckUsernameRequest;
 import foodwarehouse.web.request.CreateCustomerRequest;
@@ -14,7 +16,9 @@ import foodwarehouse.core.user.UserService;
 import foodwarehouse.core.user.Permission;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.RestException;
+import foodwarehouse.core.address.Address;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,27 +36,56 @@ public class UserController {
 
     @PostMapping("/register/username")
     public SuccessResponse<CheckUsernameResponse> checkUsername(@RequestBody CheckUsernameRequest loginUsername) {
-        System.out.println(loginUsername.username());
         boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
-        System.out.println(exists);
         return new SuccessResponse<>(new CheckUsernameResponse(exists));
     }
 
     @PostMapping("/register/email")
     public SuccessResponse<CheckEmailResponse> checkEmail(@RequestBody CheckEmailRequest loginEmail) {
-        System.out.println(loginEmail.email());
         boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
-        System.out.println(exists);
         return new SuccessResponse<>(new CheckEmailResponse(exists));
     }
 
     @PostMapping("/register")
     public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
-/*        System.out.println(loginEmail.email());
-        boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
-        System.out.println(exists);*/
 
-        
+
+        Optional <User> user = userService.createUser(
+                createCustomerRequest.account().username(),
+                createCustomerRequest.account().password(),
+                createCustomerRequest.account().email(),
+                Permission.CUSTOMER);
+
+        if(user.isEmpty()) {
+            throw new RestException("Unable to create a new user.");
+        }
+
+        Optional <Address> address = userService.createAddress(
+                createCustomerRequest.address().country(),
+                createCustomerRequest.address().town(),
+                createCustomerRequest.address().postalCode(),
+                createCustomerRequest.address().buildingNumber(),
+                createCustomerRequest.address().street(),
+                createCustomerRequest.address().apartmentNumber());
+
+        if(address.isEmpty()) {
+            throw new RestException("Unable to create a new user.");
+            //delete user from database
+        }
+
+        Optional <Customer> customer = userService.createCustomer(
+                user.get(),
+                address.get(),
+                createCustomerRequest.personalData().name(),
+                createCustomerRequest.personalData().surname(),
+                createCustomerRequest.personalData().firmName(),
+                createCustomerRequest.personalData().phoneNumber(),
+                createCustomerRequest.personalData().tax_id());
+
+        if(customer.isEmpty()) {
+            throw new RestException("Unable to create a new user.");
+            //delete user and address from database
+        }
         return new SuccessResponse<>(new RegistrationResponse(true));
     }
 
