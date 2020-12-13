@@ -33,6 +33,13 @@ public class RegisterController {
     //check if username is not used
     @PostMapping("/register/username")
     public SuccessResponse<CheckUsernameResponse> checkUsername(@RequestBody CheckUsernameRequest loginUsername) {
+        //check if database is reachable
+        if(!userService.checkConnection()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
         boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
         return new SuccessResponse<>(new CheckUsernameResponse(exists));
     }
@@ -40,6 +47,13 @@ public class RegisterController {
     //check if email is not used
     @PostMapping("/register/email")
     public SuccessResponse<CheckEmailResponse> checkEmail(@RequestBody CheckEmailRequest loginEmail) {
+        //check if database is reachable
+        if(!userService.checkConnection()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
         boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
         return new SuccessResponse<>(new CheckEmailResponse(exists));
     }
@@ -47,7 +61,7 @@ public class RegisterController {
     //register user function
     @RequestMapping("/register")
     public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
-
+        //check if database is reachable
         if(!userService.checkConnection()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);

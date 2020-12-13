@@ -7,6 +7,6 @@ import foodwarehouse.core.address.Address;
 
 public record CreateCustomerRequest(
         @JsonProperty("account")        Account account,
-        @JsonProperty("personal_data")CustomerPersonalData customerPersonalData,
+        @JsonProperty("personal_data")  CustomerPersonalData customerPersonalData,
         @JsonProperty("address")        Address address){
 }

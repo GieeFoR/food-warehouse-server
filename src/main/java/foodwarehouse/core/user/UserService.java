@@ -54,6 +54,26 @@ public class UserService {
         return userRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
+    public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) {
+        return userRepository.createEmployee(user, name, surname, position, salary);
+    }
+
+    public boolean updateUser(User user, String username, String password, String email, Permission permission) {
+        return userRepository.updateUser(user, username, password, email, permission);
+    }
+
+    public boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
+        return userRepository.updateAddress(address, country, town, postalCode, buildingNumber, street, apartmentNumber);
+    }
+
+    public boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
+        return userRepository.updateCustomer(customer, user, address, name, surname, firmName, phoneNumber, taxId);
+    }
+
+    public boolean updateEmployee(Employee employee, User user, String name, String surname, String position, Float salary) {
+        return userRepository.updateEmployee(employee, user, name, surname, position, salary);
+    }
+
     public boolean deleteUser(User user) {
         return userRepository.deleteUser(user);
     }

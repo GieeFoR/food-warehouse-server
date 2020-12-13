@@ -237,10 +237,79 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) {
+        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?)",
+                EmployeeTable.NAME,
+                EmployeeTable.Columns.USER_ID,
+                EmployeeTable.Columns.NAME,
+                EmployeeTable.Columns.SURNAME,
+                EmployeeTable.Columns.POSITION,
+                EmployeeTable.Columns.SALARY);
+        try {
+            System.out.println(query);
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, user.userId());
+                ps.setString(2, name);
+                ps.setString(3, surname);
+                ps.setString(4, position);
+                ps.setFloat(5, salary);
+                return ps;
+            }, keyHolder);
+
+            BigInteger biguid = (BigInteger) keyHolder.getKey();
+            System.out.println(biguid);
+            int employeeId = biguid.intValue();
+            return Optional.of(new Employee(employeeId, user, name, surname, position, salary));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean updateUser(User user, String username, String password, String email, Permission permission) {
+        String query = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
+                UserTable.NAME,
+                UserTable.Columns.USERNAME,
+                UserTable.Columns.PASSWORD,
+                UserTable.Columns.PERMISSION,
+                UserTable.Columns.EMAIL,
+                UserTable.Columns.USER_ID);
+
+        Object[] args = new Object[] {username, password, email, permission.value(), user.userId()};
+        int update = jdbcTemplate.update(query, args);
+
+        if(update == 1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
+        return false;
+    }
+
+    @Override
+    public boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
+        return false;
+    }
+
+    @Override
+    public boolean updateEmployee(Employee employee, User user, String name, String surname, String position, Float salary) {
+        return false;
+    }
+
+    @Override
     public boolean deleteUser(User user) {
-        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USER_ID);
+        String query = String.format("DELETE FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USER_ID);
         Object[] args = new Object[] {user.userId()};
-        int delete = jdbcTemplate.update(sql, args);
+        int delete = jdbcTemplate.update(query, args);
 
         if(delete == 1) {
             user = null;
@@ -253,9 +322,9 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean deleteAddress(Address address) {
-        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", AddressTable.NAME, AddressTable.Columns.ADDRESS_ID);
+        String query = String.format("DELETE FROM `%s` WHERE `%s` = ?", AddressTable.NAME, AddressTable.Columns.ADDRESS_ID);
         Object[] args = new Object[] {address.addressId()};
-        int delete = jdbcTemplate.update(sql, args);
+        int delete = jdbcTemplate.update(query, args);
 
         if(delete == 1) {
             address = null;
@@ -268,9 +337,9 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean deleteCustomer(Customer customer) {
-        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", CustomerTable.NAME, CustomerTable.Columns.CUSTOMER_ID);
+        String query = String.format("DELETE FROM `%s` WHERE `%s` = ?", CustomerTable.NAME, CustomerTable.Columns.CUSTOMER_ID);
         Object[] args = new Object[] {customer.customerId()};
-        int delete = jdbcTemplate.update(sql, args);
+        int delete = jdbcTemplate.update(query, args);
 
         if(delete == 1) {
             customer = null;

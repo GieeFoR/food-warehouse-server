@@ -15,6 +15,16 @@ public interface UserRepository {
 
     Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
 
+    Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary);
+
+    boolean updateUser(User user, String username, String password, String email, Permission permission);
+
+    boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber);
+
+    boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
+
+    boolean updateEmployee(Employee employee, User user, String name, String surname, String position, Float salary);
+
     boolean deleteUser(User user);
 
     boolean deleteAddress(Address address);
