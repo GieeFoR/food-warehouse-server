@@ -14,6 +14,12 @@ public interface UserRepository {
 
     Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
 
+    boolean deleteUser(User user);
+
+    boolean deleteAddress(Address address);
+
+    boolean deleteCustomer(Customer customer);
+
     List<User> findAll();
 
     Optional<User> findByEmail(String email);

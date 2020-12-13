@@ -83,16 +83,13 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> createUser(String username, String password, String email, Permission permission) {
+        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
+                UserTable.NAME,
+                UserTable.Columns.USERNAME,
+                UserTable.Columns.PASSWORD,
+                UserTable.Columns.PERMISSION,
+                UserTable.Columns.EMAIL);
         try {
-            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
-                    UserTable.NAME,
-                    UserTable.Columns.USERNAME,
-                    UserTable.Columns.PASSWORD,
-                    UserTable.Columns.PERMISSION,
-                    UserTable.Columns.EMAIL);
-
-            System.out.println("createUser " + query);
-
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
@@ -114,18 +111,15 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
+        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
+                AddressTable.NAME,
+                AddressTable.Columns.COUNTRY,
+                AddressTable.Columns.TOWN,
+                AddressTable.Columns.POSTAL_CODE,
+                AddressTable.Columns.BUILDING_NUMBER,
+                AddressTable.Columns.STREET,
+                AddressTable.Columns.APARTMENT_NUMBER);
         try {
-            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
-                    AddressTable.NAME,
-                    AddressTable.Columns.COUNTRY,
-                    AddressTable.Columns.TOWN,
-                    AddressTable.Columns.POSTAL_CODE,
-                    AddressTable.Columns.BUILDING_NUMBER,
-                    AddressTable.Columns.STREET,
-                    AddressTable.Columns.APARTMENT_NUMBER);
-
-            System.out.println("createAddress " + query);
-
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
@@ -149,19 +143,16 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
+        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
+                CustomerTable.NAME,
+                CustomerTable.Columns.USER_ID,
+                CustomerTable.Columns.ADDRESS_ID,
+                CustomerTable.Columns.NAME,
+                CustomerTable.Columns.SURNAME,
+                CustomerTable.Columns.FIRMNAME,
+                CustomerTable.Columns.PHONE,
+                CustomerTable.Columns.TAX);
         try {
-            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
-                    CustomerTable.NAME,
-                    CustomerTable.Columns.USER_ID,
-                    CustomerTable.Columns.ADDRESS_ID,
-                    CustomerTable.Columns.NAME,
-                    CustomerTable.Columns.SURNAME,
-                    CustomerTable.Columns.FIRMNAME,
-                    CustomerTable.Columns.PHONE,
-                    CustomerTable.Columns.TAX);
-
-            System.out.println("createCustomer " + query);
-
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
@@ -181,6 +172,51 @@ public class JdbcUserRepository implements UserRepository {
             return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, 0));
         } catch (Exception e) {
             return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean deleteUser(User user) {
+        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USER_ID);
+        Object[] args = new Object[] {user.userId()};
+        int delete = jdbcTemplate.update(sql, args);
+
+        if(delete == 1) {
+            user = null;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteAddress(Address address) {
+        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", AddressTable.NAME, AddressTable.Columns.ADDRESS_ID);
+        Object[] args = new Object[] {address.addressId()};
+        int delete = jdbcTemplate.update(sql, args);
+
+        if(delete == 1) {
+            address = null;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteCustomer(Customer customer) {
+        String sql = String.format("DELETE FROM `%s` WHERE `%s` = ?", CustomerTable.NAME, CustomerTable.Columns.CUSTOMER_ID);
+        Object[] args = new Object[] {customer.customerId()};
+        int delete = jdbcTemplate.update(sql, args);
+
+        if(delete == 1) {
+            customer = null;
+            return true;
+        }
+        else {
+            return false;
         }
     }
 

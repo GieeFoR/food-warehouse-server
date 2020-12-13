@@ -61,5 +61,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .sign(HMAC512(SecurityConstants.SECRET.getBytes()));
         res.setHeader("Access-Control-Expose-Headers", "Authorization");
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        res.setContentType("application/json");
+        res.getWriter().write("{\"permission\":\"" + roles.substring(5) +"\"}");
     }
 }

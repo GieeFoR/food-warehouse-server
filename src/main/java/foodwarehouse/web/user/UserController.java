@@ -48,10 +48,6 @@ public class UserController {
 
     @PostMapping("/register")
     public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
-        System.out.println(createCustomerRequest.account());
-        System.out.println(createCustomerRequest.personalData());
-        System.out.println(createCustomerRequest.address());
-
         Optional <User> user = userService.createUser(
                 createCustomerRequest.account().username(),
                 createCustomerRequest.account().password(),
@@ -71,6 +67,7 @@ public class UserController {
                 createCustomerRequest.address().apartmentNumber());
 
         if(address.isEmpty()) {
+            userService.deleteUser(user.get());
             throw new RestException("Unable to create a new address.");
             //delete user from database
         }
@@ -85,6 +82,8 @@ public class UserController {
                 createCustomerRequest.personalData().tax_id());
 
         if(customer.isEmpty()) {
+            userService.deleteUser(user.get());
+            userService.deleteAddress(address.get());
             throw new RestException("Unable to create a new customer.");
             //delete user and address from database
         }

@@ -40,6 +40,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(req, res);
     }
 
+
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         final var token = request.getHeader(SecurityConstants.HEADER_STRING);
         if (token != null) {

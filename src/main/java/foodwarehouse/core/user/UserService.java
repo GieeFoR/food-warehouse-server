@@ -37,6 +37,18 @@ public class UserService {
         return userRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
+    public boolean deleteUser(User user) {
+        return userRepository.deleteUser(user);
+    }
+
+    public boolean deleteAddress(Address address) {
+        return userRepository.deleteAddress(address);
+    }
+
+    public boolean deleteCustomer(Customer customer) {
+        return userRepository.deleteCustomer(customer);
+    }
+
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
