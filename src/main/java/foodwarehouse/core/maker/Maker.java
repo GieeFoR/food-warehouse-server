@@ -1,6 +1,6 @@
 package foodwarehouse.core.maker;
 
-import universitymanagement.core.common.Address;
+import foodwarehouse.core.address.Address;
 
 public record Maker(
         int makerId,

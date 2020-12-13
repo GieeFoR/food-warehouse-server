@@ -38,9 +38,9 @@ final class AddressTable {
         static final String COUNTRY = "COUNTRY";
         static final String TOWN = "TOWN";
         static final String POSTAL_CODE = "POSTAL_CODE";
-        static final String BUILDING_NUMBER = "BUILDING_NUMBER";
+        static final String BUILDING_NUMBER = "BUILDING_NO";
         static final String STREET = "STREET";
-        static final String APARTMENT_NUMBER = "APARTMENT_NUMBER";
+        static final String APARTMENT_NUMBER = "APARTMENT_NO";
     }
 }
 
@@ -53,7 +53,7 @@ final class CustomerTable {
         static final String ADDRESS_ID = "ADDRESS_ID";
         static final String NAME = "NAME";
         static final String SURNAME = "SURNAME";
-        static final String FIRMNAME = "FIRMNAME";
+        static final String FIRMNAME = "FIRM_NAME";
         static final String PHONE = "TELEPHONE_NO";
         static final String TAX = "TAX_ID";
         static final String DISCOUNT = "DISCOUNT";
@@ -91,6 +91,8 @@ public class JdbcUserRepository implements UserRepository {
                     UserTable.Columns.PERMISSION,
                     UserTable.Columns.EMAIL);
 
+            System.out.println("createUser " + query);
+
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
@@ -121,6 +123,8 @@ public class JdbcUserRepository implements UserRepository {
                     AddressTable.Columns.BUILDING_NUMBER,
                     AddressTable.Columns.STREET,
                     AddressTable.Columns.APARTMENT_NUMBER);
+
+            System.out.println("createAddress " + query);
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -155,6 +159,8 @@ public class JdbcUserRepository implements UserRepository {
                     CustomerTable.Columns.FIRMNAME,
                     CustomerTable.Columns.PHONE,
                     CustomerTable.Columns.TAX);
+
+            System.out.println("createCustomer " + query);
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {

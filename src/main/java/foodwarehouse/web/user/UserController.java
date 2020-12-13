@@ -48,7 +48,9 @@ public class UserController {
 
     @PostMapping("/register")
     public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
-
+        System.out.println(createCustomerRequest.account());
+        System.out.println(createCustomerRequest.personalData());
+        System.out.println(createCustomerRequest.address());
 
         Optional <User> user = userService.createUser(
                 createCustomerRequest.account().username(),
@@ -69,7 +71,7 @@ public class UserController {
                 createCustomerRequest.address().apartmentNumber());
 
         if(address.isEmpty()) {
-            throw new RestException("Unable to create a new user.");
+            throw new RestException("Unable to create a new address.");
             //delete user from database
         }
 
@@ -83,7 +85,7 @@ public class UserController {
                 createCustomerRequest.personalData().tax_id());
 
         if(customer.isEmpty()) {
-            throw new RestException("Unable to create a new user.");
+            throw new RestException("Unable to create a new customer.");
             //delete user and address from database
         }
         return new SuccessResponse<>(new RegistrationResponse(true));

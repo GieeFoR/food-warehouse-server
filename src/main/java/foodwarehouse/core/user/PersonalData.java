@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record PersonalData(
         @JsonProperty("name")           String name,
         @JsonProperty("surname")        String surname,
-        @JsonProperty("phoneNumber")    String phoneNumber,
-        @JsonProperty("firmName")       String firmName,
+        @JsonProperty("phone_umber")    String phoneNumber,
+        @JsonProperty("firm_name")       String firmName,
         @JsonProperty("tax_id")         String tax_id) {
 }
