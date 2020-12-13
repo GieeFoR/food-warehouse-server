@@ -1,5 +1,6 @@
 package foodwarehouse.core.user;
 
+import foodwarehouse.core.user.customer.Customer;
 import foodwarehouse.web.user.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import universitymanagement.core.common.Address;
 
 import javax.sql.DataSource;
 import java.math.BigInteger;
@@ -101,7 +103,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> createCustomer(int userId, int addressId, String name, String surname, String firmName, String phoneNumber, String taxId) {
+    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
         try {
             String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
                     CustomerTable.NAME,
@@ -117,8 +119,8 @@ public class JdbcUserRepository implements UserRepository {
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
                         .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                ps.setInt(1, userId);
-                ps.setInt(2, addressId);
+                ps.setInt(1, user.userId());
+                ps.setInt(2, address.addressId());
                 ps.setString(3, name);
                 ps.setString(4, surname);
                 ps.setString(4, firmName);
@@ -129,7 +131,7 @@ public class JdbcUserRepository implements UserRepository {
 
             BigInteger biguid = (BigInteger) keyHolder.getKey();
             int customerId = biguid.intValue();
-            return Optional.of(new Customer(userId, username, password, email, permission));
+            return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, 0));
         } catch (Exception e) {
             return Optional.empty();
         }
