@@ -1,4 +1,4 @@
-package foodwarehouse.web.user;
+package foodwarehouse.web.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

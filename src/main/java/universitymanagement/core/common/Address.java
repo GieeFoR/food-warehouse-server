@@ -4,8 +4,8 @@ public record Address(
         int addressId,
         String street,
         String houseNumber,
-        String flatNumber,
+        String apartmentNumber,
         String postcode,
-        String city,
+        String town,
         String country) {
 }

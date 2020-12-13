@@ -1,5 +1,13 @@
 package foodwarehouse.web.user;
 
+import foodwarehouse.web.request.CheckEmailRequest;
+import foodwarehouse.web.request.CheckUsernameRequest;
+import foodwarehouse.web.request.CreateCustomerRequest;
+import foodwarehouse.web.request.CreateUserRequest;
+import foodwarehouse.web.response.CheckEmailResponse;
+import foodwarehouse.web.response.CheckUsernameResponse;
+import foodwarehouse.web.response.RegistrationResponse;
+import foodwarehouse.web.response.UserResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import foodwarehouse.core.user.UserService;
@@ -36,6 +44,16 @@ public class UserController {
         boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
         System.out.println(exists);
         return new SuccessResponse<>(new CheckEmailResponse(exists));
+    }
+
+    @PostMapping("/register")
+    public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
+/*        System.out.println(loginEmail.email());
+        boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
+        System.out.println(exists);*/
+
+        
+        return new SuccessResponse<>(new RegistrationResponse(true));
     }
 
     @PreAuthorize("hasRole('Admin')")

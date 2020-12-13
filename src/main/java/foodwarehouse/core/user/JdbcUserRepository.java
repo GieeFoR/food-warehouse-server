@@ -1,5 +1,6 @@
 package foodwarehouse.core.user;
 
+import foodwarehouse.web.user.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import static ch.qos.logback.core.joran.action.ActionConst.NULL;
 
 final class UserTable {
-    static final String NAME = "user";
+    static final String NAME = "USER";
 
     static final class Columns {
         static final String USER_ID = "USER_ID";
@@ -30,6 +31,22 @@ final class UserTable {
         static final String PASSWORD = "PASSWORD";
         static final String PERMISSION = "PERMISSION";
         static final String EMAIL = "E_MAIL";
+    }
+}
+
+final class CustomerTable {
+    static final String NAME = "CUSTOMER";
+
+    static final class Columns {
+        static final String CUSTOMER_ID = "CUSTOMER_ID";
+        static final String USER_ID = "USER_ID";
+        static final String ADDRESS_ID = "ADDRESS_ID";
+        static final String NAME = "NAME";
+        static final String SURNAME = "SURNAME";
+        static final String FIRMNAME = "FIRMNAME";
+        static final String PHONE = "TELEPHONE_NO";
+        static final String TAX = "TAX_ID";
+        static final String DISCOUNT = "DISCOUNT";
     }
 }
 
@@ -57,9 +74,12 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> createUser(String username, String password, String email, Permission permission) {
         try {
-            String query = String.format("INSERT INTO `USER`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
-                    UserTable.Columns.USERNAME, UserTable.Columns.PASSWORD,
-                    UserTable.Columns.PERMISSION, UserTable.Columns.EMAIL);
+            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
+                    UserTable.NAME,
+                    UserTable.Columns.USERNAME,
+                    UserTable.Columns.PASSWORD,
+                    UserTable.Columns.PERMISSION,
+                    UserTable.Columns.EMAIL);
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -75,6 +95,41 @@ public class JdbcUserRepository implements UserRepository {
             BigInteger biguid = (BigInteger) keyHolder.getKey();
             int userId = biguid.intValue();
             return Optional.of(new User(userId, username, password, email, permission));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> createCustomer(int userId, int addressId, String name, String surname, String firmName, String phoneNumber, String taxId) {
+        try {
+            String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
+                    CustomerTable.NAME,
+                    CustomerTable.Columns.USER_ID,
+                    CustomerTable.Columns.ADDRESS_ID,
+                    CustomerTable.Columns.NAME,
+                    CustomerTable.Columns.SURNAME,
+                    CustomerTable.Columns.FIRMNAME,
+                    CustomerTable.Columns.PHONE,
+                    CustomerTable.Columns.TAX);
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, userId);
+                ps.setInt(2, addressId);
+                ps.setString(3, name);
+                ps.setString(4, surname);
+                ps.setString(4, firmName);
+                ps.setString(4, phoneNumber);
+                ps.setString(4, taxId);
+                return ps;
+            }, keyHolder);
+
+            BigInteger biguid = (BigInteger) keyHolder.getKey();
+            int customerId = biguid.intValue();
+            return Optional.of(new Customer(userId, username, password, email, permission));
         } catch (Exception e) {
             return Optional.empty();
         }
