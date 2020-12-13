@@ -49,6 +49,10 @@ public class UserService {
         return userRepository.deleteCustomer(customer);
     }
 
+    public boolean checkConnection() {
+        return userRepository.checkConnection();
+    }
+
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

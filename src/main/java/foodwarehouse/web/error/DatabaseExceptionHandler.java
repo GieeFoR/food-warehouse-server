@@ -10,10 +10,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class DatabaseExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(RestException.class)
-    protected ResponseEntity<ErrorResponse> handleEntityNotFound(RestException e) {
-        return new ResponseEntity<>(new ErrorResponse(new RestError(e.getMessage())), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(DatabaseException.class)
+    protected ResponseEntity<ErrorResponse> handleEntityNotFound(DatabaseException e) {
+        return new ResponseEntity<>(new ErrorResponse(new RestError(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

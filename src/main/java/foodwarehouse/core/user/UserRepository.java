@@ -20,6 +20,8 @@ public interface UserRepository {
 
     boolean deleteCustomer(Customer customer);
 
+    boolean checkConnection();
+
     List<User> findAll();
 
     Optional<User> findByEmail(String email);

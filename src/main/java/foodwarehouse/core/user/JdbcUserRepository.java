@@ -3,6 +3,7 @@ package foodwarehouse.core.user;
 import foodwarehouse.core.user.customer.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -221,6 +222,23 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean checkConnection() {
+        final String CHECK_SQL_QUERY = "SELECT 1";
+        boolean isConnected = true;
+        try {
+            jdbcTemplate.update(connection -> {
+                        final PreparedStatement statement = connection.prepareStatement(CHECK_SQL_QUERY);
+                        return statement;
+                    });
+        } catch (CannotGetJdbcConnectionException e) {
+            isConnected = false;
+        }
+        finally {
+            return isConnected;
+        }
+    }
+
+    @Override
     public List<User> findAll() {
         String query = String.format("SELECT * FROM `%s`", UserTable.NAME);
         return jdbcTemplate.query(query, USER_ROW_MAPPER);
@@ -230,6 +248,7 @@ public class JdbcUserRepository implements UserRepository {
     public Optional<User> findByUsername(String username) {
         String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USERNAME);
         try {
+
             return Optional.ofNullable(jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, username));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
