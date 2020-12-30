@@ -15,6 +15,7 @@ import foodwarehouse.web.response.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,12 +39,18 @@ public class AdminController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        final var users = userService
-                .getUsers()
-                .stream()
-                .map(user -> new UserResponse(user.permission().value(), user.userId(), user.username(), user.email()))
-                .collect(Collectors.toList());
-        return new SuccessResponse<>(users);
+        try {
+            final var users = userService
+                    .getUsers()
+                    .stream()
+                    .map(user -> new UserResponse(user.permission().value(), user.userId(), user.username(), user.email()))
+                    .collect(Collectors.toList());
+            return new SuccessResponse<>(users);
+        }
+        catch(SQLException sqlException) {
+            String exceptionMessage = "Cannot get users";
+            throw new RestException(exceptionMessage);
+        }
     }
 
     @GetMapping("/users/{id}")
@@ -69,6 +76,10 @@ public class AdminController {
             //when {id} is not a digit
             throw new RestException("Wrong ID.");
         }
+        catch(SQLException sqlException) {
+            String exceptionMessage = "Cannot get user with ID.";
+            throw new RestException(exceptionMessage);
+        }
     }
 
     @GetMapping("/employee")
@@ -81,22 +92,29 @@ public class AdminController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        final var employees = userService
-                .getEmployees()
-                .stream()
-                .map(employee -> new EmployeeResponse(
-                        new UserResponse(
-                                employee.user().permission().value(),
-                                employee.user().userId(),
-                                employee.user().username(),
-                                employee.user().email()),
-                        new EmployeePersonalData(
-                                employee.name(),
-                                employee.surname(),
-                                employee.position(),
-                                employee.salary())))
-                .collect(Collectors.toList());
-        return new SuccessResponse<>(employees);
+        try {
+            final var employees = userService
+                    .getEmployees()
+                    .stream()
+                    .map(employee -> new EmployeeResponse(
+                            new UserResponse(
+                                    employee.user().permission().value(),
+                                    employee.user().userId(),
+                                    employee.user().username(),
+                                    employee.user().email()),
+                            new EmployeePersonalData(
+                                    employee.name(),
+                                    employee.surname(),
+                                    employee.position(),
+                                    employee.salary())))
+                    .collect(Collectors.toList());
+
+            return new SuccessResponse<>(employees);
+        }
+        catch (SQLException sqlException){
+            String exceptionMessage = "Cannot get employees.";
+            throw new RestException(exceptionMessage);
+        }
     }
 
     @GetMapping("/customer")
@@ -109,31 +127,37 @@ public class AdminController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        final var customers = userService
-                .getCustomers()
-                .stream()
-                .map(customer -> new CustomerResponse(
-                        new UserResponse(
-                                customer.user().permission().value(),
-                                customer.user().userId(),
-                                customer.user().username(),
-                                customer.user().email()),
-                        new CustomerPersonalData(
-                                customer.name(),
-                                customer.surname(),
-                                customer.phoneNumber(),
-                                customer.firmName(),
-                                customer.taxId()),
-                        new Address(
-                                customer.address().addressId(),
-                                customer.address().country(),
-                                customer.address().town(),
-                                customer.address().postalCode(),
-                                customer.address().buildingNumber(),
-                                customer.address().street(),
-                                customer.address().apartmentNumber())))
-                .collect(Collectors.toList());
-        return new SuccessResponse<>(customers);
+        try{
+            final var customers = userService
+                    .getCustomers()
+                    .stream()
+                    .map(customer -> new CustomerResponse(
+                            new UserResponse(
+                                    customer.user().permission().value(),
+                                    customer.user().userId(),
+                                    customer.user().username(),
+                                    customer.user().email()),
+                            new CustomerPersonalData(
+                                    customer.name(),
+                                    customer.surname(),
+                                    customer.phoneNumber(),
+                                    customer.firmName(),
+                                    customer.taxId()),
+                            new Address(
+                                    customer.address().addressId(),
+                                    customer.address().country(),
+                                    customer.address().town(),
+                                    customer.address().postalCode(),
+                                    customer.address().buildingNumber(),
+                                    customer.address().street(),
+                                    customer.address().apartmentNumber())))
+                    .collect(Collectors.toList());
+            return new SuccessResponse<>(customers);
+        }
+        catch(SQLException sqlException) {
+            String exceptionMessage = "Cannot get customers.";
+            throw new RestException(exceptionMessage);
+        }
     }
 
     @PostMapping("/employee")

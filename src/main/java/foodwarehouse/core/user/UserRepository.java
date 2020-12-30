@@ -4,6 +4,7 @@ import foodwarehouse.core.user.customer.Customer;
 import foodwarehouse.core.address.Address;
 import foodwarehouse.core.user.employee.Employee;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,16 +34,16 @@ public interface UserRepository {
 
     boolean checkConnection();
 
-    List<User> findAllUsers();
-    Optional<User> findUserById(int userId);
+    List<User> findAllUsers() throws SQLException;
+    Optional<User> findUserById(int userId) throws SQLException;
 
-    List<Employee> findAllEmployees();
+    List<Employee> findAllEmployees() throws SQLException;
 
-    List<Customer> findAllCustomers();
+    List<Customer> findAllCustomers() throws SQLException;
 
-    Optional<Address> findAddressById(int addressId);
+    Optional<Address> findAddressById(int addressId) throws SQLException;
 
-    Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email) throws SQLException;
 
-    Optional<User> findUserByUsername(String username);
+    Optional<User> findUserByUsername(String username) throws SQLException;
 }

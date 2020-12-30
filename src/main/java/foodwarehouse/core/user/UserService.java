@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import foodwarehouse.core.address.Address;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,23 +22,23 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public List<User> getUsers() {
+    public List<User> getUsers() throws SQLException {
         return userRepository.findAllUsers();
     }
 
-    public Optional<User> getUserById(int userId) {
+    public Optional<User> getUserById(int userId) throws SQLException {
         return userRepository.findUserById(userId);
     }
 
-    public List<Employee> getEmployees() {
+    public List<Employee> getEmployees() throws SQLException {
         return userRepository.findAllEmployees();
     }
 
-    public List<Customer> getCustomers() {
+    public List<Customer> getCustomers() throws SQLException {
         return userRepository.findAllCustomers();
     }
 
-    public Optional<Address> getAddressById(int addressId) {
+    public Optional<Address> getAddressById(int addressId) throws SQLException {
         return userRepository.findAddressById(addressId);
     }
 
@@ -90,11 +91,11 @@ public class UserService {
         return userRepository.checkConnection();
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) throws SQLException {
         return userRepository.findUserByUsername(username);
     }
 
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) throws SQLException {
         return userRepository.findUserByEmail(email);
     }
 }

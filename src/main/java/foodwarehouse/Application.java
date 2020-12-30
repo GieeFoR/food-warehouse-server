@@ -33,7 +33,6 @@ public class Application {
         dataSource.setUrl("jdbc:mysql://localhost:3306/foodwarehouse?serverTimezone=Europe/Warsaw");
         dataSource.setUsername("foodwarehouse");
         dataSource.setPassword("pass");
-
         return dataSource;
     }
 

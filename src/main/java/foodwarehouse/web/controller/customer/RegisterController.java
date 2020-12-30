@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 @RestController
@@ -40,8 +41,13 @@ public class RegisterController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
-        return new SuccessResponse<>(new CheckUsernameResponse(exists));
+        try {
+            boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
+            return new SuccessResponse<>(new CheckUsernameResponse(exists));
+        }
+        catch (SQLException sqlException) {
+            throw new RestException("Unable to username.");
+        }
     }
 
     //check if email is not used
@@ -54,8 +60,13 @@ public class RegisterController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
-        return new SuccessResponse<>(new CheckEmailResponse(exists));
+        try {
+            boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
+            return new SuccessResponse<>(new CheckEmailResponse(exists));
+        }
+        catch (SQLException sqlException) {
+            throw new RestException("Unable to check email.");
+        }
     }
 
     //register user function
