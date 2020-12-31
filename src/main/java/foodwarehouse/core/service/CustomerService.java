@@ -21,7 +21,7 @@ public class CustomerService implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
+    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
         return customerRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 

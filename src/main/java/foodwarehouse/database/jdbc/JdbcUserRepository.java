@@ -1,33 +1,22 @@
 package foodwarehouse.database.jdbc;
 
-import foodwarehouse.database.rowmappers.AddressResultSetMapper;
-import foodwarehouse.database.rowmappers.CustomerResultSetMapper;
-import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
 import foodwarehouse.database.rowmappers.UserResultSetMapper;
-import foodwarehouse.database.tables.AddressTable;
-import foodwarehouse.database.tables.CustomerTable;
-import foodwarehouse.database.tables.EmployeeTable;
 import foodwarehouse.database.tables.UserTable;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.data.user.UserRepository;
-import foodwarehouse.core.data.customer.Customer;
-import foodwarehouse.core.data.employee.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import foodwarehouse.core.data.address.Address;
 
 import javax.sql.DataSource;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
 
 @Repository
 public class JdbcUserRepository implements UserRepository {
+
+    private final String procedureInsertUser = "CALL `INSERT_USER`(?,?,?,?,?)";
 
     private final String procedureReadUsers = "CALL `GET_USERS`()";
     private final String procedureReadUserById = "CALL `GET_USER_BY_ID`(?)";
@@ -44,52 +33,33 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> createUser(String username, String password, String email, Permission permission) {
-        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?)",
-                UserTable.NAME,
-                UserTable.Columns.USERNAME,
-                UserTable.Columns.PASSWORD,
-                UserTable.Columns.PERMISSION,
-                UserTable.Columns.EMAIL);
-        try {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection
-                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, username);
-                ps.setString(2, password);
-                ps.setString(3, permission.value());
-                ps.setString(4, email);
-                return ps;
-            }, keyHolder);
+    public Optional<User> createUser(String username, String password, String email, Permission permission) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureInsertUser);
+        callableStatement.setString(1, username);
+        callableStatement.setString(2, password);
+        callableStatement.setString(3, permission.value());
+        callableStatement.setString(4, email);
 
-            BigInteger biguid = (BigInteger) keyHolder.getKey();
-            int userId = biguid.intValue();
-            return Optional.of(new User(userId, username, password, email, permission));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        callableStatement.executeQuery();
+        int userId = callableStatement.getInt(5);
+
+        return Optional.of(new User(userId, username, password, email, permission));
     }
 
     @Override
-    public boolean updateUser(int userId, String username, String password, String email, Permission permission) {
-        String query = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
+    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
+        String update = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
                 UserTable.NAME,
                 UserTable.Columns.USERNAME,
                 UserTable.Columns.PASSWORD,
-                UserTable.Columns.PERMISSION,
                 UserTable.Columns.EMAIL,
+                UserTable.Columns.PERMISSION,
                 UserTable.Columns.USER_ID);
 
         Object[] args = new Object[] {username, password, email, permission.value(), userId};
-        int update = jdbcTemplate.update(query, args);
+        jdbcTemplate.update(update, args);
 
-        if(update == 1) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return Optional.of(new User(userId, username, password, email, permission));
     }
 
     @Override

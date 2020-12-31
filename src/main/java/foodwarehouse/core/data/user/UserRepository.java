@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    Optional<User> createUser(String username, String email, String password, Permission permission);
+    Optional<User> createUser(String username, String email, String password, Permission permission) throws SQLException;
 
-    boolean updateUser(int userId, String username, String password, String email, Permission permission);
+    Optional<User> updateUser(int userId, String username, String password, String email, Permission permission);
 
     boolean deleteUser(User user);
 

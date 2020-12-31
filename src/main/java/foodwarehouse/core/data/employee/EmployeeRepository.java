@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface EmployeeRepository {
 
-    Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary);
+    Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) throws SQLException;
 
-    boolean updateEmployee(Employee employee, User user, String name, String surname, String position, Float salary);
+    Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary);
 
     List<Employee> findAllEmployees() throws SQLException;
 

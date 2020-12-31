@@ -30,10 +30,9 @@ public class JdbcAddressRepository implements AddressRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
     @Override
     public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
-        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
+        String insert = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
                 AddressTable.NAME,
                 AddressTable.Columns.COUNTRY,
                 AddressTable.Columns.TOWN,
@@ -45,7 +44,7 @@ public class JdbcAddressRepository implements AddressRepository {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection
-                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                        .prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, country);
                 ps.setString(2, town);
                 ps.setString(3, postalCode);

@@ -30,13 +30,14 @@ public class UserService {
         return userRepository.findUserById(userId);
     }
 
-    public Optional<User> createUser(String username, String password, String email, Permission permission) {
+    public Optional<User> createUser(String username, String password, String email, Permission permission) throws SQLException {
         String encryptedPassword = bCryptPasswordEncoder.encode(password);
         return userRepository.createUser(username, encryptedPassword, email, permission);
     }
 
-    public boolean updateUser(int userId, String username, String password, String email, Permission permission) {
-        return userRepository.updateUser(userId, username, password, email, permission);
+    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
+        String encryptedPassword = bCryptPasswordEncoder.encode(password);
+        return userRepository.updateUser(userId, username, encryptedPassword, email, permission);
     }
 
     public boolean deleteUser(User user) {

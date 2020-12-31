@@ -83,7 +83,7 @@ public class RegisterController {
 
     //register user function
     @RequestMapping("/register")
-    public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
+    public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -92,26 +92,25 @@ public class RegisterController {
         }
 
         //add user to database
-        Optional<User> user = userService.createUser(
-                createCustomerRequest.account().username(),
-                createCustomerRequest.account().password(),
-                createCustomerRequest.account().email(),
-                Permission.CUSTOMER);
-
-        //when user was not added to database
-        if(user.isEmpty()) {
-            //response error
+        Optional<User> user;
+        try {
+            user = userService.createUser(
+                    request.account().username(),
+                    request.account().password(),
+                    request.account().email(),
+                    Permission.CUSTOMER);
+        } catch (SQLException sqlException) {
             throw new RestException("Unable to create a new user.");
         }
 
         //add address to database
         Optional <Address> address = addressService.createAddress(
-                createCustomerRequest.address().country(),
-                createCustomerRequest.address().town(),
-                createCustomerRequest.address().postalCode(),
-                createCustomerRequest.address().buildingNumber(),
-                createCustomerRequest.address().street(),
-                createCustomerRequest.address().apartmentNumber());
+                request.address().country(),
+                request.address().town(),
+                request.address().postalCode(),
+                request.address().buildingNumber(),
+                request.address().street(),
+                request.address().apartmentNumber());
 
         //when address was not added to database
         if(address.isEmpty()) {
@@ -123,22 +122,21 @@ public class RegisterController {
         }
 
         //add customer to database
-        Optional <Customer> customer = customerService.createCustomer(
-                user.get(),
-                address.get(),
-                createCustomerRequest.customerPersonalData().name(),
-                createCustomerRequest.customerPersonalData().surname(),
-                createCustomerRequest.customerPersonalData().firmName(),
-                createCustomerRequest.customerPersonalData().phoneNumber(),
-                createCustomerRequest.customerPersonalData().tax_id());
-
-        //when customer was not added to database
-        if(customer.isEmpty()) {
+        Optional <Customer> customer = null;
+        try {
+            customer = customerService.createCustomer(
+                    user.get(),
+                    address.get(),
+                    request.customerPersonalData().name(),
+                    request.customerPersonalData().surname(),
+                    request.customerPersonalData().firmName(),
+                    request.customerPersonalData().phoneNumber(),
+                    request.customerPersonalData().tax_id());
+        } catch (SQLException sqlException) {
             //delete user from database
             userService.deleteUser(user.get());
             //delete address from database
             addressService.deleteAddress(address.get());
-            //response error
             throw new RestException("Unable to create a new customer.");
         }
 

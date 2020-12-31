@@ -8,12 +8,9 @@ import foodwarehouse.database.rowmappers.CustomerResultSetMapper;
 import foodwarehouse.database.tables.CustomerTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +18,8 @@ import java.util.Optional;
 
 @Repository
 public class JdbcCustomerRepository implements CustomerRepository {
+
+    private final String procedureInsertCustomer = "CALL `INSERT_CUSTOMER`(?,?,?,?,?,?,?,?)";
 
     private final String procedureReadCustomers = "CALL `GET_CUSTOMERS`()";
     private final String procedureReadCustomerById = "CALL `GET_CUSTOMER_BY_ID`(?)";
@@ -36,37 +35,20 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
 
     @Override
-    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
-        String query = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?,?)",
-                CustomerTable.NAME,
-                CustomerTable.Columns.USER_ID,
-                CustomerTable.Columns.ADDRESS_ID,
-                CustomerTable.Columns.NAME,
-                CustomerTable.Columns.SURNAME,
-                CustomerTable.Columns.FIRMNAME,
-                CustomerTable.Columns.PHONE,
-                CustomerTable.Columns.TAX);
-        try {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection
-                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                ps.setInt(1, user.userId());
-                ps.setInt(2, address.addressId());
-                ps.setString(3, name);
-                ps.setString(4, surname);
-                ps.setString(5, firmName);
-                ps.setString(6, phoneNumber);
-                ps.setString(7, taxId);
-                return ps;
-            }, keyHolder);
+    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureInsertCustomer);
+        callableStatement.setInt(1, user.userId());
+        callableStatement.setInt(2, address.addressId());
+        callableStatement.setString(3, name);
+        callableStatement.setString(4, surname);
+        callableStatement.setString(5, firmName);
+        callableStatement.setString(6, phoneNumber);
+        callableStatement.setString(7, taxId);
 
-            BigInteger biguid = (BigInteger) keyHolder.getKey();
-            int customerId = biguid.intValue();
-            return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, 0));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        callableStatement.executeQuery();
+        int customerId = callableStatement.getInt(8);
+
+        return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, 0));
     }
 
     @Override
