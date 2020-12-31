@@ -1,7 +1,7 @@
 package foodwarehouse.web.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import foodwarehouse.core.user.employee.EmployeePersonalData;
+import foodwarehouse.core.data.employee.EmployeePersonalData;
 
 public record EmployeeResponse (
         @JsonProperty("account") UserResponse userResponse,

@@ -1,10 +1,13 @@
 package foodwarehouse.web.controller.customer;
 
-import foodwarehouse.core.address.Address;
-import foodwarehouse.core.user.Permission;
-import foodwarehouse.core.user.User;
-import foodwarehouse.core.user.UserService;
-import foodwarehouse.core.user.customer.Customer;
+import foodwarehouse.core.data.address.Address;
+import foodwarehouse.core.data.user.Permission;
+import foodwarehouse.core.data.user.User;
+import foodwarehouse.core.service.AddressService;
+import foodwarehouse.core.service.ConnectionService;
+import foodwarehouse.core.service.CustomerService;
+import foodwarehouse.core.service.UserService;
+import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
@@ -26,23 +29,32 @@ import java.util.Optional;
 public class RegisterController {
 
     private final UserService userService;
+    private final CustomerService customerService;
+    private final AddressService addressService;
+    private final ConnectionService connectionService;
 
-    public RegisterController(UserService userService) {
+    public RegisterController(UserService userService,
+                              CustomerService customerService,
+                              AddressService addressService,
+                              ConnectionService connectionService) {
         this.userService = userService;
+        this.customerService = customerService;
+        this.addressService = addressService;
+        this.connectionService = connectionService;
     }
 
     //check if username is not used
     @PostMapping("/register/username")
     public SuccessResponse<CheckUsernameResponse> checkUsername(@RequestBody CheckUsernameRequest loginUsername) {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
 
         try {
-            boolean exists = userService.findByUsername(loginUsername.username()).isPresent();
+            boolean exists = userService.findUserByUsername(loginUsername.username()).isPresent();
             return new SuccessResponse<>(new CheckUsernameResponse(exists));
         }
         catch (SQLException sqlException) {
@@ -54,14 +66,14 @@ public class RegisterController {
     @PostMapping("/register/email")
     public SuccessResponse<CheckEmailResponse> checkEmail(@RequestBody CheckEmailRequest loginEmail) {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
 
         try {
-            boolean exists = userService.findByEmail(loginEmail.email()).isPresent();
+            boolean exists = userService.findUserByEmail(loginEmail.email()).isPresent();
             return new SuccessResponse<>(new CheckEmailResponse(exists));
         }
         catch (SQLException sqlException) {
@@ -73,7 +85,7 @@ public class RegisterController {
     @RequestMapping("/register")
     public SuccessResponse<RegistrationResponse> register(@RequestBody CreateCustomerRequest createCustomerRequest) {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
@@ -93,7 +105,7 @@ public class RegisterController {
         }
 
         //add address to database
-        Optional <Address> address = userService.createAddress(
+        Optional <Address> address = addressService.createAddress(
                 createCustomerRequest.address().country(),
                 createCustomerRequest.address().town(),
                 createCustomerRequest.address().postalCode(),
@@ -111,7 +123,7 @@ public class RegisterController {
         }
 
         //add customer to database
-        Optional <Customer> customer = userService.createCustomer(
+        Optional <Customer> customer = customerService.createCustomer(
                 user.get(),
                 address.get(),
                 createCustomerRequest.customerPersonalData().name(),
@@ -125,7 +137,7 @@ public class RegisterController {
             //delete user from database
             userService.deleteUser(user.get());
             //delete address from database
-            userService.deleteAddress(address.get());
+            addressService.deleteAddress(address.get());
             //response error
             throw new RestException("Unable to create a new customer.");
         }

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import foodwarehouse.core.user.UserRepository;
+import foodwarehouse.core.data.user.UserRepository;
 
 import java.sql.SQLException;
 import java.util.List;

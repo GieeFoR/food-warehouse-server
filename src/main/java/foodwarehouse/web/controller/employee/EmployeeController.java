@@ -1,7 +1,6 @@
 package foodwarehouse.web.controller.employee;
 
-import foodwarehouse.core.user.UserService;
-import org.springframework.security.access.prepost.PreAuthorize;
+import foodwarehouse.core.service.UserService;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

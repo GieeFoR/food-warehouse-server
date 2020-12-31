@@ -1,12 +1,15 @@
 package foodwarehouse.web.controller.admin;
 
-import foodwarehouse.core.address.Address;
-import foodwarehouse.core.user.Permission;
-import foodwarehouse.core.user.User;
-import foodwarehouse.core.user.UserService;
-import foodwarehouse.core.user.customer.CustomerPersonalData;
-import foodwarehouse.core.user.employee.Employee;
-import foodwarehouse.core.user.employee.EmployeePersonalData;
+import foodwarehouse.core.data.address.Address;
+import foodwarehouse.core.data.user.Permission;
+import foodwarehouse.core.data.user.User;
+import foodwarehouse.core.data.customer.CustomerPersonalData;
+import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.core.data.employee.EmployeePersonalData;
+import foodwarehouse.core.service.ConnectionService;
+import foodwarehouse.core.service.CustomerService;
+import foodwarehouse.core.service.EmployeeService;
+import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
@@ -24,16 +27,25 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final UserService userService;
+    private final CustomerService customerService;
+    private final EmployeeService employeeService;
+    private final ConnectionService connectionService;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService,
+                           CustomerService customerService,
+                           EmployeeService employeeService,
+                           ConnectionService connectionService) {
         this.userService = userService;
+        this.customerService = customerService;
+        this.employeeService = employeeService;
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<UserResponse>> getUsers() {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
@@ -41,7 +53,7 @@ public class AdminController {
 
         try {
             final var users = userService
-                    .getUsers()
+                    .findAllUsers()
                     .stream()
                     .map(user -> new UserResponse(user.permission().value(), user.userId(), user.username(), user.email()))
                     .collect(Collectors.toList());
@@ -57,7 +69,7 @@ public class AdminController {
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<UserResponse> getUserById(@PathVariable String id) {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
@@ -66,7 +78,7 @@ public class AdminController {
         try {
             //get user from database with {id}
             final var user = userService
-                    .getUserById(Integer.parseInt(id))
+                    .findUserById(Integer.parseInt(id))
                     .map(u -> new UserResponse(u.permission().value(), u.userId(), u.username(), u.email()))
                     .orElseThrow(() -> new RestException("There is no user with this ID."));
 
@@ -86,15 +98,15 @@ public class AdminController {
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<EmployeeResponse>> getEmployees() {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
 
         try {
-            final var employees = userService
-                    .getEmployees()
+            final var employees = employeeService
+                    .findAllEmployees()
                     .stream()
                     .map(employee -> new EmployeeResponse(
                             new UserResponse(
@@ -121,15 +133,15 @@ public class AdminController {
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<CustomerResponse>> getCustomers() {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
 
         try{
-            final var customers = userService
-                    .getCustomers()
+            final var customers = customerService
+                    .findAllCustomers()
                     .stream()
                     .map(customer -> new CustomerResponse(
                             new UserResponse(
@@ -164,7 +176,7 @@ public class AdminController {
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<UserResponse> createEmployee(@RequestBody EmployeeRequest request) {
         //check if database is reachable
-        if(!userService.checkConnection()) {
+        if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
@@ -192,7 +204,7 @@ public class AdminController {
         }
 
         //add employee to database
-        Optional <Employee> employee = userService.createEmployee(
+        Optional <Employee> employee = employeeService.createEmployee(
                 user.get(),
                 request.employeePersonalData().name(),
                 request.employeePersonalData().surname(),
