@@ -18,6 +18,8 @@ public class JdbcUserRepository implements UserRepository {
 
     private final String procedureInsertUser = "CALL `INSERT_USER`(?,?,?,?,?)";
 
+    private final String procedureUpdateUser = "CALL `UPDATE_USER`(?,?,?,?,?)";
+
     private final String procedureReadUsers = "CALL `GET_USERS`()";
     private final String procedureReadUserById = "CALL `GET_USER_BY_ID`(?)";
     private final String procedureReadUserByUsername = "CALL `GET_USER_BY_USERNAME`(?)";
@@ -47,17 +49,15 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
-        String update = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
-                UserTable.NAME,
-                UserTable.Columns.USERNAME,
-                UserTable.Columns.PASSWORD,
-                UserTable.Columns.EMAIL,
-                UserTable.Columns.PERMISSION,
-                UserTable.Columns.USER_ID);
+    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureUpdateUser);
+        callableStatement.setInt(1, userId);
+        callableStatement.setString(2, username);
+        callableStatement.setString(3, password);
+        callableStatement.setString(4, permission.value());
+        callableStatement.setString(5, email);
 
-        Object[] args = new Object[] {username, password, email, permission.value(), userId};
-        jdbcTemplate.update(update, args);
+        callableStatement.executeQuery();
 
         return Optional.of(new User(userId, username, password, email, permission));
     }

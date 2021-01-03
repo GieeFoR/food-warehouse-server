@@ -17,12 +17,12 @@ public class AddressService implements AddressRepository {
         this.addressRepository = addressRepository;
     }
 
-    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
+    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
         return addressRepository.createAddress(country, town, postalCode, buildingNumber, street, apartmentNumber);
     }
 
-    public boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
-        return addressRepository.updateAddress(address, country, town, postalCode, buildingNumber, street, apartmentNumber);
+    public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
+        return addressRepository.updateAddress(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber);
     }
 
     public boolean deleteAddress(Address address) {

@@ -4,7 +4,6 @@ import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.employee.EmployeeRepository;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
-import foodwarehouse.database.tables.EmployeeTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,16 +19,18 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     private final String procedureInsertEmployee = "CALL `INSERT_EMPLOYEE`(?,?,?,?,?,?)";
 
+    private final String procedureUpdateEmployee = "CALL `UPDATE_EMPLOYEE`(?,?,?,?,?)";
+
+    private final String procedureDeleteEmployee = "CALL `DELETE_EMPLOYEE`()";
+
     private final String procedureReadEmploees = "CALL `GET_EMPLOYEES`()";
     private final String procedureReadEmploeeById = "CALL `GET_EMPLOYEE_BY_ID`(?)";
 
     private final Connection connection;
-    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     JdbcEmployeeRepository(DataSource dataSource) throws SQLException {
         this.connection = dataSource.getConnection();
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
 
@@ -49,19 +50,26 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     }
 
     @Override
-    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) {
-        String update = String.format("UPDATE `%s` SET `%s` = ?, `%s` = ?, `%s` = ?, `%s` = ? WHERE `%s` = ?",
-                EmployeeTable.NAME,
-                EmployeeTable.Columns.NAME,
-                EmployeeTable.Columns.SURNAME,
-                EmployeeTable.Columns.POSITION,
-                EmployeeTable.Columns.SALARY,
-                EmployeeTable.Columns.EMPLOYEE_ID);
+    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureUpdateEmployee);
+        callableStatement.setInt(1, employeeId);
+        callableStatement.setString(2, name);
+        callableStatement.setString(3, surname);
+        callableStatement.setString(4, position);
+        callableStatement.setFloat(5, salary);
 
-        Object[] args = new Object[] {name, surname, position, salary, employeeId};
-        jdbcTemplate.update(update, args);
+        callableStatement.executeQuery();
 
         return Optional.of(new Employee(employeeId, user, name, surname, position, salary));
+    }
+
+    @Override
+    public boolean deleteEmployee(int employeeId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureDeleteEmployee);
+        callableStatement.setInt(1, employeeId);
+
+        callableStatement.executeQuery();
+        return true;
     }
 
     @Override
@@ -73,5 +81,14 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
             employees.add(new EmployeeResultSetMapper().resultSetMap(resultSet));
         }
         return employees;
+    }
+
+    @Override
+    public Optional<Employee> findEmployee(int employeeId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureReadEmploeeById);
+        callableStatement.setInt(1, employeeId);
+
+        ResultSet rs = callableStatement.executeQuery();
+        return Optional.ofNullable(new EmployeeResultSetMapper().resultSetMap(rs));
     }
 }

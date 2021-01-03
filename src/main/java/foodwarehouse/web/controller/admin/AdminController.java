@@ -4,7 +4,6 @@ import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
-import foodwarehouse.core.data.customer.CustomerPersonalData;
 import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.employee.EmployeePersonalData;
 import foodwarehouse.core.service.*;
@@ -146,21 +145,20 @@ public class AdminController {
         }
 
         //add address to database
-        Optional <Address> address = addressService.createAddress(
-                request.address().country(),
-                request.address().town(),
-                request.address().postalCode(),
-                request.address().buildingNumber(),
-                request.address().street(),
-                request.address().apartmentNumber());
-
-        //when address was not added to database
-        if(address.isEmpty()) {
+        Optional <Address> address;
+        try {
+            address = addressService.createAddress(
+                    request.address().country(),
+                    request.address().town(),
+                    request.address().postalCode(),
+                    request.address().buildingNumber(),
+                    request.address().street(),
+                    request.address().apartmentNumber());
+        } catch (SQLException sqlException) {
             //delete user from database
             userService.deleteUser(user.get());
             //response error
             throw new RestException("Unable to create a new address.");
-
         }
 
         //add customer to database
@@ -180,6 +178,68 @@ public class AdminController {
             //delete address from database
             addressService.deleteAddress(address.get());
             throw new RestException("Unable to create a new customer.");
+        }
+
+        //response on success
+        return new SuccessResponse<>(
+                new CustomerResponse(
+                        User.toUserResponse(user.get()),
+                        Customer.toCustomerPersonalData(customer.get()),
+                        address.get()));
+    }
+
+    @PostMapping("/customer/update")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<CustomerResponse> updateCustomer(@RequestBody CreateCustomerRequest request) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        //add user to database
+        Optional<User> user;
+        try {
+            user = userService.updateUser(
+                    request.account().userId(),
+                    request.account().username(),
+                    request.account().password(),
+                    request.account().email(),
+                    Permission.CUSTOMER);
+        } catch (SQLException sqlException) {
+            throw new RestException("Unable to update a user.");
+        }
+
+        //add address to database
+        Optional <Address> address;
+        try {
+            address = addressService.updateAddress(
+                    request.address().addressId(),
+                    request.address().country(),
+                    request.address().town(),
+                    request.address().postalCode(),
+                    request.address().buildingNumber(),
+                    request.address().street(),
+                    request.address().apartmentNumber());
+        } catch (SQLException sqlException) {
+            throw new RestException("Unable to update an address.");
+        }
+
+        //add customer to database
+        Optional <Customer> customer;
+        try {
+            customer = customerService.updateCustomer(
+                    request.customerPersonalData().customerId(),
+                    user.get(),
+                    address.get(),
+                    request.customerPersonalData().name(),
+                    request.customerPersonalData().surname(),
+                    request.customerPersonalData().firmName(),
+                    request.customerPersonalData().phoneNumber(),
+                    request.customerPersonalData().tax_id());
+        } catch (SQLException sqlException) {
+            throw new RestException("Unable to update a customer.");
         }
 
         //response on success
@@ -305,46 +365,37 @@ public class AdminController {
         }
 
         //add user to database
-        Optional<User> user = userService.updateUser(
-                request.account().userId(),
-                request.account().username(),
-                request.account().password(),
-                request.account().email(),
-                Permission.from(request.account().permission()).get());
-
-        //when user was not added to database
-        if (user.isEmpty()) {
+        Optional<User> user;
+        try {
+            user = userService.updateUser(
+                    request.account().userId(),
+                    request.account().username(),
+                    request.account().password(),
+                    request.account().email(),
+                    Permission.from(request.account().permission()).get());
+        } catch (SQLException sqlException) {
             //response error
             throw new RestException("Unable to update an user.");
         }
 
         //add employee to database
-        Optional<Employee> employee = employeeService.updateEmployee(
-                request.employeePersonalData().employeeId(),
-                user.get(),
-                request.employeePersonalData().name(),
-                request.employeePersonalData().surname(),
-                request.employeePersonalData().position(),
-                request.employeePersonalData().salary());
-
-        //when employee was not added to database
-        if (employee.isEmpty()) {
+        Optional<Employee> employee;
+        try {
+            employee = employeeService.updateEmployee(
+                    request.employeePersonalData().employeeId(),
+                    user.get(),
+                    request.employeePersonalData().name(),
+                    request.employeePersonalData().surname(),
+                    request.employeePersonalData().position(),
+                    request.employeePersonalData().salary());
+        } catch (SQLException sqlException) {
             //response error
             throw new RestException("Unable to update an employee.");
         }
 
         return new SuccessResponse<>(
                 new EmployeeResponse(
-                        new UserResponse(
-                                employee.get().user().userId(),
-                                employee.get().user().username(),
-                                employee.get().user().email(),
-                                employee.get().user().permission().value()),
-                        new EmployeePersonalData(
-                                employee.get().employeeId(),
-                                employee.get().name(),
-                                employee.get().surname(),
-                                employee.get().position(),
-                                employee.get().salary())));
+                        User.toUserResponse(employee.get().user()),
+                        Employee.toEmployeePersonalData(employee.get())));
     }
 }

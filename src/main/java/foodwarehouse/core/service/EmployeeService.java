@@ -25,12 +25,22 @@ public class EmployeeService implements EmployeeRepository {
     }
 
     @Override
-    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) {
+    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) throws SQLException {
         return employeeRepository.updateEmployee(employeeId, user, name, surname, position, salary);
+    }
+
+    @Override
+    public boolean deleteEmployee(int employeeId) throws SQLException {
+        return employeeRepository.deleteEmployee(employeeId);
     }
 
     @Override
     public List<Employee> findAllEmployees() throws SQLException {
         return employeeRepository.findAllEmployees();
+    }
+
+    @Override
+    public Optional<Employee> findEmployee(int employeeId) throws SQLException {
+        return employeeRepository.findEmployee(employeeId);
     }
 }

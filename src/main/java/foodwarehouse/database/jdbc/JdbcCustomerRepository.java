@@ -21,6 +21,10 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
     private final String procedureInsertCustomer = "CALL `INSERT_CUSTOMER`(?,?,?,?,?,?,?,?)";
 
+    private final String procedureUpdateCustomer = "CALL `UPDATE_CUSTOMER`(?,?,?,?,?,?,?)";
+
+    private final String procedureDeleteCustomer = "CALL `DELETE_CUSTOMER`(?)";
+
     private final String procedureReadCustomers = "CALL `GET_CUSTOMERS`()";
     private final String procedureReadCustomerById = "CALL `GET_CUSTOMER_BY_ID`(?)";
 
@@ -52,23 +56,28 @@ public class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
-        return false;
+    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureUpdateCustomer);
+        callableStatement.setInt(1, customerId);
+        callableStatement.setString(2, name);
+        callableStatement.setString(3, surname);
+        callableStatement.setString(4, firmName);
+        callableStatement.setString(5, phoneNumber);
+        callableStatement.setString(6, taxId);
+
+        callableStatement.executeQuery();
+        Integer discount = callableStatement.getInt(7);
+
+        return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, discount));
     }
 
     @Override
-    public boolean deleteCustomer(Customer customer) {
-        String query = String.format("DELETE FROM `%s` WHERE `%s` = ?", CustomerTable.NAME, CustomerTable.Columns.CUSTOMER_ID);
-        Object[] args = new Object[] {customer.customerId()};
-        int delete = jdbcTemplate.update(query, args);
+    public boolean deleteCustomer(int customerId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureDeleteCustomer);
+        callableStatement.setInt(1, customerId);
 
-        if(delete == 1) {
-            //customer = null;
-            return true;
-        }
-        else {
-            return false;
-        }
+        callableStatement.executeQuery();
+        return true;
     }
 
     @Override

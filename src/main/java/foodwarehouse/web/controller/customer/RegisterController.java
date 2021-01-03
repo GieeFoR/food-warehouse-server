@@ -104,25 +104,24 @@ public class RegisterController {
         }
 
         //add address to database
-        Optional <Address> address = addressService.createAddress(
-                request.address().country(),
-                request.address().town(),
-                request.address().postalCode(),
-                request.address().buildingNumber(),
-                request.address().street(),
-                request.address().apartmentNumber());
-
-        //when address was not added to database
-        if(address.isEmpty()) {
+        Optional <Address> address;
+        try {
+            address = addressService.createAddress(
+                    request.address().country(),
+                    request.address().town(),
+                    request.address().postalCode(),
+                    request.address().buildingNumber(),
+                    request.address().street(),
+                    request.address().apartmentNumber());
+        } catch (SQLException sqlException) {
             //delete user from database
             userService.deleteUser(user.get());
             //response error
             throw new RestException("Unable to create a new address.");
-
         }
 
         //add customer to database
-        Optional <Customer> customer = null;
+        Optional <Customer> customer;
         try {
             customer = customerService.createCustomer(
                     user.get(),

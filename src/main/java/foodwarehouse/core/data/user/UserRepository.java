@@ -8,7 +8,7 @@ public interface UserRepository {
 
     Optional<User> createUser(String username, String email, String password, Permission permission) throws SQLException;
 
-    Optional<User> updateUser(int userId, String username, String password, String email, Permission permission);
+    Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException;
 
     boolean deleteUser(User user);
 

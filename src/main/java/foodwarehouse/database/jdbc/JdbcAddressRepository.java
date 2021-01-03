@@ -6,17 +6,18 @@ import foodwarehouse.database.rowmappers.AddressResultSetMapper;
 import foodwarehouse.database.tables.AddressTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.Optional;
 
 @Repository
 public class JdbcAddressRepository implements AddressRepository {
+
+    private final String procedureInsertAddress = "CALL `INSERT_ADDRESS`(?,?,?,?,?,?,?)";
+
+    private final String procedureUpdateAddress = "CALL `UPDATE_ADDRESS`(?,?,?,?,?,?,?)";
 
     private final String procedureReadAddresses = "CALL `GET_ADDRESSES`()";
     private final String procedureReadAddressById = "CALL `GET_ADDRESS_BY_ID`(?)";
@@ -31,40 +32,35 @@ public class JdbcAddressRepository implements AddressRepository {
     }
 
     @Override
-    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
-        String insert = String.format("INSERT INTO `%s`(`%s`, `%s`, `%s`, `%s`, `%s`, `%s`) VALUES (?,?,?,?,?,?)",
-                AddressTable.NAME,
-                AddressTable.Columns.COUNTRY,
-                AddressTable.Columns.TOWN,
-                AddressTable.Columns.POSTAL_CODE,
-                AddressTable.Columns.BUILDING_NUMBER,
-                AddressTable.Columns.STREET,
-                AddressTable.Columns.APARTMENT_NUMBER);
-        try {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection
-                        .prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, country);
-                ps.setString(2, town);
-                ps.setString(3, postalCode);
-                ps.setString(4, buildingNumber);
-                ps.setString(5, street);
-                ps.setString(6, apartmentNumber);
-                return ps;
-            }, keyHolder);
+    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureInsertAddress);
+        callableStatement.setString(1, country);
+        callableStatement.setString(2, town);
+        callableStatement.setString(3, postalCode);
+        callableStatement.setString(4, buildingNumber);
+        callableStatement.setString(5, street);
+        callableStatement.setString(6, apartmentNumber);
 
-            BigInteger biguid = (BigInteger) keyHolder.getKey();
-            int addressId = biguid.intValue();
-            return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        callableStatement.executeQuery();
+        int addressId = callableStatement.getInt(7);
+
+        return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
     }
 
     @Override
-    public boolean updateAddress(Address address, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
-        return false;
+    public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall(procedureUpdateAddress);
+        callableStatement.setInt(1, addressId);
+        callableStatement.setString(2, country);
+        callableStatement.setString(3, town);
+        callableStatement.setString(4, postalCode);
+        callableStatement.setString(5, buildingNumber);
+        callableStatement.setString(6, street);
+        callableStatement.setString(7, apartmentNumber);
+
+        callableStatement.executeQuery();
+
+        return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
     }
 
     @Override

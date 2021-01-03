@@ -11,9 +11,9 @@ public interface CustomerRepository {
 
     Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException;
 
-    boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
+    Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException;
 
-    boolean deleteCustomer(Customer customer);
+    boolean deleteCustomer(int customerId) throws SQLException;
 
     List<Customer> findAllCustomers() throws SQLException;
 

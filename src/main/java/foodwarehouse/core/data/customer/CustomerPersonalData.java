@@ -3,7 +3,7 @@ package foodwarehouse.core.data.customer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record CustomerPersonalData(
-        @JsonProperty("customerId")     int customerId,
+        @JsonProperty("customer_id")    int customerId,
         @JsonProperty("name")           String name,
         @JsonProperty("surname")        String surname,
         @JsonProperty("phone_number")   String phoneNumber,

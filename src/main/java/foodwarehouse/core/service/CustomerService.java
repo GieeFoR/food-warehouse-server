@@ -25,22 +25,18 @@ public class CustomerService implements CustomerRepository {
         return customerRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-
     @Override
-    public boolean updateCustomer(Customer customer, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
-        return customerRepository.updateCustomer(customer, user, address, name, surname, firmName, phoneNumber, taxId);
+    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
+        return customerRepository.updateCustomer(customerId, user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-
     @Override
-    public boolean deleteCustomer(Customer customer) {
-        return customerRepository.deleteCustomer(customer);
+    public boolean deleteCustomer(int customerId) throws SQLException {
+        return customerRepository.deleteCustomer(customerId);
     }
-
 
     @Override
     public List<Customer> findAllCustomers() throws SQLException {
         return customerRepository.findAllCustomers();
     }
-
 }
