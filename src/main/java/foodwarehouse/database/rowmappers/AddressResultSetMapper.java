@@ -6,7 +6,7 @@ import foodwarehouse.database.tables.AddressTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AddressResultSetMapper implements ResultSetMapper<Address> {
+final public class AddressResultSetMapper implements ResultSetMapper<Address> {
     @Override
     public Address resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Address(

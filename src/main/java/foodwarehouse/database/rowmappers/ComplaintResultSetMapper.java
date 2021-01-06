@@ -6,7 +6,7 @@ import foodwarehouse.database.tables.ComplaintTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ComplaintResultSetMapper implements ResultSetMapper<Complaint> {
+final public class ComplaintResultSetMapper implements ResultSetMapper<Complaint> {
     @Override
     public Complaint resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Complaint(

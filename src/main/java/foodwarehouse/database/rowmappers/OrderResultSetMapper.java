@@ -6,8 +6,7 @@ import foodwarehouse.database.tables.OrderTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class OrderResultSetMapper implements ResultSetMapper<Order> {
-
+final public class OrderResultSetMapper implements ResultSetMapper<Order> {
     @Override
     public Order resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Order(

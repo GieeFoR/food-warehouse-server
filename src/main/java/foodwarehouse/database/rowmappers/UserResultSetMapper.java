@@ -7,8 +7,7 @@ import foodwarehouse.core.data.user.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserResultSetMapper implements ResultSetMapper<User> {
-
+final public class UserResultSetMapper implements ResultSetMapper<User> {
     @Override
     public User resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new User(

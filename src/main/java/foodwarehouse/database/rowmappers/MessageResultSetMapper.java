@@ -6,7 +6,7 @@ import foodwarehouse.database.tables.MessageTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MessageResultSetMapper implements ResultSetMapper<Message> {
+final public class MessageResultSetMapper implements ResultSetMapper<Message> {
     @Override
     public Message resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Message(

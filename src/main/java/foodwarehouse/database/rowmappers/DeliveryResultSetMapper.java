@@ -6,7 +6,7 @@ import foodwarehouse.database.tables.DeliveryTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DeliveryResultSetMapper implements ResultSetMapper<Delivery> {
+final public class DeliveryResultSetMapper implements ResultSetMapper<Delivery> {
 
     @Override
     public Delivery resultSetMap(ResultSet rs, String prefix) throws SQLException {

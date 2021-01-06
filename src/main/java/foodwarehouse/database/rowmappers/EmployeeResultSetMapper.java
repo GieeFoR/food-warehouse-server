@@ -2,12 +2,11 @@ package foodwarehouse.database.rowmappers;
 
 import foodwarehouse.database.tables.EmployeeTable;
 import foodwarehouse.core.data.employee.Employee;
-import foodwarehouse.database.tables.OrderTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class EmployeeResultSetMapper implements ResultSetMapper<Employee> {
+final public class EmployeeResultSetMapper implements ResultSetMapper<Employee> {
     @Override
     public Employee resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Employee(

@@ -6,7 +6,7 @@ import foodwarehouse.database.tables.CarTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CarResultSetMapper implements ResultSetMapper<Car> {
+final public class CarResultSetMapper implements ResultSetMapper<Car> {
     @Override
     public Car resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Car(
