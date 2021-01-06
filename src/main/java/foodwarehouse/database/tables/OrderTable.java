@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class OrderTable {
+final public class OrderTable {
     static final public String NAME = "ORDER";
 
     static final public class Columns {
@@ -13,6 +13,11 @@ public class OrderTable {
     }
 
     static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_ORDER`(?,?,?,?,?)";
 
+        static final public String UPDATE_STATE = "CALL `UPDATE_ORDER_STATE`(?,?)";
+
+        static final public String READ_ALL = "CALL `GET_ORDERS`()";
+        static final public String READ_BY_ID = "CALL `GET_ORDER_BY_ID`(?)";
     }
 }

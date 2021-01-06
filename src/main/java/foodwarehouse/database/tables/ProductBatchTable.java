@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class ProductBatchTable {
+final public class ProductBatchTable {
     static final public String NAME = "PRODUCT_BATCH";
 
     static final public class Columns {
@@ -13,6 +13,10 @@ public class ProductBatchTable {
     }
 
     static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_PRODUCT_BATCH`(?,?,?,?,?)";
 
+        static final public String UPDATE_EAT_BY_DATE = "CALL `UPDATE_PRODUCT_BATCH_EAT_BY_DATE`(?,?)";
+
+        static final public String READ_BY_ID = "CALL `GET_PRODUCT_BATCH_BY_PRODUCT_ID`(?)";
     }
 }

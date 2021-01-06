@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class ProductOrderTable {
+final public class ProductOrderTable {
     static final public String NAME = "PRODUCT_ORDER";
 
     static final public class Columns {
@@ -10,6 +10,6 @@ public class ProductOrderTable {
     }
 
     static final public class Procedures {
-
+        static final public String INSERT = "CALL `INSERT_PRODUCT_ORDER`(?,?,?)";
     }
 }

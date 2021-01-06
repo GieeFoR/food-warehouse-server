@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class MakerTable {
+final public class MakerTable {
     static final public String NAME = "MAKER";
 
     static final public class Columns {
@@ -12,6 +12,11 @@ public class MakerTable {
     }
 
     static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_MAKER`(?,?,?,?,?)";
 
+        static final public String UPDATE = "CALL `UPDATE_MAKER`(?,?,?,?)";
+
+        static final public String READ_ALL = "CALL `GET_MAKERS`()";
+        static final public String READ_BY_ID = "CALL `GET_MAKER_BY_ID`(?)";
     }
 }

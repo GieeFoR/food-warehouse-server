@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class DeliveryTable {
+final public class DeliveryTable {
     static final public String NAME = "DELIVERY";
 
     static final public class Columns {

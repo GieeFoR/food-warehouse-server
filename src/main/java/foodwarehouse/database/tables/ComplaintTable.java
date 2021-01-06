@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class ComplaintTable {
+final public class ComplaintTable {
     static final public String NAME = "COMPLAINT";
 
     static final public class Columns {

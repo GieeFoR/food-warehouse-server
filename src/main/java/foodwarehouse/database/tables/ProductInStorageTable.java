@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class ProductInStorageTable {
+final public class ProductInStorageTable {
     static final public String NAME = "PRODUCT_IN_STORAGE";
 
     static final public class Columns {
@@ -10,6 +10,6 @@ public class ProductInStorageTable {
     }
 
     static final public class Procedures {
-
+        static final public String INSERT = "CALL `INSERT_PRODUCT_IN_STORAGE`(?,?,?)";
     }
 }

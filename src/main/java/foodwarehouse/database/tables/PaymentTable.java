@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-public class PaymentTable {
+final public class PaymentTable {
     static final public String NAME = "PAYMENT";
 
     static final public class Columns {
@@ -11,6 +11,11 @@ public class PaymentTable {
     }
 
     static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_PAYMENT`(?,?,?)";
 
+        static final public String UPDATE = "CALL `UPDATE_PAYMENT`(?,?)";
+
+        static final public String READ_ALL = "CALL `GET_PAYMENTS`()";
+        static final public String READ_BY_ID = "CALL `GET_PAYMENT_BY_ID`(?)";
     }
 }
