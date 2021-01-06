@@ -8,4 +8,8 @@ public class ProductInStorageTable {
         static final public String STORAGE_ID = "STORAGE_ID";
         static final public String QUANTITY = "QUANTITY";
     }
+
+    static final public class Procedures {
+
+    }
 }

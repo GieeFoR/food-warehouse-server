@@ -12,4 +12,8 @@ public class ProductTable {
         static final public String BUY_PRICE = "BUY_PRICE";
         static final public String SEND_PRICE = "SEND_PRICE";
     }
+
+    static final public class Procedures {
+
+    }
 }

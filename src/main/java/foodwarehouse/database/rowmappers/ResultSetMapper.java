@@ -7,5 +7,5 @@ import java.sql.SQLException;
 
 public interface ResultSetMapper<T> {
     @Nullable
-    T resultSetMap(ResultSet rs) throws SQLException;
+    T resultSetMap(ResultSet rs, String prefix) throws SQLException;
 }

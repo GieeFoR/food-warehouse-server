@@ -4,8 +4,8 @@ import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.employee.EmployeeRepository;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
+import foodwarehouse.database.tables.EmployeeTable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -17,15 +17,6 @@ import java.util.Optional;
 @Repository
 public class JdbcEmployeeRepository implements EmployeeRepository {
 
-    private final String procedureInsertEmployee = "CALL `INSERT_EMPLOYEE`(?,?,?,?,?,?)";
-
-    private final String procedureUpdateEmployee = "CALL `UPDATE_EMPLOYEE`(?,?,?,?,?)";
-
-    private final String procedureDeleteEmployee = "CALL `DELETE_EMPLOYEE`()";
-
-    private final String procedureReadEmploees = "CALL `GET_EMPLOYEES`()";
-    private final String procedureReadEmploeeById = "CALL `GET_EMPLOYEE_BY_ID`(?)";
-
     private final Connection connection;
 
     @Autowired
@@ -36,7 +27,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     @Override
     public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureInsertEmployee);
+        CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.INSERT);
         callableStatement.setInt(1, user.userId());
         callableStatement.setString(2, name);
         callableStatement.setString(3, surname);
@@ -51,7 +42,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     @Override
     public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureUpdateEmployee);
+        CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.UPDATE);
         callableStatement.setInt(1, employeeId);
         callableStatement.setString(2, name);
         callableStatement.setString(3, surname);
@@ -65,7 +56,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     @Override
     public boolean deleteEmployee(int employeeId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureDeleteEmployee);
+        CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.DELETE);
         callableStatement.setInt(1, employeeId);
 
         callableStatement.executeQuery();
@@ -74,21 +65,21 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
 
     @Override
     public List<Employee> findAllEmployees() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadEmploees);
+        CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.READ_ALL);
         ResultSet resultSet = callableStatement.executeQuery();
         List<Employee> employees = new LinkedList<>();
         while(resultSet.next()) {
-            employees.add(new EmployeeResultSetMapper().resultSetMap(resultSet));
+            employees.add(new EmployeeResultSetMapper().resultSetMap(resultSet, ""));
         }
         return employees;
     }
 
     @Override
     public Optional<Employee> findEmployee(int employeeId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadEmploeeById);
+        CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.READ_BY_ID);
         callableStatement.setInt(1, employeeId);
 
         ResultSet rs = callableStatement.executeQuery();
-        return Optional.ofNullable(new EmployeeResultSetMapper().resultSetMap(rs));
+        return Optional.ofNullable(new EmployeeResultSetMapper().resultSetMap(rs, ""));
     }
 }

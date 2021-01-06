@@ -10,4 +10,8 @@ public class MakerTable {
         static final public String TELEPHONE_NO = "TELEPHONE_NO";
         static final public String E_MAIL = "E_MAIL";
     }
+
+    static final public class Procedures {
+
+    }
 }

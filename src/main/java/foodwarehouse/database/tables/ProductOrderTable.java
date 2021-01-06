@@ -8,4 +8,8 @@ public class ProductOrderTable {
         static final public String BATCH_ID = "BATCH_ID";
         static final public String QUANTITY = "QUANTITY";
     }
+
+    static final public class Procedures {
+
+    }
 }

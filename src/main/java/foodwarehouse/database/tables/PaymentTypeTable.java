@@ -7,4 +7,8 @@ public class PaymentTypeTable {
         static final public String TYPE_ID = "PAYMENT_TYPE_ID";
         static final public String TYPE = "PAYMENT_TYPE";
     }
+
+    static final public class Procedures {
+
+    }
 }

@@ -14,4 +14,15 @@ final public class CustomerTable {
         static final public String TAX = "TAX_ID";
         static final public String DISCOUNT = "DISCOUNT";
     }
+
+    static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_CUSTOMER`(?,?,?,?,?,?,?,?)";
+
+        static final public String UPDATE = "CALL `UPDATE_CUSTOMER`(?,?,?,?,?,?,?)";
+
+        static final public String DELETE = "CALL `DELETE_CUSTOMER`(?)";
+
+        static final public String READ_ALL = "CALL `GET_CUSTOMERS`()";
+        static final public String READ_BY_ID = "CALL `GET_CUSTOMER_BY_ID`(?)";
+    }
 }

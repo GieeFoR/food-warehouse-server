@@ -11,4 +11,8 @@ public class ProductBatchTable {
         static final public String DISCOUNT = "DISCOUNT";
         static final public String PACKAGES_QUANTITY = "PACKAGES_QUANTITY";
     }
+
+    static final public class Procedures {
+
+    }
 }

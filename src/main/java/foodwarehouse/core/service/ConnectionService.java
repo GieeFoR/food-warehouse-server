@@ -1,6 +1,6 @@
 package foodwarehouse.core.service;
 
-import foodwarehouse.database.jdbc.connection.ConnectionRepository;
+import foodwarehouse.database.jdbc.repos.ConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package foodwarehouse.database.tables;
 
-final public class Message {
+final public class MessageTable {
     static final public String NAME = "MESSAGE";
 
     static final public class Columns {
@@ -11,5 +11,9 @@ final public class Message {
         static final public String STATE = "MESSAGE_STATE";
         static final public String SEND_DATE = "SEND_DATE";
         static final public String READ_DATE = "READ_DATE";
+    }
+
+    static final public class Procedures {
+        static final public String READ_ALL = "CALL `GET_MESSAGES`()";
     }
 }

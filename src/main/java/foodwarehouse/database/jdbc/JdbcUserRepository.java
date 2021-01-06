@@ -16,15 +16,6 @@ import java.util.*;
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
-    private final String procedureInsertUser = "CALL `INSERT_USER`(?,?,?,?,?)";
-
-    private final String procedureUpdateUser = "CALL `UPDATE_USER`(?,?,?,?,?)";
-
-    private final String procedureReadUsers = "CALL `GET_USERS`()";
-    private final String procedureReadUserById = "CALL `GET_USER_BY_ID`(?)";
-    private final String procedureReadUserByUsername = "CALL `GET_USER_BY_USERNAME`(?)";
-    private final String procedureReadUserByEmail = "CALL `GET_USER_BY_EMAIL`(?)";
-
     private final Connection connection;
     private final JdbcTemplate jdbcTemplate;
 
@@ -36,7 +27,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> createUser(String username, String password, String email, Permission permission) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureInsertUser);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.INSERT);
         callableStatement.setString(1, username);
         callableStatement.setString(2, password);
         callableStatement.setString(3, permission.value());
@@ -50,7 +41,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureUpdateUser);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.UPDATE);
         callableStatement.setInt(1, userId);
         callableStatement.setString(2, username);
         callableStatement.setString(3, password);
@@ -79,23 +70,23 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public List<User> findAllUsers() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadUsers);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_ALL);
         ResultSet resultSet = callableStatement.executeQuery();
         List<User> users = new LinkedList<>();
         while(resultSet.next()) {
-            users.add(new UserResultSetMapper().resultSetMap(resultSet));
+            users.add(new UserResultSetMapper().resultSetMap(resultSet, ""));
         }
         return users;
     }
 
     @Override
     public Optional<User> findUserById(int userId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadUserById);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_ID);
         callableStatement.setInt(1, userId);
         ResultSet resultSet = callableStatement.executeQuery();
         User user = null;
         while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet);
+            user = new UserResultSetMapper().resultSetMap(resultSet, "");
         }
         Optional<User> optionalUser = Optional.ofNullable(user);
         return optionalUser;
@@ -103,12 +94,12 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findUserByUsername(String username) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadUserByUsername);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_USERNAME);
         callableStatement.setString(1, username);
         ResultSet resultSet = callableStatement.executeQuery();
         User user = null;
         while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet);
+            user = new UserResultSetMapper().resultSetMap(resultSet, "");
         }
         Optional<User> optionalUser = Optional.ofNullable(user);
         return optionalUser;
@@ -116,12 +107,12 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findUserByEmail(String email) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadUserByEmail);
+        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_EMAIL);
         callableStatement.setString(1, email);
         ResultSet resultSet = callableStatement.executeQuery();
         User user = null;
         while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet);
+            user = new UserResultSetMapper().resultSetMap(resultSet, "");
         }
         Optional<User> optionalUser = Optional.ofNullable(user);
         return optionalUser;

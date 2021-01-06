@@ -5,6 +5,7 @@ import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.storage.Storage;
 import foodwarehouse.core.data.storage.StorageRepository;
 import foodwarehouse.database.rowmappers.StorageResultSetMapper;
+import foodwarehouse.database.tables.StorageTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,15 +21,6 @@ import java.util.Optional;
 @Repository
 public class JdbcStorageRepository implements StorageRepository {
 
-    private final String procedureInsertStorage = "CALL `INSERT_STORAGE`(?,?,?,?,?,?)";
-
-    private final String procedureUpdateStorage = "CALL `UPDATE_STORAGE`(?,?,?,?)";
-
-    private final String procedureDeleteStorage = "CALL `DELETE_STORAGE`(?)";
-
-    private final String procedureReadStorages = "CALL `GET_STORAGES`()";
-    private final String procedureReadStorageById = "CALL `GET_STORAGE_BY_ID`(?)";
-
     private final Connection connection;
 
     @Autowired
@@ -39,7 +31,7 @@ public class JdbcStorageRepository implements StorageRepository {
 
     @Override
     public Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureInsertStorage);
+        CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.INSERT);
         callableStatement.setInt(1, address.addressId());
         callableStatement.setInt(2, manager.employeeId());
         callableStatement.setString(3, name);
@@ -54,7 +46,7 @@ public class JdbcStorageRepository implements StorageRepository {
 
     @Override
     public Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureUpdateStorage);
+        CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.UPDATE);
         callableStatement.setInt(1, storageId);
         callableStatement.setString(2, name);
         callableStatement.setInt(3, capacity);
@@ -66,7 +58,7 @@ public class JdbcStorageRepository implements StorageRepository {
 
     @Override
     public boolean deleteStorage(int storageId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureDeleteStorage);
+        CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.DELETE);
         callableStatement.setInt(1, storageId);
 
         callableStatement.executeQuery();
@@ -75,21 +67,22 @@ public class JdbcStorageRepository implements StorageRepository {
 
     @Override
     public List<Storage> findAllStorages() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadStorages);
+        CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_ALL);
         ResultSet resultSet = callableStatement.executeQuery();
         List<Storage> storages = new LinkedList<>();
         while(resultSet.next()) {
-            storages.add(new StorageResultSetMapper().resultSetMap(resultSet));
+            storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
         }
         return storages;
     }
 
     @Override
     public Optional<Storage> findStorage(int storageId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadStorageById);
+        CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_BY_ID);
         callableStatement.setInt(1, storageId);
 
         ResultSet resultSet = callableStatement.executeQuery();
-        return Optional.ofNullable(new StorageResultSetMapper().resultSetMap(resultSet));
+
+        return Optional.ofNullable(new StorageResultSetMapper().resultSetMap(resultSet, ""));
     }
 }

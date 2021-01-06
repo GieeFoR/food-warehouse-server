@@ -12,4 +12,10 @@ public class ComplaintTable {
         static final public String DECISION = "DECISION";
         static final public String DECISION_DATE = "DECISION_DATE";
     }
+
+    static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_COMPLAINT`(?,?,?)";
+
+        static final public String READ_BY_ID = "CALL `GET_COMPLAINT_BY_ID`(?)";
+    }
 }

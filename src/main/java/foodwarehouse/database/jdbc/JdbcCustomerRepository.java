@@ -19,15 +19,6 @@ import java.util.Optional;
 @Repository
 public class JdbcCustomerRepository implements CustomerRepository {
 
-    private final String procedureInsertCustomer = "CALL `INSERT_CUSTOMER`(?,?,?,?,?,?,?,?)";
-
-    private final String procedureUpdateCustomer = "CALL `UPDATE_CUSTOMER`(?,?,?,?,?,?,?)";
-
-    private final String procedureDeleteCustomer = "CALL `DELETE_CUSTOMER`(?)";
-
-    private final String procedureReadCustomers = "CALL `GET_CUSTOMERS`()";
-    private final String procedureReadCustomerById = "CALL `GET_CUSTOMER_BY_ID`(?)";
-
     private final Connection connection;
     private final JdbcTemplate jdbcTemplate;
 
@@ -37,10 +28,9 @@ public class JdbcCustomerRepository implements CustomerRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
     @Override
     public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureInsertCustomer);
+        CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.INSERT);
         callableStatement.setInt(1, user.userId());
         callableStatement.setInt(2, address.addressId());
         callableStatement.setString(3, name);
@@ -57,7 +47,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
     @Override
     public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureUpdateCustomer);
+        CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.UPDATE);
         callableStatement.setInt(1, customerId);
         callableStatement.setString(2, name);
         callableStatement.setString(3, surname);
@@ -73,7 +63,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
     @Override
     public boolean deleteCustomer(int customerId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureDeleteCustomer);
+        CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.DELETE);
         callableStatement.setInt(1, customerId);
 
         callableStatement.executeQuery();
@@ -82,11 +72,11 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
     @Override
     public List<Customer> findAllCustomers() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadCustomers);
+        CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_ALL);
         ResultSet resultSet = callableStatement.executeQuery();
         List<Customer> customers = new LinkedList<>();
         while(resultSet.next()) {
-            customers.add(new CustomerResultSetMapper().resultSetMap(resultSet));
+            customers.add(new CustomerResultSetMapper().resultSetMap(resultSet, ""));
         }
         return customers;
     }

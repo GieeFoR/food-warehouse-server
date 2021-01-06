@@ -16,5 +16,4 @@ public interface CustomerRepository {
     boolean deleteCustomer(int customerId) throws SQLException;
 
     List<Customer> findAllCustomers() throws SQLException;
-
 }

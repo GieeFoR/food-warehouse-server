@@ -11,4 +11,8 @@ public class OrderTable {
         static final public String COMMENT = "COMMENT";
         static final public String ORDER_STATE = "ORDER_STATE";
     }
+
+    static final public class Procedures {
+
+    }
 }

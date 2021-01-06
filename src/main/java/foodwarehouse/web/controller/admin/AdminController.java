@@ -29,17 +29,20 @@ public class AdminController {
     private final EmployeeService employeeService;
     private final ConnectionService connectionService;
     private final AddressService addressService;
+    private final MessageService messageService;
 
     public AdminController(UserService userService,
                            CustomerService customerService,
                            EmployeeService employeeService,
                            ConnectionService connectionService,
-                           AddressService addressService) {
+                           AddressService addressService,
+                           MessageService messageService) {
         this.userService = userService;
         this.customerService = customerService;
         this.employeeService = employeeService;
         this.connectionService = connectionService;
         this.addressService = addressService;
+        this.messageService = messageService;
     }
 
     @GetMapping("/users")
@@ -397,5 +400,41 @@ public class AdminController {
                 new EmployeeResponse(
                         User.toUserResponse(employee.get().user()),
                         Employee.toEmployeePersonalData(employee.get())));
+    }
+
+    @GetMapping("/message")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<List<MessageResponse>> getMessages() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        try {
+            final var messages = messageService
+                    .findAllMessages()
+                    .stream()
+                    .map(message -> new MessageResponse(
+                            message.messageId(),
+                            new EmployeeResponse(
+                                    User.toUserResponse(message.sender().user()),
+                                    Employee.toEmployeePersonalData(message.sender())),
+                            new EmployeeResponse(
+                                    User.toUserResponse(message.receiver().user()),
+                                    Employee.toEmployeePersonalData(message.receiver())),
+                            message.content(),
+                            message.state(),
+                            message.sendDate(),
+                            message.readDate()))
+                    .collect(Collectors.toList());
+
+            return new SuccessResponse<>(messages);
+        }
+        catch (SQLException sqlException){
+            String exceptionMessage = "Cannot get messages.";
+            throw new RestException(exceptionMessage);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package foodwarehouse.database.jdbc;
 
-import foodwarehouse.database.jdbc.connection.ConnectionRepository;
+import foodwarehouse.database.jdbc.repos.ConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 @Repository
 public class JdbcConnectionRepository implements ConnectionRepository {
@@ -16,7 +15,7 @@ public class JdbcConnectionRepository implements ConnectionRepository {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    JdbcConnectionRepository(DataSource dataSource) throws SQLException {
+    JdbcConnectionRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

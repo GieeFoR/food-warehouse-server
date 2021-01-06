@@ -1,4 +1,4 @@
-package foodwarehouse.database.jdbc.connection;
+package foodwarehouse.database.jdbc.repos;
 
 public interface ConnectionRepository {
 

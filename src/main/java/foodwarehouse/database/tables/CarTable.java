@@ -13,4 +13,15 @@ final public class CarTable {
         static final public String INSURANCE = "INSURANCE_EXP";
         static final public String INSPECTION = "INSPECTION_EXP";
     }
+
+    static final public class Procedures {
+        static final public String INSERT = "CALL `INSERT_CAR`(?,?,?,?,?,?,?,?)";
+
+        static final public String UPDATE = "CALL `UPDATE_CAR`(?,?,?,?,?,?,?)";
+
+        static final public String DELETE = "CALL `DELETE_CAR`(?)";
+
+        static final public String READ_ALL = "CALL `GET_CARS`()";
+        static final public String READ_BY_ID = "CALL `GET_CAR_BY_ID`(?)";
+    }
 }

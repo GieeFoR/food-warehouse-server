@@ -9,4 +9,8 @@ public class PaymentTable {
         static final public String VALUE = "PAYMENT_VALUE";
         static final public String STATE = "PAYMENT_STATE";
     }
+
+    static final public class Procedures {
+
+    }
 }

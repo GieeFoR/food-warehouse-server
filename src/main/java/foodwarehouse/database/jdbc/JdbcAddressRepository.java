@@ -15,13 +15,6 @@ import java.util.Optional;
 @Repository
 public class JdbcAddressRepository implements AddressRepository {
 
-    private final String procedureInsertAddress = "CALL `INSERT_ADDRESS`(?,?,?,?,?,?,?)";
-
-    private final String procedureUpdateAddress = "CALL `UPDATE_ADDRESS`(?,?,?,?,?,?,?)";
-
-    private final String procedureReadAddresses = "CALL `GET_ADDRESSES`()";
-    private final String procedureReadAddressById = "CALL `GET_ADDRESS_BY_ID`(?)";
-
     private final Connection connection;
     private final JdbcTemplate jdbcTemplate;
 
@@ -33,7 +26,7 @@ public class JdbcAddressRepository implements AddressRepository {
 
     @Override
     public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureInsertAddress);
+        CallableStatement callableStatement = connection.prepareCall(AddressTable.Procedures.INSERT);
         callableStatement.setString(1, country);
         callableStatement.setString(2, town);
         callableStatement.setString(3, postalCode);
@@ -49,7 +42,7 @@ public class JdbcAddressRepository implements AddressRepository {
 
     @Override
     public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureUpdateAddress);
+        CallableStatement callableStatement = connection.prepareCall(AddressTable.Procedures.UPDATE);
         callableStatement.setInt(1, addressId);
         callableStatement.setString(2, country);
         callableStatement.setString(3, town);
@@ -80,14 +73,13 @@ public class JdbcAddressRepository implements AddressRepository {
 
     @Override
     public Optional<Address> findAddressById(int addressId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(procedureReadAddressById);
+        CallableStatement callableStatement = connection.prepareCall(AddressTable.Procedures.READ_BY_ID);
         callableStatement.setInt(1, addressId);
         ResultSet resultSet = callableStatement.executeQuery();
         Address address = null;
         while(resultSet.next()) {
-            address = new AddressResultSetMapper().resultSetMap(resultSet);
+            address = new AddressResultSetMapper().resultSetMap(resultSet, "");
         }
-        Optional<Address> optionalAddress = Optional.ofNullable(address);
-        return optionalAddress;
+        return Optional.ofNullable(address);
     }
 }
