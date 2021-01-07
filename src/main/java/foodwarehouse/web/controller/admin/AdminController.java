@@ -349,9 +349,9 @@ public class AdminController {
                                 employee.get().salary())));
     }
 
-    @PutMapping("/employee")
+    @PutMapping("/employee/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<EmployeeResponse> updateEmployee(@RequestBody CreateEmployeeRequest request) {
+    public SuccessResponse<String> updateEmployee(@RequestBody CreateEmployeeRequest request, @PathVariable Long id) {
         //check if database is reachable
         if (!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -359,47 +359,50 @@ public class AdminController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        //get permission from string
-        Optional<Permission> permission = Permission.from(request.account().permission());
+        //test response
+        return new SuccessResponse<>("Byczq, chciałeś edytować pracownika o id = " + id);
 
-        //when permission name was incorrect
-        if (permission.isEmpty()) {
-            throw new RestException("Wrong permission name.");
-        }
-
-        //add user to database
-        Optional<User> user;
-        try {
-            user = userService.updateUser(
-                    request.account().userId(),
-                    request.account().username(),
-                    request.account().password(),
-                    request.account().email(),
-                    Permission.from(request.account().permission()).get());
-        } catch (SQLException sqlException) {
-            //response error
-            throw new RestException("Unable to update an user.");
-        }
-
-        //add employee to database
-        Optional<Employee> employee;
-        try {
-            employee = employeeService.updateEmployee(
-                    request.employeePersonalData().employeeId(),
-                    user.get(),
-                    request.employeePersonalData().name(),
-                    request.employeePersonalData().surname(),
-                    request.employeePersonalData().position(),
-                    request.employeePersonalData().salary());
-        } catch (SQLException sqlException) {
-            //response error
-            throw new RestException("Unable to update an employee.");
-        }
-
-        return new SuccessResponse<>(
-                new EmployeeResponse(
-                        User.toUserResponse(employee.get().user()),
-                        Employee.toEmployeePersonalData(employee.get())));
+//        //get permission from string
+//        Optional<Permission> permission = Permission.from(request.account().permission());
+//
+//        //when permission name was incorrect
+//        if (permission.isEmpty()) {
+//            throw new RestException("Wrong permission name.");
+//        }
+//
+//        //add user to database
+//        Optional<User> user;
+//        try {
+//            user = userService.updateUser(
+//                    request.account().userId(),
+//                    request.account().username(),
+//                    request.account().password(),
+//                    request.account().email(),
+//                    Permission.from(request.account().permission()).get());
+//        } catch (SQLException sqlException) {
+//            //response error
+//            throw new RestException("Unable to update an user.");
+//        }
+//
+//        //add employee to database
+//        Optional<Employee> employee;
+//        try {
+//            employee = employeeService.updateEmployee(
+//                    request.employeePersonalData().employeeId(),
+//                    user.get(),
+//                    request.employeePersonalData().name(),
+//                    request.employeePersonalData().surname(),
+//                    request.employeePersonalData().position(),
+//                    request.employeePersonalData().salary());
+//        } catch (SQLException sqlException) {
+//            //response error
+//            throw new RestException("Unable to update an employee.");
+//        }
+//
+//        return new SuccessResponse<>(
+//                new EmployeeResponse(
+//                        User.toUserResponse(employee.get().user()),
+//                        Employee.toEmployeePersonalData(employee.get())));
     }
 
     @GetMapping("/message")
