@@ -13,14 +13,4 @@ public record Customer(
         String phoneNumber,
         String taxId,
         int discount) {
-
-    public static CustomerPersonalData toCustomerPersonalData(Customer customer) {
-        return new CustomerPersonalData(
-                customer.customerId(),
-                customer.name(),
-                customer.surname(),
-                customer.phoneNumber(),
-                customer.firmName(),
-                customer.taxId());
-    }
 }

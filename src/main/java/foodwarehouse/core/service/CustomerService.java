@@ -20,19 +20,19 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
+    public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
         return customerRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
+    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
         return customerRepository.updateCustomer(customerId, user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-    public boolean deleteCustomer(int customerId) throws SQLException {
+    public boolean deleteCustomer(int customerId) {
         return customerRepository.deleteCustomer(customerId);
     }
 
-    public List<Customer> findAllCustomers() throws SQLException {
+    public List<Customer> findAllCustomers() {
         return customerRepository.findAllCustomers();
     }
 }

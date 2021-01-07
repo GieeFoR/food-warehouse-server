@@ -16,6 +16,8 @@ final public class UserTable {
 
         static final public String UPDATE = "CALL `UPDATE_USER`(?,?,?,?,?)";
 
+        static final public String DELETE = "CALL `DELETE_USER`(?)";
+
         static final public String READ_ALL = "CALL `GET_USERS`()";
         static final public String READ_BY_ID = "CALL `GET_USER_BY_ID`(?)";
         static final public String READ_BY_USERNAME = "CALL `GET_USER_BY_USERNAME`(?)";

@@ -21,23 +21,23 @@ public class CarService {
         this.carRepository = carRepository;
     }
 
-    public Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException {
+    public Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
         return carRepository.createCar(employee, brand, model, yearOfProd, regNo, insurance, inspection);
     }
 
-    public Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException {
+    public Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
         return carRepository.updateCar(carId, brand, model, yearOfProd, regNo, insurance, inspection);
     }
 
-    public boolean deleteCar(int carId) throws SQLException {
+    public boolean deleteCar(int carId) {
         return carRepository.deleteCar(carId);
     }
 
-    public Optional<Car> findCarById(int carId) throws SQLException {
+    public Optional<Car> findCarById(int carId) {
         return carRepository.findCarById(carId);
     }
 
-    public List<Car> findCars() throws SQLException {
+    public List<Car> findCars() {
         return carRepository.findCars();
     }
 }

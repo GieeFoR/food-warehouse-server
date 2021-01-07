@@ -20,23 +20,23 @@ public class StorageService {
         this.storageRepository = storageRepository;
     }
 
-    public Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException {
+    public Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
         return storageRepository.insertStorage(address, manager, name, capacity, isColdStorage);
     }
 
-    public Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException {
+    public Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
         return storageRepository.updateStorage(storageId, address, manager, name, capacity, isColdStorage);
     }
 
-    public boolean deleteStorage(int storageId) throws SQLException {
+    public boolean deleteStorage(int storageId) {
         return storageRepository.deleteStorage(storageId);
     }
 
-    public List<Storage> findAllStorages() throws SQLException {
+    public List<Storage> findAllStorages() {
         return storageRepository.findAllStorages();
     }
 
-    public Optional<Storage> findStorage(int storageId) throws SQLException {
+    public Optional<Storage> findStorage(int storageId) {
         return storageRepository.findStorage(storageId);
     }
 }

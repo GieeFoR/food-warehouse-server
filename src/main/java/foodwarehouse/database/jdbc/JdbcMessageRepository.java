@@ -5,6 +5,7 @@ import foodwarehouse.core.data.message.Message;
 import foodwarehouse.core.data.message.MessageRepository;
 import foodwarehouse.database.rowmappers.MessageResultSetMapper;
 import foodwarehouse.database.tables.MessageTable;
+import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,43 +24,55 @@ public class JdbcMessageRepository implements MessageRepository {
     private final Connection connection;
 
     @Autowired
-    JdbcMessageRepository(DataSource dataSource) throws SQLException {
-        this.connection = dataSource.getConnection();
+    JdbcMessageRepository(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        }
+        catch(SQLException sqlException) {
+            throw new RestException("Cannot connect to database!");
+        }
     }
 
     @Override
-    public Optional<Message> createMessage(Employee sender, Employee receiver, String content) throws SQLException {
+    public Optional<Message> createMessage(Employee sender, Employee receiver, String content) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Message> updateMessageContent(int messageId, String content) throws SQLException {
+    public Optional<Message> updateMessageContent(int messageId, String content) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Message> updateMessageRead(int messageId) throws SQLException {
+    public Optional<Message> updateMessageRead(int messageId) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deleteMessage(int messageId) throws SQLException {
+    public boolean deleteMessage(int messageId) {
         return false;
     }
 
     @Override
-    public Optional<Message> findMessageById(int messageId) throws SQLException {
+    public Optional<Message> findMessageById(int messageId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Message> findAllMessages() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_ALL);
-        ResultSet resultSet = callableStatement.executeQuery();
+    public List<Message> findAllMessages() {
         List<Message> messages = new LinkedList<>();
-        while(resultSet.next()) {
-            messages.add(new MessageResultSetMapper().resultSetMap(resultSet, ""));
+        try {
+            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_ALL);
+            ResultSet resultSet = callableStatement.executeQuery();
+
+            while(resultSet.next()) {
+                messages.add(new MessageResultSetMapper().resultSetMap(resultSet, ""));
+            }
         }
+        catch(SQLException sqlException) {
+            messages = null;
+        }
+
         return messages;
     }
 }

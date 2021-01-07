@@ -22,33 +22,33 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public List<User> findAllUsers() throws SQLException {
+    public List<User> findAllUsers() {
         return userRepository.findAllUsers();
     }
 
-    public Optional<User> findUserById(int userId) throws SQLException {
+    public Optional<User> findUserById(int userId) {
         return userRepository.findUserById(userId);
     }
 
-    public Optional<User> createUser(String username, String password, String email, Permission permission) throws SQLException {
+    public Optional<User> createUser(String username, String password, String email, Permission permission) {
         String encryptedPassword = bCryptPasswordEncoder.encode(password);
         return userRepository.createUser(username, encryptedPassword, email, permission);
     }
 
-    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException {
+    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
         String encryptedPassword = bCryptPasswordEncoder.encode(password);
         return userRepository.updateUser(userId, username, encryptedPassword, email, permission);
     }
 
-    public boolean deleteUser(User user) {
-        return userRepository.deleteUser(user);
+    public boolean deleteUser(int userId) {
+        return userRepository.deleteUser(userId);
     }
 
-    public Optional<User> findUserByUsername(String username) throws SQLException {
+    public Optional<User> findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
 
-    public Optional<User> findUserByEmail(String email) throws SQLException {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
 }

@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface MakerRepository {
 
-    Optional<Maker> createMaker(Address address, String name, String phone, String email) throws SQLException;
+    Optional<Maker> createMaker(Address address, String name, String phone, String email);
 
-    Optional<Maker> updateMaker(int makerId, String name, String phone, String email) throws SQLException;
+    Optional<Maker> updateMaker(int makerId, String name, String phone, String email);
 
-    boolean deleteMaker(int makerId) throws SQLException;
+    boolean deleteMaker(int makerId);
 
-    Optional<Maker> findMakerById(int makerId) throws SQLException;
+    Optional<Maker> findMakerById(int makerId);
 
-    List<Maker> findMakers() throws SQLException;
+    List<Maker> findMakers();
 }

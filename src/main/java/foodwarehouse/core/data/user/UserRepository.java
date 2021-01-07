@@ -6,17 +6,17 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    Optional<User> createUser(String username, String email, String password, Permission permission) throws SQLException;
+    Optional<User> createUser(String username, String email, String password, Permission permission);
 
-    Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException;
+    Optional<User> updateUser(int userId, String username, String password, String email, Permission permission);
 
-    boolean deleteUser(User user);
+    boolean deleteUser(int userId);
 
-    List<User> findAllUsers() throws SQLException;
+    List<User> findAllUsers();
 
-    Optional<User> findUserById(int userId) throws SQLException;
+    Optional<User> findUserById(int userId);
 
-    Optional<User> findUserByEmail(String email) throws SQLException;
+    Optional<User> findUserByEmail(String email);
 
-    Optional<User> findUserByUsername(String username) throws SQLException;
+    Optional<User> findUserByUsername(String username);
 }

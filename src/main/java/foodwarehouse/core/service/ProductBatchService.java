@@ -21,23 +21,23 @@ public class ProductBatchService {
         this.productBatchRepository = productBatchRepository;
     }
 
-    public Optional<ProductBatch> createProductBatch(Product product, int batchNo, Date eatByDate, int quantity) throws SQLException {
+    public Optional<ProductBatch> createProductBatch(Product product, int batchNo, Date eatByDate, int quantity) {
         return productBatchRepository.createProductBatch(product, batchNo, eatByDate, quantity);
     }
 
-    public Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity) throws SQLException {
+    public Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity) {
         return productBatchRepository.updateProductBatch(productBatchId, batchNo, eatByDate, discount, quantity);
     }
 
-    public boolean deleteProductBatch(int productBatchId) throws SQLException {
+    public boolean deleteProductBatch(int productBatchId) {
         return productBatchRepository.deleteProductBatch(productBatchId);
     }
 
-    public Optional<ProductBatch> findProductBatchById(int productBatchId) throws SQLException {
+    public Optional<ProductBatch> findProductBatchById(int productBatchId) {
         return productBatchRepository.findProductBatchById(productBatchId);
     }
 
-    public List<ProductBatch> findProductBatches() throws SQLException {
+    public List<ProductBatch> findProductBatches() {
         return productBatchRepository.findProductBatches();
     }
 }

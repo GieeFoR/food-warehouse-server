@@ -12,27 +12,27 @@ import java.util.Optional;
 @Repository
 public class JdbcProductRepository implements ProductRepository {
     @Override
-    public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
+    public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
+    public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deleteProduct(int productId) throws SQLException {
+    public boolean deleteProduct(int productId) {
         return false;
     }
 
     @Override
-    public Optional<Product> findProductById(int productId) throws SQLException {
+    public Optional<Product> findProductById(int productId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Product> findProducts() throws SQLException {
+    public List<Product> findProducts() {
         return null;
     }
 }

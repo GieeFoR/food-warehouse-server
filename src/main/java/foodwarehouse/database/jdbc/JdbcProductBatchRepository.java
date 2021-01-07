@@ -13,27 +13,27 @@ import java.util.Optional;
 @Repository
 public class JdbcProductBatchRepository implements ProductBatchRepository {
     @Override
-    public Optional<ProductBatch> createProductBatch(Product product, int batchNo, Date eatByDate, int quantity) throws SQLException {
+    public Optional<ProductBatch> createProductBatch(Product product, int batchNo, Date eatByDate, int quantity) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity) throws SQLException {
+    public Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deleteProductBatch(int productBatchId) throws SQLException {
+    public boolean deleteProductBatch(int productBatchId) {
         return false;
     }
 
     @Override
-    public Optional<ProductBatch> findProductBatchById(int productBatchId) throws SQLException {
+    public Optional<ProductBatch> findProductBatchById(int productBatchId) {
         return Optional.empty();
     }
 
     @Override
-    public List<ProductBatch> findProductBatches() throws SQLException {
+    public List<ProductBatch> findProductBatches() {
         return null;
     }
 }

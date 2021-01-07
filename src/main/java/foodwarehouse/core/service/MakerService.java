@@ -20,23 +20,23 @@ public class MakerService {
         this.makerRepository = makerRepository;
     }
 
-    public Optional<Maker> createMaker(Address address, String name, String phone, String email) throws SQLException {
+    public Optional<Maker> createMaker(Address address, String name, String phone, String email) {
         return makerRepository.createMaker(address, name, phone, email);
     }
 
-    public Optional<Maker> updateMaker(int makerId, String name, String phone, String email) throws SQLException {
+    public Optional<Maker> updateMaker(int makerId, String name, String phone, String email) {
         return makerRepository.updateMaker(makerId, name, phone, email);
     }
 
-    public boolean deleteMaker(int makerId) throws SQLException {
+    public boolean deleteMaker(int makerId) {
         return makerRepository.deleteMaker(makerId);
     }
 
-    public Optional<Maker> findMakerById(int makerId) throws SQLException {
+    public Optional<Maker> findMakerById(int makerId) {
         return makerRepository.findMakerById(makerId);
     }
 
-    public List<Maker> findMakers() throws SQLException {
+    public List<Maker> findMakers() {
         return makerRepository.findMakers();
     }
 }

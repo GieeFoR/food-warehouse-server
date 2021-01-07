@@ -20,23 +20,23 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
+    public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
         return productRepository.createProduct(maker, name, category, needColdStorage, buyPrice, sellPrice);
     }
 
-    public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
+    public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
         return productRepository.updateProduct(productId, name, category, needColdStorage, buyPrice, sellPrice);
     }
 
-    public boolean deleteProduct(int productId) throws SQLException {
+    public boolean deleteProduct(int productId) {
         return productRepository.deleteProduct(productId);
     }
 
-    public Optional<Product> findProductById(int productId) throws SQLException {
+    public Optional<Product> findProductById(int productId) {
         return productRepository.findProductById(productId);
     }
 
-    public List<Product> findProducts() throws SQLException {
+    public List<Product> findProducts() {
         return productRepository.findProducts();
     }
 }

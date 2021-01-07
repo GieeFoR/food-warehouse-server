@@ -12,32 +12,32 @@ import java.util.Optional;
 @Repository
 public class JdbcPaymentRepository implements PaymentRepository {
     @Override
-    public Optional<Payment> createPayment(PaymentType paymentType, float value) throws SQLException {
+    public Optional<Payment> createPayment(PaymentType paymentType, float value) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Payment> updatePaymentValue(int paymentId, float value) throws SQLException {
+    public Optional<Payment> updatePaymentValue(int paymentId, float value) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Payment> completePayment(int paymentId) throws SQLException {
+    public Optional<Payment> completePayment(int paymentId) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deletePayment(int paymentId) throws SQLException {
+    public boolean deletePayment(int paymentId) {
         return false;
     }
 
     @Override
-    public Optional<Payment> findPaymentById(int paymentId) throws SQLException {
+    public Optional<Payment> findPaymentById(int paymentId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Payment> findPayments() throws SQLException {
+    public List<Payment> findPayments() {
         return null;
     }
 }

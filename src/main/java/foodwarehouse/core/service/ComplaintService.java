@@ -21,15 +21,15 @@ public class ComplaintService {
         this.complaintRepository = complaintRepository;
     }
 
-    public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) throws SQLException {
+    public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) {
         return complaintRepository.createComplaint(order, content, sendDate, state, decision, decisionDate);
     }
 
-    public Optional<Complaint> findComplaintById(int complaintId) throws SQLException {
+    public Optional<Complaint> findComplaintById(int complaintId) {
         return complaintRepository.findComplaintById(complaintId);
     }
 
-    public List<Complaint> findComplaints() throws SQLException {
+    public List<Complaint> findComplaints() {
         return complaintRepository.findComplaints();
     }
 }

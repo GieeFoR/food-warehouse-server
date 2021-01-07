@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface EmployeeRepository {
 
-    Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) throws SQLException;
+    Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary);
 
-    Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) throws SQLException;
+    Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary);
 
-    boolean deleteEmployee(int employeeId) throws SQLException;
+    boolean deleteEmployee(int employeeId);
 
-    List<Employee> findAllEmployees() throws SQLException;
+    List<Employee> findAllEmployees();
 
-    Optional<Employee> findEmployee(int employeeId) throws SQLException;
+    Optional<Employee> findEmployeeById(int employeeId);
 }

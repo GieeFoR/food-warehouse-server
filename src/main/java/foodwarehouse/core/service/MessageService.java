@@ -19,27 +19,27 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    public Optional<Message> createMessage(Employee sender, Employee receiver, String content) throws SQLException {
+    public Optional<Message> createMessage(Employee sender, Employee receiver, String content) {
         return messageRepository.createMessage(sender, receiver, content);
     }
 
-    public Optional<Message> updateMessageContent(int messageId, String content) throws SQLException {
+    public Optional<Message> updateMessageContent(int messageId, String content) {
         return messageRepository.updateMessageContent(messageId, content);
     }
 
-    public Optional<Message> updateMessageRead(int messageId) throws SQLException {
+    public Optional<Message> updateMessageRead(int messageId) {
         return messageRepository.updateMessageRead(messageId);
     }
 
-    public boolean deleteMessage(int messageId) throws SQLException {
+    public boolean deleteMessage(int messageId) {
         return messageRepository.deleteMessage(messageId);
     }
 
-    public Optional<Message> findMessageById(int messageId) throws SQLException {
+    public Optional<Message> findMessageById(int messageId) {
         return messageRepository.findMessageById(messageId);
     }
 
-    public List<Message> findAllMessages() throws SQLException {
+    public List<Message> findAllMessages() {
         return messageRepository.findAllMessages();
     }
 }

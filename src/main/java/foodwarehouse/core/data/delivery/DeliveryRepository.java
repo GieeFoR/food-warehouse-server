@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface DeliveryRepository {
 
-    Optional<Delivery> createDelivery(Address address, Employee supplier) throws SQLException;
+    Optional<Delivery> createDelivery(Address address, Employee supplier);
 
-    Optional<Delivery> updateRemoveDate(int deliveryId, Date date) throws SQLException;
+    Optional<Delivery> updateRemoveDate(int deliveryId, Date date);
 
-    Optional<Delivery> updateCompleteDate(int deliveryId, Date date) throws SQLException;
+    Optional<Delivery> updateCompleteDate(int deliveryId, Date date);
 
-    boolean deleteDelivery (int deliveryId) throws SQLException;
+    boolean deleteDelivery (int deliveryId);
 
-    Optional<Delivery> findDeliveryById(int deliveryId) throws SQLException;
+    Optional<Delivery> findDeliveryById(int deliveryId);
 
-    List<Delivery> findDeliveries() throws SQLException;
+    List<Delivery> findDeliveries();
 }

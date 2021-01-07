@@ -1,6 +1,9 @@
 package foodwarehouse.web.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.core.data.message.Message;
+import foodwarehouse.core.data.user.User;
 
 import java.util.Date;
 
@@ -12,4 +15,19 @@ public record MessageResponse (
         @JsonProperty("state")          String state,
         @JsonProperty("send_date")      Date sendDate,
         @JsonProperty("read_date")      Date readDate) {
+
+    public static MessageResponse fromMessage(Message message) {
+        return new MessageResponse(
+                message.messageId(),
+                new EmployeeResponse(
+                        UserResponse.fromUser(message.sender().user()),
+                        Employee.toEmployeePersonalData(message.sender())),
+                new EmployeeResponse(
+                        UserResponse.fromUser(message.receiver().user()),
+                        Employee.toEmployeePersonalData(message.receiver())),
+                message.content(),
+                message.state(),
+                message.sendDate(),
+                message.readDate());
+    }
 }

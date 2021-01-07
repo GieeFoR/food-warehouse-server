@@ -15,27 +15,27 @@ import java.util.Optional;
 @Repository
 public class JdbcOrderRepository implements OrderRepository {
     @Override
-    public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) throws SQLException {
+    public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Order> updateOrderState(int orderId, OrderState orderState) throws SQLException {
+    public Optional<Order> updateOrderState(int orderId, OrderState orderState) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deleteOrder(int orderId) throws SQLException {
+    public boolean deleteOrder(int orderId) {
         return false;
     }
 
     @Override
-    public Optional<Order> findOrderById(int orderId) throws SQLException {
+    public Optional<Order> findOrderById(int orderId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Order> findOrders() throws SQLException {
+    public List<Order> findOrders() {
         return null;
     }
 }

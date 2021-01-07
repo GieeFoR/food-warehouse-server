@@ -8,4 +8,13 @@ public record EmployeePersonalData(
         @JsonProperty("surname")        String surname,
         @JsonProperty("position")       String position,
         @JsonProperty("salary")         Float salary) {
+
+    public static EmployeePersonalData fromEmployee(Employee employee) {
+        return new EmployeePersonalData(
+                employee.employeeId(),
+                employee.name(),
+                employee.surname(),
+                employee.position(),
+                employee.salary());
+    }
 }

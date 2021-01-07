@@ -13,27 +13,27 @@ import java.util.Optional;
 @Repository
 public class JdbcCarRepository implements CarRepository {
     @Override
-    public Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException {
+    public Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException {
+    public Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deleteCar(int carId) throws SQLException {
+    public boolean deleteCar(int carId) {
         return false;
     }
 
     @Override
-    public Optional<Car> findCarById(int carId) throws SQLException {
+    public Optional<Car> findCarById(int carId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Car> findCars() throws SQLException {
+    public List<Car> findCars() {
         return null;
     }
 }

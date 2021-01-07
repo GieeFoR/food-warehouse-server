@@ -20,7 +20,7 @@ public class ProductInStorageService {
         this.productInStorageRepository = productInStorageRepository;
     }
 
-    public Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) throws SQLException {
+    public Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) {
         return productInStorageRepository.createProductInStorage(productBatch, storage, quantity);
     }
 }

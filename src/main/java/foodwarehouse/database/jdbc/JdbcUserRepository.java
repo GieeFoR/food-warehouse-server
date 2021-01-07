@@ -5,8 +5,8 @@ import foodwarehouse.database.tables.UserTable;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.data.user.UserRepository;
+import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -17,104 +17,139 @@ import java.util.*;
 public class JdbcUserRepository implements UserRepository {
 
     private final Connection connection;
-    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    JdbcUserRepository(DataSource dataSource) throws SQLException {
-        this.connection = dataSource.getConnection();
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcUserRepository(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        }
+        catch(SQLException sqlException) {
+            throw new RestException("Cannot connect to database!");
+        }
     }
 
     @Override
-    public Optional<User> createUser(String username, String password, String email, Permission permission) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.INSERT);
-        callableStatement.setString(1, username);
-        callableStatement.setString(2, password);
-        callableStatement.setString(3, permission.value());
-        callableStatement.setString(4, email);
+    public Optional<User> createUser(String username, String password, String email, Permission permission) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.INSERT);
+            callableStatement.setString(1, username);
+            callableStatement.setString(2, password);
+            callableStatement.setString(3, permission.value());
+            callableStatement.setString(4, email);
 
-        callableStatement.executeQuery();
-        int userId = callableStatement.getInt(5);
+            callableStatement.executeQuery();
+            int userId = callableStatement.getInt(5);
 
-        return Optional.of(new User(userId, username, password, email, permission));
+            return Optional.of(new User(userId, username, password, email, permission));
+        }
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.UPDATE);
-        callableStatement.setInt(1, userId);
-        callableStatement.setString(2, username);
-        callableStatement.setString(3, password);
-        callableStatement.setString(4, permission.value());
-        callableStatement.setString(5, email);
+    public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.UPDATE);
+            callableStatement.setInt(1, userId);
+            callableStatement.setString(2, username);
+            callableStatement.setString(3, password);
+            callableStatement.setString(4, permission.value());
+            callableStatement.setString(5, email);
 
-        callableStatement.executeQuery();
+            callableStatement.executeQuery();
 
-        return Optional.of(new User(userId, username, password, email, permission));
+            return Optional.of(new User(userId, username, password, email, permission));
+        }
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        String query = String.format("DELETE FROM `%s` WHERE `%s` = ?", UserTable.NAME, UserTable.Columns.USER_ID);
-        Object[] args = new Object[] {user.userId()};
-        int delete = jdbcTemplate.update(query, args);
+    public boolean deleteUser(int userId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.DELETE);
+            callableStatement.setInt(1, userId);
 
-        if(delete == 1) {
-            user = null;
+            callableStatement.executeQuery();
+
             return true;
         }
-        else {
+        catch (SQLException sqlException) {
             return false;
         }
     }
 
     @Override
-    public List<User> findAllUsers() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_ALL);
-        ResultSet resultSet = callableStatement.executeQuery();
+    public List<User> findAllUsers() {
         List<User> users = new LinkedList<>();
-        while(resultSet.next()) {
-            users.add(new UserResultSetMapper().resultSetMap(resultSet, ""));
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_ALL);
+            ResultSet resultSet = callableStatement.executeQuery();
+
+            while(resultSet.next()) {
+                users.add(new UserResultSetMapper().resultSetMap(resultSet, ""));
+            }
         }
+        catch (SQLException sqlException) {
+            users = null;
+        }
+
         return users;
     }
 
     @Override
-    public Optional<User> findUserById(int userId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_ID);
-        callableStatement.setInt(1, userId);
-        ResultSet resultSet = callableStatement.executeQuery();
-        User user = null;
-        while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet, "");
+    public Optional<User> findUserById(int userId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_ID);
+            callableStatement.setInt(1, userId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            User user = null;
+            if(resultSet.next()) {
+                user = new UserResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(user);
         }
-        Optional<User> optionalUser = Optional.ofNullable(user);
-        return optionalUser;
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public Optional<User> findUserByUsername(String username) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_USERNAME);
-        callableStatement.setString(1, username);
-        ResultSet resultSet = callableStatement.executeQuery();
-        User user = null;
-        while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet, "");
+    public Optional<User> findUserByUsername(String username) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_USERNAME);
+            callableStatement.setString(1, username);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            User user = null;
+            if(resultSet.next()) {
+                user = new UserResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(user);
         }
-        Optional<User> optionalUser = Optional.ofNullable(user);
-        return optionalUser;
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_EMAIL);
-        callableStatement.setString(1, email);
-        ResultSet resultSet = callableStatement.executeQuery();
-        User user = null;
-        while(resultSet.next()) {
-            user = new UserResultSetMapper().resultSetMap(resultSet, "");
+    public Optional<User> findUserByEmail(String email) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.READ_BY_EMAIL);
+            callableStatement.setString(1, email);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            User user = null;
+            if(resultSet.next()) {
+                user = new UserResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(user);
         }
-        Optional<User> optionalUser = Optional.ofNullable(user);
-        return optionalUser;
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 }

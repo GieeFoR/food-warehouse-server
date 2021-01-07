@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public class JdbcProductOrderRepository implements ProductOrderRepository {
     @Override
-    public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) throws SQLException {
+    public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) {
         return Optional.empty();
     }
 }

@@ -19,23 +19,23 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) throws SQLException {
+    public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) {
         return employeeRepository.createEmployee(user, name, surname, position, salary);
     }
 
-    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) throws SQLException {
+    public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) {
         return employeeRepository.updateEmployee(employeeId, user, name, surname, position, salary);
     }
 
-    public boolean deleteEmployee(int employeeId) throws SQLException {
+    public boolean deleteEmployee(int employeeId) {
         return employeeRepository.deleteEmployee(employeeId);
     }
 
-    public List<Employee> findAllEmployees() throws SQLException {
+    public List<Employee> findAllEmployees() {
         return employeeRepository.findAllEmployees();
     }
 
-    public Optional<Employee> findEmployee(int employeeId) throws SQLException {
-        return employeeRepository.findEmployee(employeeId);
+    public Optional<Employee> findEmployeeById(int employeeId) {
+        return employeeRepository.findEmployeeById(employeeId);
     }
 }

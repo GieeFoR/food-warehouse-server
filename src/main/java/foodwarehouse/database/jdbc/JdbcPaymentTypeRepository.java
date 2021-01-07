@@ -11,27 +11,27 @@ import java.util.Optional;
 @Repository
 public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     @Override
-    public Optional<PaymentType> createPaymentType(String type) throws SQLException {
+    public Optional<PaymentType> createPaymentType(String type) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<PaymentType> updatePaymentType(int paymentId, String type) throws SQLException {
+    public Optional<PaymentType> updatePaymentType(int paymentId, String type) {
         return Optional.empty();
     }
 
     @Override
-    public boolean deletePaymentType(int paymentId) throws SQLException {
+    public boolean deletePaymentType(int paymentId) {
         return false;
     }
 
     @Override
-    public Optional<PaymentType> findPaymentTypeById(int paymentId) throws SQLException {
+    public Optional<PaymentType> findPaymentTypeById(int paymentId) {
         return Optional.empty();
     }
 
     @Override
-    public List<PaymentType> findPayments() throws SQLException {
+    public List<PaymentType> findPayments() {
         return null;
     }
 }

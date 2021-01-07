@@ -20,7 +20,7 @@ public class ProductOrderService {
         this.productOrderRepository = productOrderRepository;
     }
 
-    public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) throws SQLException {
+    public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) {
         return productOrderRepository.createProductOrder(order, productBatch, quantity);
     }
 }

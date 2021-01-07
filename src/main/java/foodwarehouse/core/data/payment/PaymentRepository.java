@@ -8,15 +8,15 @@ import java.util.Optional;
 
 public interface PaymentRepository {
 
-    Optional<Payment> createPayment(PaymentType paymentType, float value) throws SQLException;
+    Optional<Payment> createPayment(PaymentType paymentType, float value);
 
-    Optional<Payment> updatePaymentValue(int paymentId, float value) throws SQLException;
+    Optional<Payment> updatePaymentValue(int paymentId, float value);
 
-    Optional<Payment> completePayment(int paymentId) throws SQLException;
+    Optional<Payment> completePayment(int paymentId);
 
-    boolean deletePayment(int paymentId) throws SQLException;
+    boolean deletePayment(int paymentId);
 
-    Optional<Payment> findPaymentById(int paymentId) throws SQLException;
+    Optional<Payment> findPaymentById(int paymentId);
 
-    List<Payment> findPayments() throws SQLException;
+    List<Payment> findPayments();
 }

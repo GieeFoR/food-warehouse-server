@@ -8,4 +8,13 @@ public record Account(
         @JsonProperty("password")       String password,
         @JsonProperty("email")          String email,
         @JsonProperty("permission")     String permission) {
+
+    public static Account fromUser(User user) {
+        return new Account(
+                user.userId(),
+                user.username(),
+                "",
+                user.email(),
+                user.permission().value());
+    }
 }

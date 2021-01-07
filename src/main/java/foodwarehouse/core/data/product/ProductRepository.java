@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface ProductRepository {
 
-    Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException;
+    Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice);
 
-    Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException;
+    Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice);
 
-    boolean deleteProduct(int productId) throws SQLException;
+    boolean deleteProduct(int productId);
 
-    Optional<Product> findProductById(int productId) throws SQLException;
+    Optional<Product> findProductById(int productId);
 
-    List<Product> findProducts() throws SQLException;
+    List<Product> findProducts();
 }

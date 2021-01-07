@@ -22,27 +22,27 @@ public class DeliveryService {
         this.deliveryRepository = deliveryRepository;
     }
 
-    public Optional<Delivery> createDelivery(Address address, Employee supplier) throws SQLException {
+    public Optional<Delivery> createDelivery(Address address, Employee supplier) {
         return deliveryRepository.createDelivery(address, supplier);
     }
 
-    public Optional<Delivery> updateRemoveDate(int deliveryId, Date date) throws SQLException {
+    public Optional<Delivery> updateRemoveDate(int deliveryId, Date date) {
         return deliveryRepository.updateRemoveDate(deliveryId, date);
     }
 
-    public Optional<Delivery> updateCompleteDate(int deliveryId, Date date) throws SQLException {
+    public Optional<Delivery> updateCompleteDate(int deliveryId, Date date) {
         return deliveryRepository.updateCompleteDate(deliveryId, date);
     }
 
-    public boolean deleteDelivery(int deliveryId) throws SQLException {
+    public boolean deleteDelivery(int deliveryId) {
         return deliveryRepository.deleteDelivery(deliveryId);
     }
 
-    public Optional<Delivery> findDeliveryById(int deliveryId) throws SQLException {
+    public Optional<Delivery> findDeliveryById(int deliveryId) {
         return deliveryRepository.findDeliveryById(deliveryId);
     }
 
-    public List<Delivery> findDeliveries() throws SQLException {
+    public List<Delivery> findDeliveries() {
         return deliveryRepository.findDeliveries();
     }
 }

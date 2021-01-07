@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface StorageRepository {
 
-    Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException;
+    Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage);
 
-    Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage) throws SQLException;
+    Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage);
 
-    boolean deleteStorage(int storageId) throws SQLException;
+    boolean deleteStorage(int storageId);
 
-    List<Storage> findAllStorages() throws SQLException;
+    List<Storage> findAllStorages();
 
-    Optional<Storage> findStorage(int storageId) throws SQLException;
+    Optional<Storage> findStorage(int storageId);
 }

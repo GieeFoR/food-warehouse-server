@@ -13,17 +13,17 @@ import java.util.Optional;
 @Repository
 public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
-    public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) throws SQLException {
+    public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Complaint> findComplaintById(int complaintId) throws SQLException {
+    public Optional<Complaint> findComplaintById(int complaintId) {
         return Optional.empty();
     }
 
     @Override
-    public List<Complaint> findComplaints() throws SQLException {
+    public List<Complaint> findComplaints() {
         return null;
     }
 }

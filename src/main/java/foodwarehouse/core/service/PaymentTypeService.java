@@ -19,23 +19,23 @@ public class PaymentTypeService {
         this.paymentTypeRepository = paymentTypeRepository;
     }
 
-    public Optional<PaymentType> createPaymentType(String type) throws SQLException {
+    public Optional<PaymentType> createPaymentType(String type) {
         return paymentTypeRepository.createPaymentType(type);
     }
 
-    public Optional<PaymentType> updatePaymentType(int paymentId, String type) throws SQLException {
+    public Optional<PaymentType> updatePaymentType(int paymentId, String type) {
         return paymentTypeRepository.updatePaymentType(paymentId, type);
     }
 
-    public boolean deletePaymentType(int paymentId) throws SQLException {
+    public boolean deletePaymentType(int paymentId) {
         return paymentTypeRepository.deletePaymentType(paymentId);
     }
 
-    public Optional<PaymentType> findPaymentTypeById(int paymentId) throws SQLException {
+    public Optional<PaymentType> findPaymentTypeById(int paymentId) {
         return paymentTypeRepository.findPaymentTypeById(paymentId);
     }
 
-    public List<PaymentType> findPayments() throws SQLException {
+    public List<PaymentType> findPayments() {
         return paymentTypeRepository.findPayments();
     }
 }

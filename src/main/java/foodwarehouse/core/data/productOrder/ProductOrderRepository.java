@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface ProductOrderRepository {
 
-    Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) throws SQLException;
+    Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity);
 }

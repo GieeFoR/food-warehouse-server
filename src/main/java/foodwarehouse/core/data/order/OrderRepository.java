@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface OrderRepository {
 
-    Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) throws SQLException;
+    Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment);
 
-    Optional<Order> updateOrderState(int orderId, OrderState orderState) throws SQLException;
+    Optional<Order> updateOrderState(int orderId, OrderState orderState);
 
-    boolean deleteOrder(int orderId) throws SQLException;
+    boolean deleteOrder(int orderId);
 
-    Optional<Order> findOrderById(int orderId) throws SQLException;
+    Optional<Order> findOrderById(int orderId);
 
-    List<Order> findOrders() throws SQLException;
+    List<Order> findOrders();
 }

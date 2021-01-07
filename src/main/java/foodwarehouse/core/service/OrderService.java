@@ -23,23 +23,23 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) throws SQLException {
+    public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) {
         return orderRepository.createOrder(payment, customer, delivery, comment);
     }
 
-    public Optional<Order> updateOrderState(int orderId, OrderState orderState) throws SQLException {
+    public Optional<Order> updateOrderState(int orderId, OrderState orderState) {
         return orderRepository.updateOrderState(orderId, orderState);
     }
 
-    public boolean deleteOrder(int orderId) throws SQLException {
+    public boolean deleteOrder(int orderId) {
         return orderRepository.deleteOrder(orderId);
     }
 
-    public Optional<Order> findOrderById(int orderId) throws SQLException {
+    public Optional<Order> findOrderById(int orderId) {
         return orderRepository.findOrderById(orderId);
     }
 
-    public List<Order> findOrders() throws SQLException {
+    public List<Order> findOrders() {
         return orderRepository.findOrders();
     }
 }

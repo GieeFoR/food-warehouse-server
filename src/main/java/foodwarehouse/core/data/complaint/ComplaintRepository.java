@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface ComplaintRepository {
 
-    Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) throws SQLException;
+    Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate);
 
-    Optional<Complaint> findComplaintById(int complaintId) throws SQLException;
+    Optional<Complaint> findComplaintById(int complaintId);
 
-    List<Complaint> findComplaints() throws SQLException;
+    List<Complaint> findComplaints();
 }

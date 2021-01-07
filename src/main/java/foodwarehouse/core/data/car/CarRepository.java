@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface CarRepository {
 
-    Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException;
+    Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection);
 
-    Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) throws SQLException;
+    Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection);
 
-    boolean deleteCar(int carId) throws SQLException;
+    boolean deleteCar(int carId);
 
-    Optional<Car> findCarById(int carId) throws SQLException;
+    Optional<Car> findCarById(int carId);
 
-    List<Car> findCars() throws SQLException;
+    List<Car> findCars();
 }

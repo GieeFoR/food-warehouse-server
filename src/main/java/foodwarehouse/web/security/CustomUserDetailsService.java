@@ -23,13 +23,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        try {
-            return userRepository
-                    .findUserByUsername(username)
-                    .map(user -> new User(user.username(), user.password(), List.of(new SimpleGrantedAuthority("ROLE_" + user.permission().value()))))
-                    .orElseThrow(() -> new UsernameNotFoundException(username));
-        } catch (SQLException sqlException) {
-            throw new RestException("Unable to login user.");
-        }
+        return userRepository
+                .findUserByUsername(username)
+                .map(user -> new User(user.username(), user.password(), List.of(new SimpleGrantedAuthority("ROLE_" + user.permission().value()))))
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }

@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public class JdbcProductInStorageRepository implements ProductInStorageRepository {
     @Override
-    public Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) throws SQLException {
+    public Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) {
         return Optional.empty();
     }
 }

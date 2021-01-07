@@ -17,19 +17,19 @@ public class AddressService {
         this.addressRepository = addressRepository;
     }
 
-    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
+    public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         return addressRepository.createAddress(country, town, postalCode, buildingNumber, street, apartmentNumber);
     }
 
-    public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) throws SQLException {
+    public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         return addressRepository.updateAddress(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber);
     }
 
-    public boolean deleteAddress(Address address) {
-        return addressRepository.deleteAddress(address);
+    public boolean deleteAddress(int addressId) {
+        return addressRepository.deleteAddress(addressId);
     }
 
-    public Optional<Address> findAddressById(int addressId) throws SQLException {
+    public Optional<Address> findAddressById(int addressId) {
         return addressRepository.findAddressById(addressId);
     }
 }

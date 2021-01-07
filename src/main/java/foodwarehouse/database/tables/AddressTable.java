@@ -18,6 +18,8 @@ final public class AddressTable {
 
         static final public String UPDATE = "CALL `UPDATE_ADDRESS`(?,?,?,?,?,?,?)";
 
+        static final public String DELETE = "CALL `DELETE_ADDRESS`(?)";
+
         static final public String READ_ALL = "CALL `GET_ADDRESSES`()";
         static final public String READ_BY_ID = "CALL `GET_ADDRESS_BY_ID`(?)";
     }

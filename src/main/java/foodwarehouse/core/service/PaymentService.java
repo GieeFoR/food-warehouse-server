@@ -20,27 +20,27 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public Optional<Payment> createPayment(PaymentType paymentType, float value) throws SQLException {
+    public Optional<Payment> createPayment(PaymentType paymentType, float value) {
         return paymentRepository.createPayment(paymentType, value);
     }
 
-    public Optional<Payment> updatePaymentValue(int paymentId, float value) throws SQLException {
+    public Optional<Payment> updatePaymentValue(int paymentId, float value) {
         return paymentRepository.updatePaymentValue(paymentId, value);
     }
 
-    public Optional<Payment> completePayment(int paymentId) throws SQLException {
+    public Optional<Payment> completePayment(int paymentId) {
         return paymentRepository.completePayment(paymentId);
     }
 
-    public boolean deletePayment(int paymentId) throws SQLException {
+    public boolean deletePayment(int paymentId) {
         return paymentRepository.deletePayment(paymentId);
     }
 
-    public Optional<Payment> findPaymentById(int paymentId) throws SQLException {
+    public Optional<Payment> findPaymentById(int paymentId) {
         return paymentRepository.findPaymentById(paymentId);
     }
 
-    public List<Payment> findPayments() throws SQLException {
+    public List<Payment> findPayments() {
         return paymentRepository.findPayments();
     }
 }

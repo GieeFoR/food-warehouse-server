@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface ProductInStorageRepository {
 
-    Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) throws SQLException;
+    Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity);
 
 }
