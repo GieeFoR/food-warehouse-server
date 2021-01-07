@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface PaymentTypeRepository {
 
-    Optional<PaymentType> createPaymentType(String name) throws SQLException;
+    Optional<PaymentType> createPaymentType(String type) throws SQLException;
 
     Optional<PaymentType> updatePaymentType(int paymentId, String type) throws SQLException;
 

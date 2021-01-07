@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PaymentRepository {
 
-    Optional<Payment> createPayment(PaymentType paymentType, float Value) throws SQLException;
+    Optional<Payment> createPayment(PaymentType paymentType, float value) throws SQLException;
 
     Optional<Payment> updatePaymentValue(int paymentId, float value) throws SQLException;
 
