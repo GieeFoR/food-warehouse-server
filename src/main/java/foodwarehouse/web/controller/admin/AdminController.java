@@ -191,7 +191,7 @@ public class AdminController {
                         address.get()));
     }
 
-    @PostMapping("/customer/update")
+    @PutMapping("/customer")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<CustomerResponse> updateCustomer(@RequestBody CreateCustomerRequest request) {
         //check if database is reachable
@@ -349,7 +349,7 @@ public class AdminController {
                                 employee.get().salary())));
     }
 
-    @PostMapping("/employee/update")
+    @PutMapping("/employee")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<EmployeeResponse> updateEmployee(@RequestBody CreateEmployeeRequest request) {
         //check if database is reachable
