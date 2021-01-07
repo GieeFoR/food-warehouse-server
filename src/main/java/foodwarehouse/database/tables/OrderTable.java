@@ -17,6 +17,8 @@ final public class OrderTable {
 
         static final public String UPDATE_STATE = "CALL `UPDATE_ORDER_STATE`(?,?)";
 
+        static final public String DELETE = "CALL `DELETE_ORDER`(?)";
+
         static final public String READ_ALL = "CALL `GET_ORDERS`()";
         static final public String READ_BY_ID = "CALL `GET_ORDER_BY_ID`(?)";
     }

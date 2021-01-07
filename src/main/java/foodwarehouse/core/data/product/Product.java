@@ -9,5 +9,5 @@ public record Product(
         String category,
         boolean needColdStorage,
         float buyPrice,
-        float sendPrice) {
+        float sellPrice) {
 }

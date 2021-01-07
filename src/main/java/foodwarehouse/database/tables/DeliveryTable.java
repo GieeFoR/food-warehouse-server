@@ -14,7 +14,7 @@ final public class DeliveryTable {
     static final public class Procedures {
         static final public String INSERT = "CALL `INSERT_DELIVERY`(?,?,?)";
 
-        static final public String UPDATE = "CALL `UPDATE_DELIVERY_REMOVE_FROM_STORAGE`(?,?)";
+        static final public String UPDATE_REMOVE = "CALL `UPDATE_DELIVERY_REMOVE_FROM_STORAGE`(?,?)";
         static final public String UPDATE_COMPLETE = "CALL `UPDATE_DELIVERY_COMPLETE`(?,?)";
 
         static final public String DELETE = "CALL `DELETE_DELIVERY`(?)";

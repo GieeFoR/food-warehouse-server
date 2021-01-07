@@ -12,5 +12,4 @@ public interface AddressRepository {
     boolean deleteAddress(Address address);
 
     Optional<Address> findAddressById(int addressId) throws SQLException;
-
 }
