@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PaymentTypeService implements PaymentTypeRepository {
+public class PaymentTypeService {
 
     private final PaymentTypeRepository paymentTypeRepository;
 
@@ -19,27 +19,22 @@ public class PaymentTypeService implements PaymentTypeRepository {
         this.paymentTypeRepository = paymentTypeRepository;
     }
 
-    @Override
     public Optional<PaymentType> createPaymentType(String type) throws SQLException {
         return paymentTypeRepository.createPaymentType(type);
     }
 
-    @Override
     public Optional<PaymentType> updatePaymentType(int paymentId, String type) throws SQLException {
         return paymentTypeRepository.updatePaymentType(paymentId, type);
     }
 
-    @Override
     public boolean deletePaymentType(int paymentId) throws SQLException {
         return paymentTypeRepository.deletePaymentType(paymentId);
     }
 
-    @Override
     public Optional<PaymentType> findPaymentTypeById(int paymentId) throws SQLException {
         return paymentTypeRepository.findPaymentTypeById(paymentId);
     }
 
-    @Override
     public List<PaymentType> findPayments() throws SQLException {
         return paymentTypeRepository.findPayments();
     }

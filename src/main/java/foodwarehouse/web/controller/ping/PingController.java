@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PingController {
 
     @GetMapping("/ping")
-    public SuccessResponse<PingResponse> ping() {
+    public SuccessResponse<PingResponse> getPing() {
         return new SuccessResponse<>(
                 new PingResponse(true)
         );

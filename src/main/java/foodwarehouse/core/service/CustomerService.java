@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CustomerService implements CustomerRepository {
+public class CustomerService {
     private final CustomerRepository customerRepository;
 
     @Autowired
@@ -20,22 +20,18 @@ public class CustomerService implements CustomerRepository {
         this.customerRepository = customerRepository;
     }
 
-    @Override
     public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
         return customerRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-    @Override
     public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) throws SQLException {
         return customerRepository.updateCustomer(customerId, user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-    @Override
     public boolean deleteCustomer(int customerId) throws SQLException {
         return customerRepository.deleteCustomer(customerId);
     }
 
-    @Override
     public List<Customer> findAllCustomers() throws SQLException {
         return customerRepository.findAllCustomers();
     }

@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
-public class AddressService implements AddressRepository {
+public class AddressService {
     private final AddressRepository addressRepository;
 
     @Autowired

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
-public class ProductInStorageService implements ProductInStorageRepository {
+public class ProductInStorageService {
 
     private final ProductInStorageRepository productInStorageRepository;
 
@@ -20,7 +20,6 @@ public class ProductInStorageService implements ProductInStorageRepository {
         this.productInStorageRepository = productInStorageRepository;
     }
 
-    @Override
     public Optional<ProductInStorage> createProductInStorage(ProductBatch productBatch, Storage storage, int quantity) throws SQLException {
         return productInStorageRepository.createProductInStorage(productBatch, storage, quantity);
     }

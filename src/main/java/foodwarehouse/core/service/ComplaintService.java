@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ComplaintService implements ComplaintRepository {
+public class ComplaintService {
 
     private final ComplaintRepository complaintRepository;
 
@@ -21,17 +21,14 @@ public class ComplaintService implements ComplaintRepository {
         this.complaintRepository = complaintRepository;
     }
 
-    @Override
     public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) throws SQLException {
         return complaintRepository.createComplaint(order, content, sendDate, state, decision, decisionDate);
     }
 
-    @Override
     public Optional<Complaint> findComplaintById(int complaintId) throws SQLException {
         return complaintRepository.findComplaintById(complaintId);
     }
 
-    @Override
     public List<Complaint> findComplaints() throws SQLException {
         return complaintRepository.findComplaints();
     }

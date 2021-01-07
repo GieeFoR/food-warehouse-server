@@ -1,42 +1,38 @@
-package foodwarehouse.core.service;
+package foodwarehouse.database.jdbc;
 
 import foodwarehouse.core.data.maker.Maker;
 import foodwarehouse.core.data.product.Product;
 import foodwarehouse.core.data.product.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class ProductService {
-
-    private final ProductRepository productRepository;
-
-    @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
+@Repository
+public class JdbcProductRepository implements ProductRepository {
+    @Override
     public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
-        return productRepository.createProduct(maker, name, category, needColdStorage, buyPrice, sellPrice);
+        return Optional.empty();
     }
 
+    @Override
     public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) throws SQLException {
-        return productRepository.updateProduct(productId, name, category, needColdStorage, buyPrice, sellPrice);
+        return Optional.empty();
     }
 
+    @Override
     public boolean deleteProduct(int productId) throws SQLException {
-        return productRepository.deleteProduct(productId);
+        return false;
     }
 
+    @Override
     public Optional<Product> findProductById(int productId) throws SQLException {
-        return productRepository.findProductById(productId);
+        return Optional.empty();
     }
 
+    @Override
     public List<Product> findProducts() throws SQLException {
-        return productRepository.findProducts();
+        return null;
     }
 }

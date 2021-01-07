@@ -1,46 +1,43 @@
-package foodwarehouse.core.service;
+package foodwarehouse.database.jdbc;
 
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentRepository;
 import foodwarehouse.core.data.paymentType.PaymentType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class PaymentService {
-
-    private final PaymentRepository paymentRepository;
-
-    @Autowired
-    public PaymentService(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
-
+@Repository
+public class JdbcPaymentRepository implements PaymentRepository {
+    @Override
     public Optional<Payment> createPayment(PaymentType paymentType, float value) throws SQLException {
-        return paymentRepository.createPayment(paymentType, value);
+        return Optional.empty();
     }
 
+    @Override
     public Optional<Payment> updatePaymentValue(int paymentId, float value) throws SQLException {
-        return paymentRepository.updatePaymentValue(paymentId, value);
+        return Optional.empty();
     }
 
+    @Override
     public Optional<Payment> completePayment(int paymentId) throws SQLException {
-        return paymentRepository.completePayment(paymentId);
+        return Optional.empty();
     }
 
+    @Override
     public boolean deletePayment(int paymentId) throws SQLException {
-        return paymentRepository.deletePayment(paymentId);
+        return false;
     }
 
+    @Override
     public Optional<Payment> findPaymentById(int paymentId) throws SQLException {
-        return paymentRepository.findPaymentById(paymentId);
+        return Optional.empty();
     }
 
+    @Override
     public List<Payment> findPayments() throws SQLException {
-        return paymentRepository.findPayments();
+        return null;
     }
 }

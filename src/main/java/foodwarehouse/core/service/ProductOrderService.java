@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
-public class ProductOrderService implements ProductOrderRepository {
+public class ProductOrderService {
 
     private final ProductOrderRepository productOrderRepository;
 
@@ -20,7 +20,6 @@ public class ProductOrderService implements ProductOrderRepository {
         this.productOrderRepository = productOrderRepository;
     }
 
-    @Override
     public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) throws SQLException {
         return productOrderRepository.createProductOrder(order, productBatch, quantity);
     }
