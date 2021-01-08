@@ -92,11 +92,11 @@ public class CustomerController {
                 .createCustomer(
                     user,
                     address,
-                    request.customerPersonalData().name(),
-                    request.customerPersonalData().surname(),
-                    request.customerPersonalData().firmName(),
-                    request.customerPersonalData().phoneNumber(),
-                    request.customerPersonalData().tax_id())
+                    request.createCustomerData().name(),
+                    request.createCustomerData().surname(),
+                    request.createCustomerData().firmName(),
+                    request.createCustomerData().phoneNumber(),
+                    request.createCustomerData().tax_id())
                 .map(CustomerResponse::fromCustomer)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to create a new customer."));
@@ -114,7 +114,7 @@ public class CustomerController {
 
         //update user
         User user = userService.updateUser(
-                    request.userId(),
+                    request.updateUserRequest().userId(),
                     request.updateUserRequest().username(),
                     request.updateUserRequest().password(),
                     request.updateUserRequest().email(),
@@ -123,7 +123,7 @@ public class CustomerController {
 
         //update address
         Address address = addressService.updateAddress(
-                    request.addressId(),
+                    request.updateAddressRequest().addressId(),
                     request.updateAddressRequest().country(),
                     request.updateAddressRequest().town(),
                     request.updateAddressRequest().postalCode(),
@@ -135,14 +135,14 @@ public class CustomerController {
         //update customer
         //return response to client with updated customer
         return customerService.updateCustomer(
-                    request.customerId(),
+                    request.updateCustomerData().customerId(),
                     user,
                     address,
-                    request.customerPersonalData().name(),
-                    request.customerPersonalData().surname(),
-                    request.customerPersonalData().firmName(),
-                    request.customerPersonalData().phoneNumber(),
-                    request.customerPersonalData().tax_id())
+                    request.updateCustomerData().name(),
+                    request.updateCustomerData().surname(),
+                    request.updateCustomerData().firmName(),
+                    request.updateCustomerData().phoneNumber(),
+                    request.updateCustomerData().tax_id())
                 .map(CustomerResponse::fromCustomer)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to update a customer."));

@@ -90,10 +90,10 @@ public class EmployeeController {
 
         return employeeService.createEmployee(
                 user,
-                request.employeePersonalData().name(),
-                request.employeePersonalData().surname(),
-                request.employeePersonalData().position(),
-                request.employeePersonalData().salary())
+                request.createEmployeeData().name(),
+                request.createEmployeeData().surname(),
+                request.createEmployeeData().position(),
+                request.createEmployeeData().salary())
                 .map(EmployeeResponse::fromEmployee)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to create a new employee."));
@@ -110,7 +110,7 @@ public class EmployeeController {
         }
 
         User user = userService.updateUser(
-                request.userId(),
+                request.updateUserRequest().userId(),
                 request.updateUserRequest().username(),
                 request.updateUserRequest().password(),
                 request.updateUserRequest().email(),
@@ -120,12 +120,12 @@ public class EmployeeController {
                 .orElseThrow(() -> new RestException("Unable to update an user."));
 
         return employeeService.updateEmployee(
-                request.employeeId(),
+                request.updateEmployeeData().employeeId(),
                 user,
-                request.employeePersonalData().name(),
-                request.employeePersonalData().surname(),
-                request.employeePersonalData().position(),
-                request.employeePersonalData().salary())
+                request.updateEmployeeData().name(),
+                request.updateEmployeeData().surname(),
+                request.updateEmployeeData().position(),
+                request.updateEmployeeData().salary())
                 .map(EmployeeResponse::fromEmployee)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to update an employee."));

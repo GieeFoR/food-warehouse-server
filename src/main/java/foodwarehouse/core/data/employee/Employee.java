@@ -9,12 +9,4 @@ public record Employee(
         String surname,
         String position,
         float salary) {
-
-    public static EmployeePersonalData toEmployeePersonalData(Employee employee){
-        return new EmployeePersonalData(
-                employee.name(),
-                employee.surname(),
-                employee.position(),
-                employee.salary());
-    }
 }

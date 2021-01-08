@@ -8,13 +8,13 @@ import foodwarehouse.core.data.user.User;
 import java.util.Date;
 
 public record MessageResponse (
-        @JsonProperty("message_id")     int messageId,
-        @JsonProperty("sender")         EmployeeResponse senderResponse,
-        @JsonProperty("receiver")       EmployeeResponse receiverReponse,
-        @JsonProperty("content")        String content,
-        @JsonProperty("state")          String state,
-        @JsonProperty("send_date")      Date sendDate,
-        @JsonProperty("read_date")      Date readDate) {
+        @JsonProperty(value = "message_id", required = true)     int messageId,
+        @JsonProperty(value = "sender", required = true)         EmployeeResponse senderResponse,
+        @JsonProperty(value = "receiver", required = true)       EmployeeResponse receiverResponse,
+        @JsonProperty(value = "content", required = true)        String content,
+        @JsonProperty(value = "state", required = true)          String state,
+        @JsonProperty(value = "send_date", required = true)      Date sendDate,
+        @JsonProperty(value = "read_date")      Date readDate) {
 
     public static MessageResponse fromMessage(Message message) {
         return new MessageResponse(

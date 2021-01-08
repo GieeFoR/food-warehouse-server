@@ -2,17 +2,16 @@ package foodwarehouse.web.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.customer.Customer;
-import foodwarehouse.core.data.customer.CustomerPersonalData;
 
 public record CustomerResponse(
-        @JsonProperty("account")            UserResponse userResponse,
-        @JsonProperty("personal_data")      CustomerPersonalData customerPersonalData,
-        @JsonProperty("address")            AddressResponse addressResponse) {
+        @JsonProperty(value = "account", required = true)            UserResponse userResponse,
+        @JsonProperty(value = "personal_data", required = true)      CustomerDataResponse customerDataResponse,
+        @JsonProperty(value = "address", required = true)            AddressResponse addressResponse) {
 
     public static CustomerResponse fromCustomer(Customer customer) {
         return new CustomerResponse(
                         UserResponse.fromUser(customer.user()),
-                        CustomerPersonalData.fromCustomer(customer),
+                        CustomerDataResponse.fromCustomer(customer),
                         AddressResponse.fromAddress(customer.address()));
     }
 }

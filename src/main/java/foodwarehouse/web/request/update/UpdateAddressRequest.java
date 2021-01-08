@@ -3,6 +3,7 @@ package foodwarehouse.web.request.update;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record UpdateAddressRequest(
+        @JsonProperty(value = "address_id", required = true)         int addressId,
         @JsonProperty(value = "country", required = true)            String country,
         @JsonProperty(value = "town", required = true)               String town,
         @JsonProperty(value = "postal_code", required = true)        String postalCode,

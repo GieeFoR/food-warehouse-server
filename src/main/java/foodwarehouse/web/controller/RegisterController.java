@@ -95,11 +95,11 @@ public class RegisterController {
         customerService.createCustomer(
                         user,
                         address,
-                        request.customerPersonalData().name(),
-                        request.customerPersonalData().surname(),
-                        request.customerPersonalData().firmName(),
-                        request.customerPersonalData().phoneNumber(),
-                        request.customerPersonalData().tax_id())
+                        request.createCustomerData().name(),
+                        request.createCustomerData().surname(),
+                        request.createCustomerData().firmName(),
+                        request.createCustomerData().phoneNumber(),
+                        request.createCustomerData().tax_id())
                 .orElseThrow(() -> new RestException("Unable to create a new customer."));
 
         return new SuccessResponse<>(new RegistrationResponse(true));
