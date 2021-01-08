@@ -20,12 +20,21 @@ public class MakerService {
         this.makerRepository = makerRepository;
     }
 
-    public Optional<Maker> createMaker(Address address, String name, String phone, String email) {
+    public Optional<Maker> createMaker(
+            Address address,
+            String name,
+            String phone,
+            String email) {
         return makerRepository.createMaker(address, name, phone, email);
     }
 
-    public Optional<Maker> updateMaker(int makerId, String name, String phone, String email) {
-        return makerRepository.updateMaker(makerId, name, phone, email);
+    public Optional<Maker> updateMaker(
+            int makerId,
+            Address address,
+            String name,
+            String phone,
+            String email) {
+        return makerRepository.updateMaker(makerId, address, name, phone, email);
     }
 
     public boolean deleteMaker(int makerId) {

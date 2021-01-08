@@ -16,6 +16,8 @@ final public class MakerTable {
 
         static final public String UPDATE = "CALL `UPDATE_MAKER`(?,?,?,?)";
 
+        static final public String DELETE = "CALL `DELETE_MAKER`(?)";
+
         static final public String READ_ALL = "CALL `GET_MAKERS`()";
         static final public String READ_BY_ID = "CALL `GET_MAKER_BY_ID`(?)";
     }

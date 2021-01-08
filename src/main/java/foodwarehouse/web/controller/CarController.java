@@ -91,7 +91,7 @@ public class CarController {
                         createCarRequest.brand(),
                         createCarRequest.model(),
                         createCarRequest.yearOfProd(),
-                        createCarRequest.brand(),
+                        createCarRequest.registrationNumber(),
                         createCarRequest.insuranceExp(),
                         createCarRequest.inspectionExp())
                 .map(CarResponse::fromCar)
