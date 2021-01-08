@@ -8,9 +8,22 @@ import java.util.Optional;
 
 public interface ProductRepository {
 
-    Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice);
+    Optional<Product> createProduct(
+            Maker maker,
+            String name,
+            String category,
+            boolean needColdStorage,
+            float buyPrice,
+            float sellPrice);
 
-    Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice);
+    Optional<Product> updateProduct(
+            int productId,
+            Maker maker,
+            String name,
+            String category,
+            boolean needColdStorage,
+            float buyPrice,
+            float sellPrice);
 
     boolean deleteProduct(int productId);
 

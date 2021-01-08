@@ -18,6 +18,8 @@ final public class ProductTable {
 
         static final public String UPDATE = "CALL `UPDATE_PRODUCT`(?,?,?,?,?,?)";
 
+        static final public String DELETE = "CALL `DELETE_PRODUCT`(?)";
+
         static final public String READ_ALL = "CALL `GET_PRODUCTS`()";
         static final public String READ_BY_ID = "CALL `GET_PRODUCT_BY_ID`(?)";
     }

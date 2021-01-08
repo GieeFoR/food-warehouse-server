@@ -20,12 +20,25 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Optional<Product> createProduct(Maker maker, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
+    public Optional<Product> createProduct(
+            Maker maker,
+            String name,
+            String category,
+            boolean needColdStorage,
+            float buyPrice,
+            float sellPrice) {
         return productRepository.createProduct(maker, name, category, needColdStorage, buyPrice, sellPrice);
     }
 
-    public Optional<Product> updateProduct(int productId, String name, String category, boolean needColdStorage, float buyPrice, float sellPrice) {
-        return productRepository.updateProduct(productId, name, category, needColdStorage, buyPrice, sellPrice);
+    public Optional<Product> updateProduct(
+            int productId,
+            Maker maker,
+            String name,
+            String category,
+            boolean needColdStorage,
+            float buyPrice,
+            float sellPrice) {
+        return productRepository.updateProduct(productId, maker, name, category, needColdStorage, buyPrice, sellPrice);
     }
 
     public boolean deleteProduct(int productId) {
