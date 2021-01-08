@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/car")
+@RequestMapping("/vehicle")
 public class CarController {
 
     private final CarService carService;
