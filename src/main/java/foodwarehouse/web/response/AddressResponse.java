@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.address.Address;
 
 public record AddressResponse(
+        @JsonProperty(value = "address_id", required = true)         int addressId,
         @JsonProperty(value = "country", required = true)            String country,
         @JsonProperty(value = "town", required = true)               String town,
         @JsonProperty(value = "postal_code", required = true)        String postalCode,
@@ -13,6 +14,7 @@ public record AddressResponse(
 
     public static AddressResponse fromAddress(Address address) {
         return new AddressResponse(
+                address.addressId(),
                 address.country(),
                 address.town(),
                 address.postalCode(),
