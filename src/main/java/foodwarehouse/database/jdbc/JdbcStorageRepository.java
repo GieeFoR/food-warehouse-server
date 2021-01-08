@@ -35,9 +35,14 @@ public class JdbcStorageRepository implements StorageRepository {
         }
     }
 
-
     @Override
-    public Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
+    public Optional<Storage> insertStorage(
+            Address address,
+            Employee manager,
+            String name,
+            int capacity,
+            boolean isColdStorage) {
+
         try {
             CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.INSERT);
             callableStatement.setInt(1, address.addressId());
@@ -57,7 +62,14 @@ public class JdbcStorageRepository implements StorageRepository {
     }
 
     @Override
-    public Optional<Storage> updateStorage(int storageId, Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
+    public Optional<Storage> updateStorage(
+            int storageId,
+            Address address,
+            Employee manager,
+            String name,
+            int capacity,
+            boolean isColdStorage) {
+
         try {
             CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.UPDATE);
             callableStatement.setInt(1, storageId);

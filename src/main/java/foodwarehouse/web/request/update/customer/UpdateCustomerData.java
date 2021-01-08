@@ -1,4 +1,4 @@
-package foodwarehouse.web.request.update;
+package foodwarehouse.web.request.update.customer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.customer.Customer;

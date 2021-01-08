@@ -6,9 +6,9 @@ import foodwarehouse.web.response.AddressResponse;
 import foodwarehouse.web.response.UserResponse;
 
 public record CustomerResponse(
-        @JsonProperty(value = "account", required = true)UserResponse userResponse,
-        @JsonProperty(value = "personal_data", required = true)      CustomerDataResponse customerDataResponse,
-        @JsonProperty(value = "address", required = true)AddressResponse addressResponse) {
+        @JsonProperty(value = "account", required = true)           UserResponse userResponse,
+        @JsonProperty(value = "personal_data", required = true)     CustomerDataResponse customerDataResponse,
+        @JsonProperty(value = "address", required = true)           AddressResponse addressResponse) {
 
     public static CustomerResponse fromCustomer(Customer customer) {
         return new CustomerResponse(

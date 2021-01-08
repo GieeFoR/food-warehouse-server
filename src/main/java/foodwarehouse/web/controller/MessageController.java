@@ -8,8 +8,8 @@ import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.create.CreateMessageRequest;
-import foodwarehouse.web.response.MessageResponse;
-import foodwarehouse.web.response.MessageSentResponse;
+import foodwarehouse.web.response.message.MessageResponse;
+import foodwarehouse.web.response.message.MessageSentResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

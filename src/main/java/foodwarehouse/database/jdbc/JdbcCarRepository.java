@@ -60,6 +60,7 @@ public class JdbcCarRepository implements CarRepository {
             return Optional.of(new Car(carId, employee, brand, model ,yearOfProd, regNo, insurance, inspection));
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }

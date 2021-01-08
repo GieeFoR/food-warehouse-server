@@ -1,4 +1,4 @@
-package foodwarehouse.web.response;
+package foodwarehouse.web.response.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

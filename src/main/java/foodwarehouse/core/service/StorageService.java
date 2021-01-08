@@ -20,7 +20,7 @@ public class StorageService {
         this.storageRepository = storageRepository;
     }
 
-    public Optional<Storage> insertStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
+    public Optional<Storage> createStorage(Address address, Employee manager, String name, int capacity, boolean isColdStorage) {
         return storageRepository.insertStorage(address, manager, name, capacity, isColdStorage);
     }
 

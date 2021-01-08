@@ -9,7 +9,7 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.others.CheckEmailRequest;
 import foodwarehouse.web.request.others.CheckUsernameRequest;
-import foodwarehouse.web.request.create.CreateCustomerRequest;
+import foodwarehouse.web.request.create.customer.CreateCustomerRequest;
 import foodwarehouse.web.response.*;
 import org.springframework.web.bind.annotation.*;
 

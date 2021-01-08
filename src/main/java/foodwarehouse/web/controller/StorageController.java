@@ -1,16 +1,18 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.address.Address;
-import foodwarehouse.core.service.AddressService;
-import foodwarehouse.core.service.ConnectionService;
-import foodwarehouse.core.service.MakerService;
+import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.create.maker.CreateMakerRequest;
-import foodwarehouse.web.request.update.maker.UpdateMakerRequest;
+import foodwarehouse.web.request.create.CreateCarRequest;
+import foodwarehouse.web.request.create.storage.CreateStorageRequest;
+import foodwarehouse.web.request.update.UpdateCarRequest;
+import foodwarehouse.web.request.update.storage.UpdateStorageRequest;
 import foodwarehouse.web.response.DeleteResponse;
-import foodwarehouse.web.response.maker.MakerResponse;
+import foodwarehouse.web.response.car.CarResponse;
+import foodwarehouse.web.response.storage.StorageResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,25 +21,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/producer")
-public class MakerController {
+@RequestMapping("/storage")
+public class StorageController {
 
-    private final MakerService makerService;
+    private final StorageService storageService;
+    private final EmployeeService employeeService;
     private final AddressService addressService;
     private final ConnectionService connectionService;
 
-    public MakerController(
-            MakerService makerService,
+    public StorageController(
+            StorageService storageService,
+            EmployeeService employeeService,
             AddressService addressService,
             ConnectionService connectionService) {
-        this.makerService = makerService;
+        this.storageService = storageService;
+        this.employeeService = employeeService;
         this.addressService = addressService;
         this.connectionService = connectionService;
     }
 
     @GetMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<List<MakerResponse>> getMakers() {
+    public SuccessResponse<List<StorageResponse>> getStorages() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -45,18 +50,18 @@ public class MakerController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        final var makers = makerService
-                .findMakers()
+        final var cars = storageService
+                .findAllStorages()
                 .stream()
-                .map(MakerResponse::fromMaker)
+                .map(StorageResponse::fromStorage)
                 .collect(Collectors.toList());
 
-        return new SuccessResponse<>(makers);
+        return new SuccessResponse<>(cars);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<MakerResponse> getMakerById(@PathVariable int id) {
+    public SuccessResponse<StorageResponse> getStorageById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -64,22 +69,26 @@ public class MakerController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        return makerService
-                .findMakerById(id)
-                .map(MakerResponse::fromMaker)
+        return storageService
+                .findStorage(id)
+                .map(StorageResponse::fromStorage)
                 .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot find producer with this ID."));
+                .orElseThrow(() -> new RestException("Cannot find storage with this ID."));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<MakerResponse> createMaker(@RequestBody CreateMakerRequest request) {
+    public SuccessResponse<StorageResponse> createStorage(@RequestBody CreateStorageRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
         }
+
+        Employee manager = employeeService
+                .findEmployeeById(request.managerId())
+                .orElseThrow(() -> new RestException("Cannot find manager."));
 
         //create address
         Address address = addressService.createAddress(
@@ -91,20 +100,21 @@ public class MakerController {
                 request.createAddressRequest().apartmentNumber())
                 .orElseThrow(() -> new RestException("Unable to create a new address."));
 
-        return makerService
-                .createMaker(
+        return storageService
+                .createStorage(
                         address,
-                        request.createMakerData().firmName(),
-                        request.createMakerData().phoneNumber(),
-                        request.createMakerData().email())
-                .map(MakerResponse::fromMaker)
+                        manager,
+                        request.createStorageData().storageName(),
+                        request.createStorageData().capacity(),
+                        request.createStorageData().isColdStorage())
+                .map(StorageResponse::fromStorage)
                 .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot create a new producer."));
+                .orElseThrow(() -> new RestException("Cannot create a new storage."));
     }
 
     @PutMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<MakerResponse> updateMaker(@RequestBody UpdateMakerRequest request) {
+    public SuccessResponse<StorageResponse> updateStorage(@RequestBody UpdateStorageRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -112,7 +122,11 @@ public class MakerController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        //update address
+        Employee manager = employeeService
+                .findEmployeeById(request.managerId())
+                .orElseThrow(() -> new RestException("Cannot find manager."));
+
+        //create address
         Address address = addressService.updateAddress(
                 request.updateAddressRequest().addressId(),
                 request.updateAddressRequest().country(),
@@ -121,24 +135,24 @@ public class MakerController {
                 request.updateAddressRequest().buildingNumber(),
                 request.updateAddressRequest().street(),
                 request.updateAddressRequest().apartmentNumber())
-                .orElseThrow(() -> new RestException("Unable to update an address."));
+                .orElseThrow(() -> new RestException("Unable update an address."));
 
-        return makerService
-                .updateMaker(
-                        request.updateMakerData().makerId(),
+        return storageService
+                .updateStorage(
+                        request.updateStorageData().storageId(),
                         address,
-                        request.updateMakerData().firmName(),
-                        request.updateMakerData().phoneNumber(),
-                        request.updateMakerData().email()
-                )
-                .map(MakerResponse::fromMaker)
+                        manager,
+                        request.updateStorageData().storageName(),
+                        request.updateStorageData().capacity(),
+                        request.updateStorageData().isColdStorage())
+                .map(StorageResponse::fromStorage)
                 .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot update producer."));
+                .orElseThrow(() -> new RestException("Cannot update a storage."));
     }
 
     @DeleteMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<List<DeleteResponse>> deleteMakers(@RequestBody List<Integer> request) {
+    public SuccessResponse<List<DeleteResponse>> deleteStorages(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -150,7 +164,7 @@ public class MakerController {
         for(int i : request) {
             result.add(
                     new DeleteResponse(
-                            makerService.deleteMaker(i)));
+                            storageService.deleteStorage(i)));
         }
 
         return new SuccessResponse<>(result);
@@ -158,7 +172,7 @@ public class MakerController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<DeleteResponse> deleteMakerById(@PathVariable int id) {
+    public SuccessResponse<DeleteResponse> deleteStorageById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -168,6 +182,6 @@ public class MakerController {
 
         return new SuccessResponse<>(
                 new DeleteResponse(
-                        makerService.deleteMaker(id)));
+                        storageService.deleteStorage(id)));
     }
 }
