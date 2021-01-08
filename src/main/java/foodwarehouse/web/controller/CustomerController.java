@@ -1,8 +1,6 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.address.Address;
-import foodwarehouse.core.data.customer.Customer;
-import foodwarehouse.core.data.user.Account;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.AddressService;
@@ -12,15 +10,13 @@ import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.CreateCustomerRequest;
-import foodwarehouse.web.response.AddressResponse;
+import foodwarehouse.web.request.create.CreateCustomerRequest;
+import foodwarehouse.web.request.update.UpdateCustomerRequest;
 import foodwarehouse.web.response.CustomerResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -74,20 +70,20 @@ public class CustomerController {
 
         //create user
         User user = userService.createUser(
-                        request.account().username(),
-                        request.account().password(),
-                        request.account().email(),
+                        request.createUserRequest().username(),
+                        request.createUserRequest().password(),
+                        request.createUserRequest().email(),
                         Permission.CUSTOMER)
                 .orElseThrow(() -> new RestException("Unable to create a new user."));
 
         //create address
         Address address = addressService.createAddress(
-                        request.addressResponse().country(),
-                        request.addressResponse().town(),
-                        request.addressResponse().postalCode(),
-                        request.addressResponse().buildingNumber(),
-                        request.addressResponse().street(),
-                        request.addressResponse().apartmentNumber())
+                        request.createAddressRequest().country(),
+                        request.createAddressRequest().town(),
+                        request.createAddressRequest().postalCode(),
+                        request.createAddressRequest().buildingNumber(),
+                        request.createAddressRequest().street(),
+                        request.createAddressRequest().apartmentNumber())
                 .orElseThrow(() -> new RestException("Unable to create a new address."));
 
         //create customer with user and address
@@ -108,7 +104,7 @@ public class CustomerController {
 
     @PutMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<CustomerResponse> updateCustomer(@RequestBody CreateCustomerRequest request) {
+    public SuccessResponse<CustomerResponse> updateCustomer(@RequestBody UpdateCustomerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -118,28 +114,28 @@ public class CustomerController {
 
         //update user
         User user = userService.updateUser(
-                    request.account().userId(),
-                    request.account().username(),
-                    request.account().password(),
-                    request.account().email(),
+                    request.userId(),
+                    request.updateUserRequest().username(),
+                    request.updateUserRequest().password(),
+                    request.updateUserRequest().email(),
                     Permission.CUSTOMER)
                 .orElseThrow(() -> new RestException("Unable to update a user."));
 
         //update address
         Address address = addressService.updateAddress(
-                    request.addressResponse().addressId(),
-                    request.addressResponse().country(),
-                    request.addressResponse().town(),
-                    request.addressResponse().postalCode(),
-                    request.addressResponse().buildingNumber(),
-                    request.addressResponse().street(),
-                    request.addressResponse().apartmentNumber())
+                    request.addressId(),
+                    request.updateAddressRequest().country(),
+                    request.updateAddressRequest().town(),
+                    request.updateAddressRequest().postalCode(),
+                    request.updateAddressRequest().buildingNumber(),
+                    request.updateAddressRequest().street(),
+                    request.updateAddressRequest().apartmentNumber())
                 .orElseThrow(() -> new RestException("Unable to update an address."));
 
         //update customer
         //return response to client with updated customer
         return customerService.updateCustomer(
-                    request.customerPersonalData().customerId(),
+                    request.customerId(),
                     user,
                     address,
                     request.customerPersonalData().name(),

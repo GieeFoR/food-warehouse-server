@@ -53,7 +53,7 @@ public class JdbcUserRepository implements UserRepository {
             CallableStatement callableStatement = connection.prepareCall(UserTable.Procedures.UPDATE);
             callableStatement.setInt(1, userId);
             callableStatement.setString(2, username);
-            callableStatement.setString(3, password);
+            callableStatement.setString(3, password.equals("") ? null : password);
             callableStatement.setString(4, permission.value());
             callableStatement.setString(5, email);
 

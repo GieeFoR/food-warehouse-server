@@ -1,7 +1,5 @@
 package foodwarehouse.web.controller;
 
-import foodwarehouse.core.data.employee.Employee;
-import foodwarehouse.core.data.employee.EmployeePersonalData;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.ConnectionService;
@@ -10,16 +8,15 @@ import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.CreateEmployeeRequest;
-import foodwarehouse.web.response.CustomerResponse;
+import foodwarehouse.web.request.create.CreateEmployeeRequest;
+import foodwarehouse.web.request.update.UpdateEmployeeRequest;
+import foodwarehouse.web.response.DeleteResponse;
 import foodwarehouse.web.response.EmployeeResponse;
-import foodwarehouse.web.response.UserResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +52,23 @@ public class EmployeeController {
         return new SuccessResponse<>(customers);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<EmployeeResponse> getEmployeeById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return employeeService
+                .findEmployeeById(id)
+                .map(EmployeeResponse::fromEmployee)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find user with this ID."));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<EmployeeResponse> createEmployee(@RequestBody CreateEmployeeRequest request) {
@@ -66,11 +80,11 @@ public class EmployeeController {
         }
 
         User user = userService.createUser(
-                request.account().username(),
-                request.account().password(),
-                request.account().email(),
+                request.createUserRequest().username(),
+                request.createUserRequest().password(),
+                request.createUserRequest().email(),
                 Permission.from(
-                        request.account().permission())
+                        request.createUserRequest().permission())
                         .orElseThrow(() -> new RestException("Wrong permission name.")))
                 .orElseThrow(() -> new RestException("Unable to create a new user."));
 
@@ -87,7 +101,7 @@ public class EmployeeController {
 
     @PutMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<EmployeeResponse> updateEmployee(@RequestBody CreateEmployeeRequest request) {
+    public SuccessResponse<EmployeeResponse> updateEmployee(@RequestBody UpdateEmployeeRequest request) {
         //check if database is reachable
         if (!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -96,17 +110,17 @@ public class EmployeeController {
         }
 
         User user = userService.updateUser(
-                request.account().userId(),
-                request.account().username(),
-                request.account().password(),
-                request.account().email(),
+                request.userId(),
+                request.updateUserRequest().username(),
+                request.updateUserRequest().password(),
+                request.updateUserRequest().email(),
                 Permission.from(
-                        request.account().permission())
+                        request.updateUserRequest().permission())
                         .orElseThrow(() -> new RestException("Wrong permission name.")))
                 .orElseThrow(() -> new RestException("Unable to update an user."));
 
         return employeeService.updateEmployee(
-                request.employeePersonalData().employeeId(),
+                request.employeeId(),
                 user,
                 request.employeePersonalData().name(),
                 request.employeePersonalData().surname(),
@@ -115,5 +129,40 @@ public class EmployeeController {
                 .map(EmployeeResponse::fromEmployee)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to update an employee."));
+    }
+
+    @DeleteMapping
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<List<DeleteResponse>> deleteEmployees(@RequestBody List<Integer> request) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        List<DeleteResponse> result = new LinkedList<>();
+        for(int i : request) {
+            result.add(
+                    new DeleteResponse(
+                            employeeService.deleteEmployee(i)));
+        }
+
+        return new SuccessResponse<>(result);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<DeleteResponse> deleteEmployeeById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return new SuccessResponse<>(
+                DeleteResponse.fromBoolean(
+                employeeService.deleteEmployee(id)));
     }
 }

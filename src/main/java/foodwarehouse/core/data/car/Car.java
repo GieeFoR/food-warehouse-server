@@ -6,7 +6,7 @@ import java.util.Date;
 
 public record Car(
         int carId,
-        Employee driverId,
+        Employee driver,
         String brand,
         String model,
         int yearOfProd,

@@ -17,7 +17,7 @@ final public class EmployeeTable {
 
         static final public String UPDATE = "CALL `UPDATE_EMPLOYEE`(?,?,?,?,?)";
 
-        static final public String DELETE = "CALL `DELETE_EMPLOYEE`()";
+        static final public String DELETE = "CALL `DELETE_EMPLOYEE`(?)";
 
         static final public String READ_ALL = "CALL `GET_EMPLOYEES`()";
         static final public String READ_BY_ID = "CALL `GET_EMPLOYEE_BY_ID`(?)";

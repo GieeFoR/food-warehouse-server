@@ -3,7 +3,6 @@ package foodwarehouse.core.data.customer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record CustomerPersonalData(
-        @JsonProperty("customer_id")    int customerId,
         @JsonProperty("name")           String name,
         @JsonProperty("surname")        String surname,
         @JsonProperty("phone_number")   String phoneNumber,
@@ -12,7 +11,6 @@ public record CustomerPersonalData(
 
     public static CustomerPersonalData fromCustomer(Customer customer) {
         return new CustomerPersonalData(
-                customer.customerId(),
                 customer.name(),
                 customer.surname(),
                 customer.phoneNumber(),

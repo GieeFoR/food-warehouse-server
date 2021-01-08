@@ -4,18 +4,14 @@ import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.*;
-import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.CheckEmailRequest;
-import foodwarehouse.web.request.CheckUsernameRequest;
-import foodwarehouse.web.request.CreateCustomerRequest;
+import foodwarehouse.web.request.others.CheckEmailRequest;
+import foodwarehouse.web.request.others.CheckUsernameRequest;
+import foodwarehouse.web.request.create.CreateCustomerRequest;
 import foodwarehouse.web.response.*;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.SQLException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/register")
@@ -78,20 +74,20 @@ public class RegisterController {
 
         //create user
         User user = userService.createUser(
-                request.account().username(),
-                request.account().password(),
-                request.account().email(),
+                request.createUserRequest().username(),
+                request.createUserRequest().password(),
+                request.createUserRequest().email(),
                 Permission.CUSTOMER)
                 .orElseThrow(() -> new RestException("Unable to create a new user."));
 
         //create address
         Address address = addressService.createAddress(
-                request.addressResponse().country(),
-                request.addressResponse().town(),
-                request.addressResponse().postalCode(),
-                request.addressResponse().buildingNumber(),
-                request.addressResponse().street(),
-                request.addressResponse().apartmentNumber())
+                request.createAddressRequest().country(),
+                request.createAddressRequest().town(),
+                request.createAddressRequest().postalCode(),
+                request.createAddressRequest().buildingNumber(),
+                request.createAddressRequest().street(),
+                request.createAddressRequest().apartmentNumber())
                 .orElseThrow(() -> new RestException("Unable to create a new address."));
 
         //create customer with user and address

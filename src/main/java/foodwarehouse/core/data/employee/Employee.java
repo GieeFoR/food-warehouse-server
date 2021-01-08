@@ -12,7 +12,6 @@ public record Employee(
 
     public static EmployeePersonalData toEmployeePersonalData(Employee employee){
         return new EmployeePersonalData(
-                employee.employeeId(),
                 employee.name(),
                 employee.surname(),
                 employee.position(),
