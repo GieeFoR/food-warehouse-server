@@ -19,12 +19,8 @@ public record MessageResponse (
     public static MessageResponse fromMessage(Message message) {
         return new MessageResponse(
                 message.messageId(),
-                new EmployeeResponse(
-                        UserResponse.fromUser(message.sender().user()),
-                        Employee.toEmployeePersonalData(message.sender())),
-                new EmployeeResponse(
-                        UserResponse.fromUser(message.receiver().user()),
-                        Employee.toEmployeePersonalData(message.receiver())),
+                EmployeeResponse.fromEmployee(message.sender()),
+                EmployeeResponse.fromEmployee(message.receiver()),
                 message.content(),
                 message.state(),
                 message.sendDate(),
