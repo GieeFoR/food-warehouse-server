@@ -1,7 +1,6 @@
 package foodwarehouse.web.request.update;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import foodwarehouse.core.data.car.Car;
 
 import java.util.Date;
 
@@ -14,16 +13,4 @@ public record UpdateCarRequest(
         @JsonProperty("reg_no")         String registrationNumber,
         @JsonProperty("insurance")      Date insuranceExp,
         @JsonProperty("inspection")     Date inspectionExp) {
-
-    public static UpdateCarRequest fromCar(Car car) {
-        return new UpdateCarRequest(
-                car.carId(),
-                car.driver().employeeId(),
-                car.brand(),
-                car.model(),
-                car.yearOfProd(),
-                car.registrationNumber(),
-                car.insuranceExp(),
-                car.inspectionExp());
-    }
 }

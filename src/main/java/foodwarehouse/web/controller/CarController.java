@@ -120,7 +120,7 @@ public class CarController {
                         updateCarRequest.brand(),
                         updateCarRequest.model(),
                         updateCarRequest.yearOfProd(),
-                        updateCarRequest.brand(),
+                        updateCarRequest.registrationNumber(),
                         updateCarRequest.insuranceExp(),
                         updateCarRequest.inspectionExp())
                 .map(CarResponse::fromCar)
