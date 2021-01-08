@@ -10,7 +10,7 @@ public record UpdateCarRequest(
         @JsonProperty("driver_id")      int driverId,
         @JsonProperty("brand")          String brand,
         @JsonProperty("model")          String model,
-        @JsonProperty("year_of_prod")   int yearOfProd,
+        @JsonProperty("prod_year")      int yearOfProd,
         @JsonProperty("reg_no")         String registrationNumber,
         @JsonProperty("insurance")      Date insuranceExp,
         @JsonProperty("inspection")     Date inspectionExp) {
