@@ -1,16 +1,16 @@
-package foodwarehouse.web.response;
+package foodwarehouse.web.response.car;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.car.Car;
-import foodwarehouse.core.data.car.CarInfo;
+import foodwarehouse.web.response.employee.EmployeeResponse;
 
 public record CarResponse (
-        @JsonProperty(value = "car_info", required = true)       CarInfo carInfo,
+        @JsonProperty(value = "car_info", required = true)       CarDataResponse carDataResponse,
         @JsonProperty(value = "driver", required = true)         EmployeeResponse employeeResponse){
 
     public static CarResponse fromCar(Car car) {
         return new CarResponse(
-                CarInfo.fromCar(car),
+                CarDataResponse.fromCar(car),
                 EmployeeResponse.fromEmployee(car.driver())
         );
     }

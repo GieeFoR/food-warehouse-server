@@ -12,10 +12,12 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.create.CreateCustomerRequest;
 import foodwarehouse.web.request.update.UpdateCustomerRequest;
-import foodwarehouse.web.response.CustomerResponse;
+import foodwarehouse.web.response.customer.CustomerResponse;
+import foodwarehouse.web.response.DeleteResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +58,23 @@ public class CustomerController {
                 .collect(Collectors.toList());
 
         return new SuccessResponse<>(customers);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<CustomerResponse> getCustomerById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return customerService
+                .findCustomerById(id)
+                .map(CustomerResponse::fromCustomer)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find user with this ID."));
     }
 
     @PostMapping
@@ -146,5 +165,40 @@ public class CustomerController {
                 .map(CustomerResponse::fromCustomer)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to update a customer."));
+    }
+
+    @DeleteMapping
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<List<DeleteResponse>> deleteCustomers(@RequestBody List<Integer> request) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        List<DeleteResponse> result = new LinkedList<>();
+        for(int i : request) {
+            result.add(
+                    new DeleteResponse(
+                            customerService.deleteCustomer(i)));
+        }
+
+        return new SuccessResponse<>(result);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<DeleteResponse> deleteCustomerById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return new SuccessResponse<>(
+                new DeleteResponse(
+                        customerService.deleteCustomer(id)));
     }
 }

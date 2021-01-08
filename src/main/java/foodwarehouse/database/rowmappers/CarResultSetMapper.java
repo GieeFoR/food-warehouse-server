@@ -16,7 +16,7 @@ final public class CarResultSetMapper implements ResultSetMapper<Car> {
                 rs.getString(prefix+CarTable.NAME+"."+CarTable.Columns.MODEL),
                 rs.getInt(prefix+CarTable.NAME+"."+CarTable.Columns.PROD_YEAR),
                 rs.getString(prefix+CarTable.NAME+"."+CarTable.Columns.REG_NO),
-                rs.getDate(prefix+CarTable.NAME+"."+CarTable.Columns.INSURANCE),
-                rs.getDate(prefix+CarTable.NAME+"."+CarTable.Columns.INSPECTION));
+                new java.util.Date(rs.getDate(prefix+CarTable.NAME+"."+CarTable.Columns.INSURANCE).getTime()),
+                new java.util.Date(rs.getDate(prefix+CarTable.NAME+"."+CarTable.Columns.INSPECTION).getTime()));
     }
 }

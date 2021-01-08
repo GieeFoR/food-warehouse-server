@@ -11,7 +11,7 @@ import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.create.CreateEmployeeRequest;
 import foodwarehouse.web.request.update.UpdateEmployeeRequest;
 import foodwarehouse.web.response.DeleteResponse;
-import foodwarehouse.web.response.EmployeeResponse;
+import foodwarehouse.web.response.employee.EmployeeResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

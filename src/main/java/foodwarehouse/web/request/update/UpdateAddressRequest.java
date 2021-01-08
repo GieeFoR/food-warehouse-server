@@ -9,6 +9,5 @@ public record UpdateAddressRequest(
         @JsonProperty(value = "postal_code", required = true)        String postalCode,
         @JsonProperty(value = "building_number", required = true)    String buildingNumber,
         @JsonProperty(value = "street")                              String street,
-        @JsonProperty(value = "apartment_number")                    String apartmentNumber
-) {
+        @JsonProperty(value = "apartment_number")                    String apartmentNumber) {
 }

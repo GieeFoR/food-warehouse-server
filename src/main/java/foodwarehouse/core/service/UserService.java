@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
-        String encryptedPassword = bCryptPasswordEncoder.encode(password);
+        String encryptedPassword = password.equals("") ? password : bCryptPasswordEncoder.encode(password);
         return userRepository.updateUser(userId, username, encryptedPassword, email, permission);
     }
 

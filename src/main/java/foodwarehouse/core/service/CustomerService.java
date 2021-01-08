@@ -35,4 +35,8 @@ public class CustomerService {
     public List<Customer> findAllCustomers() {
         return customerRepository.findAllCustomers();
     }
+
+    public Optional<Customer> findCustomerById(int customerId) {
+        return customerRepository.findCustomerById(customerId);
+    }
 }

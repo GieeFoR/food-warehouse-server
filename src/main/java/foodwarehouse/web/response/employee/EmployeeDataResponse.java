@@ -1,4 +1,4 @@
-package foodwarehouse.web.response;
+package foodwarehouse.web.response.employee;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.employee.Employee;

@@ -17,7 +17,7 @@ final public class CarTable {
     static final public class Procedures {
         static final public String INSERT = "CALL `INSERT_CAR`(?,?,?,?,?,?,?,?)";
 
-        static final public String UPDATE = "CALL `UPDATE_CAR`(?,?,?,?,?,?,?)";
+        static final public String UPDATE = "CALL `UPDATE_CAR`(?,?,?,?,?,?,?,?)";
 
         static final public String DELETE = "CALL `DELETE_CAR`(?)";
 

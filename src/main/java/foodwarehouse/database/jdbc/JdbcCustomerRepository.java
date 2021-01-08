@@ -3,9 +3,12 @@ package foodwarehouse.database.jdbc;
 import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.customer.CustomerRepository;
+import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.database.rowmappers.CustomerResultSetMapper;
+import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
 import foodwarehouse.database.tables.CustomerTable;
+import foodwarehouse.database.tables.EmployeeTable;
 import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -103,5 +106,24 @@ public class JdbcCustomerRepository implements CustomerRepository {
             customers = null;
         }
         return customers;
+    }
+
+    @Override
+    public Optional<Customer> findCustomerById(int customerId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_BY_ID);
+            callableStatement.setInt(1, customerId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            Customer customer = null;
+            if(resultSet.next()) {
+                customer = new CustomerResultSetMapper().resultSetMap(resultSet, "");
+            }
+
+            return Optional.ofNullable(customer);
+        }
+        catch(SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 }

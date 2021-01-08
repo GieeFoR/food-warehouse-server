@@ -9,9 +9,24 @@ import java.util.Optional;
 
 public interface CarRepository {
 
-    Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection);
+    Optional<Car> createCar(
+            Employee employee,
+            String brand,
+            String model,
+            int yearOfProd,
+            String regNo,
+            Date insurance,
+            Date inspection);
 
-    Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection);
+    Optional<Car> updateCar(
+            int carId,
+            Employee employee,
+            String brand,
+            String model,
+            int yearOfProd,
+            String regNo,
+            Date insurance,
+            Date inspection);
 
     boolean deleteCar(int carId);
 

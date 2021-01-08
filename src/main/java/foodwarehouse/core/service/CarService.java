@@ -21,12 +21,42 @@ public class CarService {
         this.carRepository = carRepository;
     }
 
-    public Optional<Car> createCar(Employee employee, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
-        return carRepository.createCar(employee, brand, model, yearOfProd, regNo, insurance, inspection);
+    public Optional<Car> createCar(
+            Employee employee,
+            String brand,
+            String model,
+            int yearOfProd,
+            String regNo,
+            Date insurance,
+            Date inspection) {
+        return carRepository.createCar(
+                employee,
+                brand,
+                model,
+                yearOfProd,
+                regNo,
+                insurance,
+                inspection);
     }
 
-    public Optional<Car> updateCar(int carId, String brand, String model, int yearOfProd, String regNo, Date insurance, Date inspection) {
-        return carRepository.updateCar(carId, brand, model, yearOfProd, regNo, insurance, inspection);
+    public Optional<Car> updateCar(
+            int carId,
+            Employee employee,
+            String brand,
+            String model,
+            int yearOfProd,
+            String regNo,
+            Date insurance,
+            Date inspection) {
+        return carRepository.updateCar(
+                carId,
+                employee,
+                brand,
+                model,
+                yearOfProd,
+                regNo,
+                insurance,
+                inspection);
     }
 
     public boolean deleteCar(int carId) {

@@ -16,4 +16,6 @@ public interface CustomerRepository {
     boolean deleteCustomer(int customerId);
 
     List<Customer> findAllCustomers();
+
+    Optional<Customer> findCustomerById(int customerId);
 }

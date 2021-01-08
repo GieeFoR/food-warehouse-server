@@ -1,22 +1,18 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.employee.Employee;
-import foodwarehouse.core.data.message.Message;
-import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.ConnectionService;
+import foodwarehouse.core.service.EmployeeService;
 import foodwarehouse.core.service.MessageService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.response.EmployeeResponse;
+import foodwarehouse.web.request.create.CreateMessageRequest;
 import foodwarehouse.web.response.MessageResponse;
+import foodwarehouse.web.response.MessageSentResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,10 +21,16 @@ import java.util.stream.Collectors;
 public class MessageController {
 
     private final MessageService messageService;
+    private final EmployeeService employeeService;
     private final ConnectionService connectionService;
 
-    public MessageController(MessageService messageService, ConnectionService connectionService) {
+
+    public MessageController(
+            MessageService messageService,
+            EmployeeService employeeService,
+            ConnectionService connectionService) {
         this.messageService = messageService;
+        this.employeeService = employeeService;
         this.connectionService = connectionService;
     }
 
@@ -66,5 +68,33 @@ public class MessageController {
                 .map(MessageResponse::fromMessage)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot get message."));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<MessageSentResponse> createMessage(@RequestBody CreateMessageRequest createMessageRequest) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee sender = employeeService
+                .findEmployeeById(createMessageRequest.sender())
+                .orElseThrow(() -> new RestException("Cannot find sender."));
+
+        Employee receiver = employeeService
+                .findEmployeeById(createMessageRequest.receiver())
+                .orElseThrow(() -> new RestException("Cannot find receiver."));
+
+        return new SuccessResponse<>(
+                MessageSentResponse.fromBoolean(
+                        messageService
+                                .createMessage(
+                                        sender,
+                                        receiver,
+                                        createMessageRequest.content())
+                                .isPresent()));
     }
 }
