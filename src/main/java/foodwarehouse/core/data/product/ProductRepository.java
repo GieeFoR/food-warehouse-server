@@ -18,7 +18,7 @@ public interface ProductRepository {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image);
+            String image);
 
     Optional<Product> updateProduct(
             int productId,
@@ -30,7 +30,7 @@ public interface ProductRepository {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image);
+            String image);
 
     boolean deleteProduct(int productId);
 

@@ -14,7 +14,7 @@ public record ProductDataResponse(
         @JsonProperty(value = "needs_cold", required = true)    boolean needColdStorage,
         @JsonProperty(value = "buy_price",required = true)      float buyPrice,
         @JsonProperty(value = "sell_price", required = true)    float sellPrice,
-        @JsonProperty(value = "image", required = true)         Blob image) {
+        @JsonProperty(value = "image", required = true)         String image) {
 
     public static ProductDataResponse fromProduct(Product product) {
         return new ProductDataResponse(

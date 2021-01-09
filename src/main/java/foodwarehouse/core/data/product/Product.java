@@ -14,5 +14,5 @@ public record Product(
         boolean needColdStorage,
         float buyPrice,
         float sellPrice,
-        Blob image) {
+        String image) {
 }

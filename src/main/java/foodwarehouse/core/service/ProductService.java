@@ -30,7 +30,7 @@ public class ProductService {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image) {
+            String image) {
         return productRepository.createProduct(maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image);
     }
 
@@ -44,7 +44,7 @@ public class ProductService {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image) {
+            String image) {
         return productRepository.updateProduct(productId,  maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image);
     }
 

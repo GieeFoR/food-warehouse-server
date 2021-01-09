@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +41,12 @@ public class JdbcProductRepository implements ProductRepository {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image) {
+            String image) {
 
         try {
+            Blob blob = connection.createBlob();
+            blob.setBytes(1, image.getBytes());
+
             CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.INSERT);
             callableStatement.setInt(1, maker.makerId());
             callableStatement.setString(2, name);
@@ -52,7 +56,7 @@ public class JdbcProductRepository implements ProductRepository {
             callableStatement.setBoolean(6, needColdStorage);
             callableStatement.setFloat(7, buyPrice);
             callableStatement.setFloat(8, sellPrice);
-            callableStatement.setBlob(9, image);
+            callableStatement.setBlob(9, blob);
 
             callableStatement.executeQuery();
             int productId = callableStatement.getInt(10);
@@ -75,9 +79,12 @@ public class JdbcProductRepository implements ProductRepository {
             boolean needColdStorage,
             float buyPrice,
             float sellPrice,
-            Blob image) {
+            String image) {
 
         try {
+            Blob blob = connection.createBlob();
+            blob.setBytes(1, image.getBytes());
+
             CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.UPDATE);
             callableStatement.setInt(1, productId);
             callableStatement.setString(2, name);
@@ -87,7 +94,7 @@ public class JdbcProductRepository implements ProductRepository {
             callableStatement.setBoolean(6, needColdStorage);
             callableStatement.setFloat(7, buyPrice);
             callableStatement.setFloat(8, sellPrice);
-            callableStatement.setBlob(9, image);
+            callableStatement.setBlob(9, blob);
 
             callableStatement.executeQuery();
             return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
