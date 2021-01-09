@@ -9,9 +9,24 @@ import java.util.Optional;
 
 public interface CustomerRepository {
 
-    Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
+    Optional<Customer> createCustomer(
+            User user,
+            Address address,
+            String name,
+            String surname,
+            String firmName,
+            String phoneNumber,
+            String taxId);
 
-    Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId);
+    Optional<Customer> updateCustomer(
+            int customerId,
+            User user,
+            Address address,
+            String name,
+            String surname,
+            String firmName,
+            String phoneNumber,
+            String taxId);
 
     boolean deleteCustomer(int customerId);
 

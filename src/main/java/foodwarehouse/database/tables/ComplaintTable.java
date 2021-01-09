@@ -17,5 +17,6 @@ final public class ComplaintTable {
         static final public String INSERT = "CALL `INSERT_COMPLAINT`(?,?,?)";
 
         static final public String READ_BY_ID = "CALL `GET_COMPLAINT_BY_ID`(?)";
+        static  final public String READ_ALL = "CALL `GET_COMPLAINTS`()";
     }
 }

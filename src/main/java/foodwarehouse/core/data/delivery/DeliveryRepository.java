@@ -12,9 +12,9 @@ public interface DeliveryRepository {
 
     Optional<Delivery> createDelivery(Address address, Employee supplier);
 
-    Optional<Delivery> updateRemoveDate(int deliveryId, Date date);
+    Optional<Delivery> updateRemoveDate(int deliveryId, Address address, Employee supplier, Date date);
 
-    Optional<Delivery> updateCompleteDate(int deliveryId, Date date);
+    Optional<Delivery> updateCompleteDate(int deliveryId, Address address, Employee supplier, Date date);
 
     boolean deleteDelivery (int deliveryId);
 

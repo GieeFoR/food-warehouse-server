@@ -26,12 +26,12 @@ public class DeliveryService {
         return deliveryRepository.createDelivery(address, supplier);
     }
 
-    public Optional<Delivery> updateRemoveDate(int deliveryId, Date date) {
-        return deliveryRepository.updateRemoveDate(deliveryId, date);
+    public Optional<Delivery> updateRemoveDate(int deliveryId, Address address, Employee supplier, Date date) {
+        return deliveryRepository.updateRemoveDate(deliveryId, address, supplier, date);
     }
 
-    public Optional<Delivery> updateCompleteDate(int deliveryId, Date date) {
-        return deliveryRepository.updateCompleteDate(deliveryId, date);
+    public Optional<Delivery> updateCompleteDate(int deliveryId, Address address, Employee supplier, Date date) {
+        return deliveryRepository.updateCompleteDate(deliveryId, address, supplier, date);
     }
 
     public boolean deleteDelivery(int deliveryId) {

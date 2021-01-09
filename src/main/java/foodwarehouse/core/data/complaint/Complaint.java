@@ -9,7 +9,7 @@ public record Complaint(
         Order order,
         String content,
         Date sendDate,
-        String state,
+        ComplaintState state,
         String decision,
         Date decisionDate) {
 }

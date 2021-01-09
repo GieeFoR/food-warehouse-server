@@ -21,8 +21,8 @@ public class ComplaintService {
         this.complaintRepository = complaintRepository;
     }
 
-    public Optional<Complaint> createComplaint(Order order, String content, Date sendDate, String state, String decision, Date decisionDate) {
-        return complaintRepository.createComplaint(order, content, sendDate, state, decision, decisionDate);
+    public Optional<Complaint> createComplaint(Order order,  String content) {
+        return complaintRepository.createComplaint(order, content);
     }
 
     public Optional<Complaint> findComplaintById(int complaintId) {

@@ -73,9 +73,10 @@ public class JdbcStorageRepository implements StorageRepository {
         try {
             CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.UPDATE);
             callableStatement.setInt(1, storageId);
-            callableStatement.setString(2, name);
-            callableStatement.setInt(3, capacity);
-            callableStatement.setBoolean(4, isColdStorage);
+            callableStatement.setInt(2, manager.employeeId());
+            callableStatement.setString(3, name);
+            callableStatement.setInt(4, capacity);
+            callableStatement.setBoolean(5, isColdStorage);
 
             callableStatement.executeQuery();
             return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));

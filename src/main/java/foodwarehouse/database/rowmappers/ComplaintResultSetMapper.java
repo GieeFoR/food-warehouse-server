@@ -1,6 +1,7 @@
 package foodwarehouse.database.rowmappers;
 
 import foodwarehouse.core.data.complaint.Complaint;
+import foodwarehouse.core.data.complaint.ComplaintState;
 import foodwarehouse.database.tables.ComplaintTable;
 
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ final public class ComplaintResultSetMapper implements ResultSetMapper<Complaint
                 new OrderResultSetMapper().resultSetMap(rs, prefix + ComplaintTable.NAME + "_"),
                 rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.CONTENT),
                 rs.getDate(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.SEND_DATE),
-                rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.STATE),
+                ComplaintState.valueOf(rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.STATE)),
                 rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION),
                 rs.getDate(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION_DATE));
     }

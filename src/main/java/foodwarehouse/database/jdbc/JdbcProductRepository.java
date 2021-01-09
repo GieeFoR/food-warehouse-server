@@ -74,12 +74,11 @@ public class JdbcProductRepository implements ProductRepository {
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.UPDATE);
             callableStatement.setInt(1, productId);
-            callableStatement.setInt(2, maker.makerId());
-            callableStatement.setString(3, name);
-            callableStatement.setString(4, category);
-            callableStatement.setBoolean(5, needColdStorage);
-            callableStatement.setFloat(6, buyPrice);
-            callableStatement.setFloat(7, sellPrice);
+            callableStatement.setString(2, name);
+            callableStatement.setString(3, category);
+            callableStatement.setBoolean(4, needColdStorage);
+            callableStatement.setFloat(5, buyPrice);
+            callableStatement.setFloat(6, sellPrice);
 
             callableStatement.executeQuery();
             return Optional.of(new Product(productId, maker, name, category, needColdStorage, buyPrice, sellPrice));
