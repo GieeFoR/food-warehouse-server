@@ -11,7 +11,7 @@ public interface ProductBatchRepository {
 
     Optional<ProductBatch> createProductBatch(Product product, int batchNo, Date eatByDate, int quantity);
 
-    Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity);
+    Optional<ProductBatch> updateProductBatch(int productBatchId, Product product, int batchNo, Date eatByDate, int discount, int quantity);
 
     boolean deleteProductBatch(int productBatchId);
 

@@ -84,10 +84,13 @@ public class ProductController {
                 .createProduct(
                         maker,
                         request.name(),
+                        request.shortDesc(),
+                        request.longDesc(),
                         request.category(),
                         request.needColdStorage(),
                         request.buyPrice(),
-                        request.sellPrice())
+                        request.sellPrice(),
+                        request.image())
                 .map(ProductResponse::fromProduct)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot create a new product."));
@@ -112,10 +115,13 @@ public class ProductController {
                         request.productId(),
                         maker,
                         request.name(),
+                        request.shortDesc(),
+                        request.longDesc(),
                         request.category(),
                         request.needColdStorage(),
                         request.buyPrice(),
-                        request.sellPrice())
+                        request.sellPrice(),
+                        request.image())
                 .map(ProductResponse::fromProduct)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot update a product."));

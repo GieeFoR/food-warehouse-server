@@ -6,6 +6,7 @@ import foodwarehouse.core.data.product.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -23,22 +24,28 @@ public class ProductService {
     public Optional<Product> createProduct(
             Maker maker,
             String name,
+            String shortDesc,
+            String longDesc,
             String category,
             boolean needColdStorage,
             float buyPrice,
-            float sellPrice) {
-        return productRepository.createProduct(maker, name, category, needColdStorage, buyPrice, sellPrice);
+            float sellPrice,
+            Blob image) {
+        return productRepository.createProduct(maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image);
     }
 
     public Optional<Product> updateProduct(
             int productId,
             Maker maker,
             String name,
+            String shortDesc,
+            String longDesc,
             String category,
             boolean needColdStorage,
             float buyPrice,
-            float sellPrice) {
-        return productRepository.updateProduct(productId, maker, name, category, needColdStorage, buyPrice, sellPrice);
+            float sellPrice,
+            Blob image) {
+        return productRepository.updateProduct(productId,  maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image);
     }
 
     public boolean deleteProduct(int productId) {

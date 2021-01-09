@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -37,23 +34,29 @@ public class JdbcProductRepository implements ProductRepository {
     public Optional<Product> createProduct(
             Maker maker,
             String name,
+            String shortDesc,
+            String longDesc,
             String category,
             boolean needColdStorage,
             float buyPrice,
-            float sellPrice) {
+            float sellPrice,
+            Blob image) {
 
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.INSERT);
             callableStatement.setInt(1, maker.makerId());
             callableStatement.setString(2, name);
-            callableStatement.setString(3, category);
-            callableStatement.setBoolean(4, needColdStorage);
-            callableStatement.setFloat(5, buyPrice);
-            callableStatement.setFloat(6, sellPrice);
+            callableStatement.setString(3, shortDesc);
+            callableStatement.setString(4, longDesc);
+            callableStatement.setString(5, category);
+            callableStatement.setBoolean(6, needColdStorage);
+            callableStatement.setFloat(7, buyPrice);
+            callableStatement.setFloat(8, sellPrice);
+            callableStatement.setBlob(9, image);
 
             callableStatement.executeQuery();
-            int productId = callableStatement.getInt(7);
-            return Optional.of(new Product(productId, maker, name, category, needColdStorage, buyPrice, sellPrice));
+            int productId = callableStatement.getInt(10);
+            return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
@@ -66,22 +69,28 @@ public class JdbcProductRepository implements ProductRepository {
             int productId,
             Maker maker,
             String name,
+            String shortDesc,
+            String longDesc,
             String category,
             boolean needColdStorage,
             float buyPrice,
-            float sellPrice) {
+            float sellPrice,
+            Blob image) {
 
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.UPDATE);
             callableStatement.setInt(1, productId);
             callableStatement.setString(2, name);
-            callableStatement.setString(3, category);
-            callableStatement.setBoolean(4, needColdStorage);
-            callableStatement.setFloat(5, buyPrice);
-            callableStatement.setFloat(6, sellPrice);
+            callableStatement.setString(3, shortDesc);
+            callableStatement.setString(4, longDesc);
+            callableStatement.setString(5, category);
+            callableStatement.setBoolean(6, needColdStorage);
+            callableStatement.setFloat(7, buyPrice);
+            callableStatement.setFloat(8, sellPrice);
+            callableStatement.setBlob(9, image);
 
             callableStatement.executeQuery();
-            return Optional.of(new Product(productId, maker, name, category, needColdStorage, buyPrice, sellPrice));
+            return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());

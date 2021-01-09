@@ -12,7 +12,9 @@ public interface OrderRepository {
 
     Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment);
 
-    Optional<Order> updateOrderState(int orderId, OrderState orderState);
+    Optional<Order> updateOrderState(int orderId, Payment payment, Customer customer, Delivery delivery, String comment, OrderState orderState);
+
+    Optional<Order> updateOrderPayment(int orderId, Payment payment, Customer customer, Delivery delivery, String comment, OrderState orderState);
 
     boolean deleteOrder(int orderId);
 

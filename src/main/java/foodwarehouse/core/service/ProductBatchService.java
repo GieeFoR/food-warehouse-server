@@ -25,8 +25,8 @@ public class ProductBatchService {
         return productBatchRepository.createProductBatch(product, batchNo, eatByDate, quantity);
     }
 
-    public Optional<ProductBatch> updateProductBatch(int productBatchId, int batchNo, Date eatByDate, int discount, int quantity) {
-        return productBatchRepository.updateProductBatch(productBatchId, batchNo, eatByDate, discount, quantity);
+    public Optional<ProductBatch> updateProductBatch(int productBatchId, Product product, int batchNo, Date eatByDate, int discount, int quantity) {
+        return productBatchRepository.updateProductBatch(productBatchId, product, batchNo, eatByDate, discount, quantity);
     }
 
     public boolean deleteProductBatch(int productBatchId) {

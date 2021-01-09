@@ -16,6 +16,7 @@ final public class OrderTable {
         static final public String INSERT = "CALL `INSERT_ORDER`(?,?,?,?,?)";
 
         static final public String UPDATE_STATE = "CALL `UPDATE_ORDER_STATE`(?,?)";
+        static final public String UPDATE_PAYMENT = "CALL `UPDATE_ORDER_STATE`(?,?)";
 
         static final public String DELETE = "CALL `DELETE_ORDER`(?)";
 
