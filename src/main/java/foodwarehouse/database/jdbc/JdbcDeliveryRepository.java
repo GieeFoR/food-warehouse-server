@@ -5,6 +5,8 @@ import foodwarehouse.core.data.car.Car;
 import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.delivery.DeliveryRepository;
 import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.database.rowmappers.CarResultSetMapper;
+import foodwarehouse.database.rowmappers.DeliveryResultSetMapper;
 import foodwarehouse.database.tables.CarTable;
 import foodwarehouse.database.tables.DeliveryTable;
 import foodwarehouse.web.error.RestException;
@@ -14,8 +16,10 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +47,24 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
 
             callableStatement.executeQuery();
             int deliveryId = callableStatement.getInt(8);
+            return Optional.of(new Delivery(deliveryId, address, supplier, null, null));
+        }
+        catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Delivery> updateDelivery(int deliveryId, Address address, Employee supplier) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.UPDATE_DELIVERY);
+            callableStatement.setInt(1, deliveryId);
+            callableStatement.setInt(2, address.addressId());
+            callableStatement.setInt(3, supplier.employeeId());
+
+            callableStatement.executeQuery();
+
             return Optional.of(new Delivery(deliveryId, address, supplier, null, null));
         }
         catch (SQLException sqlException) {
@@ -101,11 +123,36 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
 
     @Override
     public Optional<Delivery> findDeliveryById(int deliveryId) {
-        return Optional.empty();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.READ_BY_ID);
+            callableStatement.setInt(1, deliveryId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            Delivery delivery = null;
+            if(resultSet.next()) {
+                delivery = new DeliveryResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(delivery);
+        }
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public List<Delivery> findDeliveries() {
-        return null;
+        List<Delivery> deliveries = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(CarTable.Procedures.READ_ALL);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                deliveries.add(new DeliveryResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return deliveries;
     }
 }
