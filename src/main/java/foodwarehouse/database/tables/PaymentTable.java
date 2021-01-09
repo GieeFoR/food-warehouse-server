@@ -14,11 +14,12 @@ final public class PaymentTable {
         static final public String INSERT = "CALL `INSERT_PAYMENT`(?,?,?)";
 
         static final public String UPDATE_VALUE = "CALL `UPDATE_PAYMENT_VALUE`(?,?)";
-        static final public String COMPLETE = "CALL `COMPLETE_PAYMENT`(?)";
+        static final public String UPDATE_STATE = "CALL `UPDATE_PAYMENT_STATE`(?,?)";
 
         static final public String DELETE = "CALL `DELETE_PAYMENT`(?)";
 
         static final public String READ_ALL = "CALL `GET_PAYMENTS`()";
         static final public String READ_BY_ID = "CALL `GET_PAYMENT_BY_ID`(?)";
+        static final public String READ_CUSTOMER_PAYMENTS = "CALL `GET_CLIENT_PAYMENTS`(?)";
     }
 }

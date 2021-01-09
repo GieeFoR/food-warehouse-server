@@ -2,8 +2,8 @@ package foodwarehouse.web.response.customer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.customer.Customer;
-import foodwarehouse.web.response.AddressResponse;
-import foodwarehouse.web.response.UserResponse;
+import foodwarehouse.web.response.address.AddressResponse;
+import foodwarehouse.web.response.user.UserResponse;
 
 public record CustomerResponse(
         @JsonProperty(value = "account", required = true)           UserResponse userResponse,

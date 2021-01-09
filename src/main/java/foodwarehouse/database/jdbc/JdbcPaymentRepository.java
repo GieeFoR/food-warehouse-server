@@ -73,9 +73,9 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> updatePaymentState(int paymentId, PaymentState state) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(PaymentTable.Procedures.COMPLETE);
+            CallableStatement callableStatement = connection.prepareCall(PaymentTable.Procedures.UPDATE_STATE);
             callableStatement.setInt(1, paymentId);
-            callableStatement.setString(2, state.value());
+            callableStatement.setObject(2, state.value());
 
             ResultSet resultSet = callableStatement.executeQuery();
             Payment payment = null;
@@ -85,6 +85,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
             return Optional.ofNullable(payment);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
@@ -133,7 +134,25 @@ public class JdbcPaymentRepository implements PaymentRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
+        }
+        return payments;
+    }
+
+    @Override
+    public List<Payment> findCustomerPayments(String username) {
+        List<Payment> payments = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(PaymentTable.Procedures.READ_CUSTOMER_PAYMENTS);
+            callableStatement.setString(1, username);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                payments.add(new PaymentResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
         }
         return payments;
     }

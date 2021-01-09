@@ -43,4 +43,8 @@ public class PaymentService {
     public List<Payment> findPayments() {
         return paymentRepository.findPayments();
     }
+
+    public List<Payment> findCustomerPayments(String username) {
+        return paymentRepository.findCustomerPayments(username);
+    }
 }

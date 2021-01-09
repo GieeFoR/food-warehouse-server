@@ -2,7 +2,7 @@ package foodwarehouse.web.response.storage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.storage.Storage;
-import foodwarehouse.web.response.AddressResponse;
+import foodwarehouse.web.response.address.AddressResponse;
 import foodwarehouse.web.response.employee.EmployeeResponse;
 
 public record StorageResponse(
@@ -14,6 +14,6 @@ public record StorageResponse(
         return new StorageResponse(
                 EmployeeResponse.fromEmployee(storage.manager()),
                 StorageDataResponse.fromStorage(storage),
-                foodwarehouse.web.response.AddressResponse.fromAddress(storage.address()));
+                foodwarehouse.web.response.address.AddressResponse.fromAddress(storage.address()));
     }
 }

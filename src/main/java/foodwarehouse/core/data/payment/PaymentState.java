@@ -1,7 +1,5 @@
 package foodwarehouse.core.data.payment;
 
-import foodwarehouse.core.data.order.OrderState;
-
 import java.util.Optional;
 
 public enum PaymentState {
@@ -9,7 +7,7 @@ public enum PaymentState {
     COMPLETED("COMPLETED"),
     REJECTED("REJECTED"),
     CANCELED("CANCELED"),
-    WAITING("WAITING");
+    WAITING("WAITING FOR PAYMENT");
 
     private final String value;
 
@@ -23,7 +21,7 @@ public enum PaymentState {
             case "COMPLETED" -> Optional.of(PaymentState.COMPLETED);
             case "REJECTED" -> Optional.of(PaymentState.REJECTED);
             case "CANCELED" -> Optional.of(PaymentState.CANCELED);
-            case "WAITING" -> Optional.of(PaymentState.WAITING);
+            case "WAITING FOR PAYMENT" -> Optional.of(PaymentState.WAITING);
             default -> Optional.empty();
         };
     }

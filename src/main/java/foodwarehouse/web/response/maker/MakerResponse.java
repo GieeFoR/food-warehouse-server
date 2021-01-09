@@ -2,7 +2,7 @@ package foodwarehouse.web.response.maker;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.maker.Maker;
-import foodwarehouse.web.response.AddressResponse;
+import foodwarehouse.web.response.address.AddressResponse;
 
 public record MakerResponse(
         @JsonProperty(value = "maker_data", required = true)    MakerDataResponse makerDataResponse,

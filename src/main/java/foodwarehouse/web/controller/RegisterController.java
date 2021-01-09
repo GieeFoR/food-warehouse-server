@@ -9,8 +9,10 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.others.CheckEmailRequest;
 import foodwarehouse.web.request.others.CheckUsernameRequest;
-import foodwarehouse.web.request.create.customer.CreateCustomerRequest;
-import foodwarehouse.web.response.*;
+import foodwarehouse.web.request.customer.CreateCustomerRequest;
+import foodwarehouse.web.response.others.CheckEmailResponse;
+import foodwarehouse.web.response.others.CheckUsernameResponse;
+import foodwarehouse.web.response.others.RegistrationResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

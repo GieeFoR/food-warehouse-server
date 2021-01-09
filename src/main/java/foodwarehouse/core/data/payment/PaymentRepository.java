@@ -18,4 +18,6 @@ public interface PaymentRepository {
     Optional<Payment> findPaymentById(int paymentId);
 
     List<Payment> findPayments();
+
+    List<Payment> findCustomerPayments(String username);
 }

@@ -35,7 +35,7 @@ public class PaymentTypeService {
         return paymentTypeRepository.findPaymentTypeById(paymentId);
     }
 
-    public List<PaymentType> findPayments() {
+    public List<PaymentType> findPaymentTypes() {
         return paymentTypeRepository.findPayments();
     }
 }

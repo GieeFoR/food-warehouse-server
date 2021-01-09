@@ -5,9 +5,9 @@ import foodwarehouse.core.service.PaymentTypeService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.create.CreatePaymentTypeRequest;
-import foodwarehouse.web.request.update.UpdatePaymentTypeRequest;
-import foodwarehouse.web.response.DeleteResponse;
+import foodwarehouse.web.request.paymentType.CreatePaymentTypeRequest;
+import foodwarehouse.web.request.paymentType.UpdatePaymentTypeRequest;
+import foodwarehouse.web.response.others.DeleteResponse;
 import foodwarehouse.web.response.paymentType.PaymentTypeResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +41,7 @@ public class PaymentTypeController {
         }
 
         final var cars = paymentTypeService
-                .findPayments()
+                .findPaymentTypes()
                 .stream()
                 .map(PaymentTypeResponse::fromPaymentType)
                 .collect(Collectors.toList());

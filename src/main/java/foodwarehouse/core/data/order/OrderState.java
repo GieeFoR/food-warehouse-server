@@ -1,10 +1,9 @@
 package foodwarehouse.core.data.order;
 
-import foodwarehouse.core.data.complaint.ComplaintState;
-
 import java.util.Optional;
 
 public enum OrderState {
+    PENDING("PENDING"),
     REGISTERED("REGISTERED"),
     CANCELED("CANCELED"),
     COMPLETING("COMPLETING"),
@@ -21,6 +20,7 @@ public enum OrderState {
 
     public static Optional<OrderState> from(String value) {
         return switch (value) {
+            case "PENDING" -> Optional.of(OrderState.PENDING);
             case "REGISTERED" -> Optional.of(OrderState.REGISTERED);
             case "CANCELED" -> Optional.of(OrderState.CANCELED);
             case "COMPLETING" -> Optional.of(OrderState.COMPLETING);

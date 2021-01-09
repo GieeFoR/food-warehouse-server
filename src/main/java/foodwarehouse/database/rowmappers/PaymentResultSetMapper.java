@@ -3,6 +3,7 @@ package foodwarehouse.database.rowmappers;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.database.tables.PaymentTable;
+import foodwarehouse.web.error.RestException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

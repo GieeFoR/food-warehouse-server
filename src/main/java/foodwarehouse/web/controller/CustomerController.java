@@ -10,10 +10,10 @@ import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.create.customer.CreateCustomerRequest;
-import foodwarehouse.web.request.update.customer.UpdateCustomerRequest;
+import foodwarehouse.web.request.customer.CreateCustomerRequest;
+import foodwarehouse.web.request.customer.UpdateCustomerRequest;
 import foodwarehouse.web.response.customer.CustomerResponse;
-import foodwarehouse.web.response.DeleteResponse;
+import foodwarehouse.web.response.others.DeleteResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
