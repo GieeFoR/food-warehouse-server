@@ -82,6 +82,7 @@ public class JdbcStorageRepository implements StorageRepository {
             return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }

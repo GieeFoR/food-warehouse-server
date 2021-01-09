@@ -15,7 +15,7 @@ final public class StorageTable {
     static final public class Procedures {
         static final public String INSERT = "CALL `INSERT_STORAGE`(?,?,?,?,?,?)";
 
-        static final public String UPDATE = "CALL `UPDATE_STORAGE`(?,?,?,?)";
+        static final public String UPDATE = "CALL `UPDATE_STORAGE`(?,?,?,?,?)";
 
         static final public String DELETE = "CALL `DELETE_STORAGE`(?)";
 
