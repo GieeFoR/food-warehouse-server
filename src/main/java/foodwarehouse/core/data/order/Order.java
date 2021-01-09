@@ -10,5 +10,5 @@ public record Order(
         Customer customer,
         Delivery delivery,
         String comment,
-        String state) {
+        OrderState state) {
 }

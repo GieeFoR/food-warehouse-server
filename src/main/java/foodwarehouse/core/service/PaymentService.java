@@ -2,11 +2,11 @@ package foodwarehouse.core.service;
 
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentRepository;
+import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +28,8 @@ public class PaymentService {
         return paymentRepository.updatePaymentValue(paymentId, value);
     }
 
-    public Optional<Payment> completePayment(int paymentId) {
-        return paymentRepository.completePayment(paymentId);
+    public Optional<Payment> updatePaymentState(int paymentId, PaymentState state) {
+        return paymentRepository.updatePaymentState(paymentId, state);
     }
 
     public boolean deletePayment(int paymentId) {

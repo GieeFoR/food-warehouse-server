@@ -1,6 +1,7 @@
 package foodwarehouse.database.rowmappers;
 
 import foodwarehouse.core.data.payment.Payment;
+import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.database.tables.PaymentTable;
 
 import java.sql.ResultSet;
@@ -13,6 +14,6 @@ final public class PaymentResultSetMapper implements ResultSetMapper<Payment> {
                 rs.getInt(prefix+PaymentTable.NAME+"."+PaymentTable.Columns.PAYMENT_ID),
                 new PaymentTypeResultSetMapper().resultSetMap(rs, prefix + PaymentTable.NAME + "_"),
                 rs.getFloat(prefix+PaymentTable.NAME+"."+PaymentTable.Columns.VALUE),
-                rs.getString(prefix+PaymentTable.NAME+"."+PaymentTable.Columns.STATE));
+                PaymentState.from(rs.getString(prefix+PaymentTable.NAME+"."+PaymentTable.Columns.STATE)).get());
     }
 }

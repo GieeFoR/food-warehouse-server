@@ -6,5 +6,5 @@ public record Payment(
         int paymentId,
         PaymentType paymentType,
         float value,
-        String state) {
+        PaymentState state) {
 }
