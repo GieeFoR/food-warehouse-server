@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -34,7 +35,7 @@ public class ProductController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping("/product")
+    @GetMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<ProductResponse>> getProducts() {
         //check if database is reachable
@@ -53,63 +54,7 @@ public class ProductController {
         return new SuccessResponse<>(product);
     }
 
-    @GetMapping("/store/products")
-    public SuccessResponse<List<StoreProductResponse>> getProductsForCustomers() {
-        //check if database is reachable
-        if(!connectionService.isReachable()) {
-            String exceptionMessage = "Cannot connect to database.";
-            System.out.println(exceptionMessage);
-            throw new DatabaseException(exceptionMessage);
-        }
-
-//        final var product = productService
-//                .findProducts()
-//                .stream()
-//                .map(StoreProductResponse::fromProduct)
-//                .collect(Collectors.toList());
-
-        List<StoreProductResponse> result = new LinkedList<>();
-
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-
-        List<DiscountResponse> discountResponses = new LinkedList<>();
-        try {
-            discountResponses.add(new DiscountResponse(sdf.parse("2021-05-12"), 100));
-        }
-        catch (ParseException e) {
-            System.out.println(e.getMessage());
-        }
-        result.add(new StoreProductResponse(
-                        1,
-                "ziemniorek",
-                "pyszny",
-                "Pan Małkowicz byłby bardzo zadowolony z takiego ziemniaczka polanego masełkiem i zjedzonego w Alpach.",
-                "Warzywa",
-                false,
-                (float) 2.5,
-                NoImageTemplate.image(),
-                "Rolnik",
-                100,
-                new LinkedList<DiscountResponse>()));
-
-        result.add(new StoreProductResponse(
-                1,
-                "marchewaczka",
-                "Jest pomarańczowa i bogata w karoten",
-                "Karol Okrasa by taką chciał.",
-                "Warzywa",
-                false,
-                (float) 200.0,
-                NoImageTemplate.image(),
-                "Rolnik",
-                1000,
-                discountResponses));
-
-        return new SuccessResponse<>(result);
-    }
-
-    @GetMapping("/product/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> getCarById(@PathVariable int id) {
         //check if database is reachable
@@ -126,7 +71,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot find product with this ID."));
     }
 
-    @PostMapping("/product")
+    @PostMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> createCar(@RequestBody CreateProductRequest request) {
         //check if database is reachable
@@ -156,7 +101,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot create a new product."));
     }
 
-    @PutMapping("/product")
+    @PutMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> updateCar(@RequestBody UpdateProductRequest request) {
         //check if database is reachable
@@ -187,7 +132,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot update a product."));
     }
 
-    @DeleteMapping("/product")
+    @DeleteMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<DeleteResponse>> deleteCars(@RequestBody List<Integer> request) {
         //check if database is reachable
@@ -207,7 +152,7 @@ public class ProductController {
         return new SuccessResponse<>(result);
     }
 
-    @DeleteMapping("/product/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<DeleteResponse> deleteCarById(@PathVariable int id) {
         //check if database is reachable

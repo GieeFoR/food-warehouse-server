@@ -134,4 +134,58 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
         }
         return productBatches;
     }
+
+    @Override
+    public List<ProductBatch> findProductBatchesByProductId(int productId) {
+        List<ProductBatch> productBatches = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_BY_PRODUCT_ID);
+            callableStatement.setInt(1, productId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productBatches.add(new ProductBatchResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return productBatches;
+    }
+
+    @Override
+    public List<ProductBatch> findProductBatchesWithDiscountAndProductId(int productId) {
+        List<ProductBatch> productBatches = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_ALL_WITH_DISCOUNT_BY_PRODUCT_ID);
+            callableStatement.setInt(1, productId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productBatches.add(new ProductBatchResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return productBatches;
+    }
+
+    @Override
+    public int countProductBatchAmount(int productBatchId) {
+        int result = 0;
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.COUNT_PRODUCT_BATCH_QUANTITY);
+            callableStatement.setInt(1, productBatchId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            if(resultSet.next()) {
+                result = resultSet.getInt("RESULT");
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return result;
+    }
 }

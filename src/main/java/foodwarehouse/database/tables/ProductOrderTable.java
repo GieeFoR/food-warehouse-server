@@ -11,5 +11,12 @@ final public class ProductOrderTable {
 
     static final public class Procedures {
         static final public String INSERT = "CALL `INSERT_PRODUCT_ORDER`(?,?,?)";
+
+        static final public String UPDATE = "CALL `UPDATE_PRODUCT_ORDER`(?,?,?)";
+
+        static final public String DELETE = "CALL `DELETE_PRODUCT_ORDER`(?,?)";
+
+        static final public String READ_ALL = "CALL `GET_PRODUCT_ORDER_ALL`()";
+        static final public String READ_BY_ID = "CALL `GET_PRODUCT_ORDER_BY_PRODUCT_ID`(?,?)";
     }
 }

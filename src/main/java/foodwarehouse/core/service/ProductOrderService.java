@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,5 +23,21 @@ public class ProductOrderService {
 
     public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) {
         return productOrderRepository.createProductOrder(order, productBatch, quantity);
+    }
+
+    public Optional<ProductOrder> updateProductOrder(Order order, ProductBatch productBatch, int quantity) {
+        return productOrderRepository.updateProductOrder(order, productBatch, quantity);
+    }
+
+    public boolean deleteProductOrder(Order order, ProductBatch productBatch) {
+        return productOrderRepository.deleteProductOrder(order, productBatch);
+    }
+
+    public Optional<ProductOrder> findProductOrderById(Order order, ProductBatch productBatch) {
+        return productOrderRepository.findProductOrderById(order, productBatch);
+    }
+
+    public List<ProductOrder> findProductOrderAll() {
+        return productOrderRepository.findProductOrderAll();
     }
 }

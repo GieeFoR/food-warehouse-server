@@ -37,4 +37,8 @@ public interface ProductRepository {
     Optional<Product> findProductById(int productId);
 
     List<Product> findProducts();
+
+    List<Product> findAvailableProducts();
+
+    int countAmountOfProducts(int productId);
 }

@@ -9,7 +9,7 @@ public final class NoImageTemplate {
 
     public static String image() {
         String result = "";
-        Path fileName = Path.of("C:\\Users\\GieeF\\IdeaProjects\\projekt-java-server\\src\\main\\java\\foodwarehouse\\database\\image.txt");
+        Path fileName = Path.of("src\\main\\java\\foodwarehouse\\database\\image.txt");
         try {
             result = Files.readString(fileName);
         } catch (IOException e) {

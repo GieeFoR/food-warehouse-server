@@ -18,4 +18,10 @@ public interface ProductBatchRepository {
     Optional<ProductBatch> findProductBatchById(int productBatchId);
 
     List<ProductBatch> findProductBatches();
+
+    List<ProductBatch> findProductBatchesByProductId(int productId);
+
+    List<ProductBatch> findProductBatchesWithDiscountAndProductId(int productId);
+
+    int countProductBatchAmount(int productId);
 }

@@ -40,4 +40,16 @@ public class ProductBatchService {
     public List<ProductBatch> findProductBatches() {
         return productBatchRepository.findProductBatches();
     }
+
+    public List<ProductBatch> findProductBatchesByProductId(int productId) {
+        return productBatchRepository.findProductBatchesByProductId(productId);
+    }
+
+    public List<ProductBatch> findProductBatchesWithDiscountAndProductId(int productId) {
+        return productBatchRepository.findProductBatchesWithDiscountAndProductId(productId);
+    }
+
+    public int countProductBatchAmount(int productBatchId) {
+        return productBatchRepository.countProductBatchAmount(productBatchId);
+    }
 }

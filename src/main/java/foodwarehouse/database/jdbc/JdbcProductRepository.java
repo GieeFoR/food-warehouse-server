@@ -153,4 +153,39 @@ public class JdbcProductRepository implements ProductRepository {
         }
         return products;
     }
+
+    @Override
+    public List<Product> findAvailableProducts() {
+        List<Product> products = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.READ_AVAILABLE);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return products;
+    }
+
+    @Override
+    public int countAmountOfProducts(int productId) {
+        int result = 0;
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.GET_PRODUCT_QUANTITY_WITH_REGULAR_PRICE_AND_PRODUCT_ID);
+            callableStatement.setInt(1, productId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            if(resultSet.next()) {
+                result = resultSet.getInt("RESULT");
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return result;
+    }
 }

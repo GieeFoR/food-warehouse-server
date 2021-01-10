@@ -59,4 +59,12 @@ public class ProductService {
     public List<Product> findProducts() {
         return productRepository.findProducts();
     }
+
+    public List<Product> findAvailableProducts() {
+        return productRepository.findAvailableProducts();
+    }
+
+    public int countAmountOfProduct(int productId) {
+        return productRepository.countAmountOfProducts(productId);
+    }
 }
