@@ -2,22 +2,26 @@ package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.maker.Maker;
 import foodwarehouse.core.service.*;
+import foodwarehouse.database.NoImageTemplate;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.product.CreateProductRequest;
 import foodwarehouse.web.request.product.UpdateProductRequest;
 import foodwarehouse.web.response.others.DeleteResponse;
+import foodwarehouse.web.response.product.DiscountResponse;
 import foodwarehouse.web.response.product.ProductResponse;
+import foodwarehouse.web.response.product.StoreProductResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -30,7 +34,7 @@ public class ProductController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping
+    @GetMapping("/product")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<ProductResponse>> getProducts() {
         //check if database is reachable
@@ -40,16 +44,72 @@ public class ProductController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        final var cars = productService
+        final var product = productService
                 .findProducts()
                 .stream()
                 .map(ProductResponse::fromProduct)
                 .collect(Collectors.toList());
 
-        return new SuccessResponse<>(cars);
+        return new SuccessResponse<>(product);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/store/products")
+    public SuccessResponse<List<StoreProductResponse>> getProductsForCustomers() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+//        final var product = productService
+//                .findProducts()
+//                .stream()
+//                .map(StoreProductResponse::fromProduct)
+//                .collect(Collectors.toList());
+
+        List<StoreProductResponse> result = new LinkedList<>();
+
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+
+        List<DiscountResponse> discountResponses = new LinkedList<>();
+        try {
+            discountResponses.add(new DiscountResponse(sdf.parse("2021-05-12"), 100));
+        }
+        catch (ParseException e) {
+            System.out.println(e.getMessage());
+        }
+        result.add(new StoreProductResponse(
+                        1,
+                "ziemniorek",
+                "pyszny",
+                "Pan Małkowicz byłby bardzo zadowolony z takiego ziemniaczka polanego masełkiem i zjedzonego w Alpach.",
+                "Warzywa",
+                false,
+                (float) 2.5,
+                NoImageTemplate.image(),
+                "Rolnik",
+                100,
+                new LinkedList<DiscountResponse>()));
+
+        result.add(new StoreProductResponse(
+                1,
+                "marchewaczka",
+                "Jest pomarańczowa i bogata w karoten",
+                "Karol Okrasa by taką chciał.",
+                "Warzywa",
+                false,
+                (float) 200.0,
+                NoImageTemplate.image(),
+                "Rolnik",
+                1000,
+                discountResponses));
+
+        return new SuccessResponse<>(result);
+    }
+
+    @GetMapping("/product/{id}")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> getCarById(@PathVariable int id) {
         //check if database is reachable
@@ -66,7 +126,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot find product with this ID."));
     }
 
-    @PostMapping
+    @PostMapping("/product")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> createCar(@RequestBody CreateProductRequest request) {
         //check if database is reachable
@@ -96,7 +156,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot create a new product."));
     }
 
-    @PutMapping
+    @PutMapping("/product")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<ProductResponse> updateCar(@RequestBody UpdateProductRequest request) {
         //check if database is reachable
@@ -127,7 +187,7 @@ public class ProductController {
                 .orElseThrow(() -> new RestException("Cannot update a product."));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/product")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<DeleteResponse>> deleteCars(@RequestBody List<Integer> request) {
         //check if database is reachable
@@ -147,7 +207,7 @@ public class ProductController {
         return new SuccessResponse<>(result);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/product/{id}")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<DeleteResponse> deleteCarById(@PathVariable int id) {
         //check if database is reachable
