@@ -4,6 +4,7 @@ import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.paymentType.PaymentType;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -81,10 +83,14 @@ public class OrderController {
 
         float valueToPay = 0;
 
+        List<List<Integer>> productBatchesMemoryList = new LinkedList<>();
+
         for(ProductInOrderData product : products) {
             int productId = product.productId();
             int productBatchId = product.discountId();
             int quantityOrdered = product.quantity();
+
+            List<Integer> productBatchesTempList = new LinkedList<>();
 
             float productPrice;
 
@@ -95,6 +101,7 @@ public class OrderController {
 
                 int tempQuantity = 0;
                 for(ProductInStorage productInStorage : productInStorageAllBatches) {
+                    productBatchesTempList.add(productInStorage.batch().batchId());
                     if(productInStorage.quantity() < quantityOrdered - tempQuantity) {
                         tempQuantity += productInStorage.quantity();
 
@@ -139,6 +146,7 @@ public class OrderController {
                 }
             }
             valueToPay += productPrice * quantityOrdered;
+            productBatchesMemoryList.add(productBatchesTempList);
         }
 
         Payment payment = paymentService
@@ -176,9 +184,26 @@ public class OrderController {
                 .findCustomerByUsername(authentication.getName())
                 .orElseThrow(() -> new RestException("Cannot find customer."));
 
-        final var orderResponse = orderService
-                .createOrder(payment, customer, delivery, request.comment());
+        Order order = orderService
+                .createOrder(payment, customer, delivery, request.comment())
+                .orElseThrow(() -> new RestException("Cannot create order."));
 
+//        for(ProductInOrderData product : products) {
+//            int productId = product.productId();
+//            int productBatchId = product.discountId();
+//            int quantityOrdered = product.quantity();
+//
+//            if(productBatchId == -1) {
+//
+//            }
+//            else {
+//
+//            }
+//            productOrderService
+//                    .createProductOrder(order, )
+//        }
+
+        //for()
 
 
 

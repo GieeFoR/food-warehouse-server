@@ -44,6 +44,5 @@ public class AccountController {
                 .orElseThrow(() -> new RestException("Cannot find user."));
 
         return new SuccessResponse<>(AddressResponse.fromAddress(customer.address()));
-
     }
 }
