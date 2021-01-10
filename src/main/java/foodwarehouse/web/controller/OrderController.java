@@ -7,6 +7,7 @@ import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.paymentType.PaymentType;
+import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
@@ -83,14 +84,16 @@ public class OrderController {
 
         float valueToPay = 0;
 
-        List<List<Integer>> productBatchesMemoryList = new LinkedList<>();
+        List<List<ProductBatch>> productBatchesMemoryList = new LinkedList<>();
+        List<List<Integer>> productBatchQuantityMemoryList = new LinkedList<>();
 
         for(ProductInOrderData product : products) {
             int productId = product.productId();
             int productBatchId = product.discountId();
             int quantityOrdered = product.quantity();
 
-            List<Integer> productBatchesTempList = new LinkedList<>();
+            List<ProductBatch> productBatchesTempList = new LinkedList<>();
+            List<Integer> productBatchesQuantityTempList = new LinkedList<>();
 
             float productPrice;
 
@@ -101,17 +104,20 @@ public class OrderController {
 
                 int tempQuantity = 0;
                 for(ProductInStorage productInStorage : productInStorageAllBatches) {
-                    productBatchesTempList.add(productInStorage.batch().batchId());
+                    productBatchesTempList.add(productInStorage.batch());
                     if(productInStorage.quantity() < quantityOrdered - tempQuantity) {
                         tempQuantity += productInStorage.quantity();
+                        productBatchesQuantityTempList.add(productInStorage.quantity());
 
                         productInStorageService.updateProductInStorage(productInStorage.batch(), productInStorage.storage(), 0);
                     }
                     else if (productInStorage.quantity() == quantityOrdered - tempQuantity) {
+                        productBatchesQuantityTempList.add(productInStorage.quantity());
                         productInStorageService.updateProductInStorage(productInStorage.batch(), productInStorage.storage(), 0);
                         break;
                     }
                     else {
+                        productBatchesQuantityTempList.add(quantityOrdered - tempQuantity);
                         productInStorageService.updateProductInStorage(
                                 productInStorage.batch(),
                                 productInStorage.storage(),
@@ -127,16 +133,21 @@ public class OrderController {
 
                 int tempQuantity = 0;
                 for(ProductInStorage productInStorage : productInStorageAll) {
+                    productBatchesTempList.add(productInStorage.batch());
+
                     if(productInStorage.quantity() < quantityOrdered - tempQuantity) {
                         tempQuantity += productInStorage.quantity();
+                        productBatchesQuantityTempList.add(productInStorage.quantity());
 
                         productInStorageService.updateProductInStorage(productInStorage.batch(), productInStorage.storage(), 0);
                     }
                     else if (productInStorage.quantity() == quantityOrdered - tempQuantity) {
+                        productBatchesQuantityTempList.add(productInStorage.quantity());
                         productInStorageService.updateProductInStorage(productInStorage.batch(), productInStorage.storage(), 0);
                         break;
                     }
                     else {
+                        productBatchesQuantityTempList.add(quantityOrdered - tempQuantity);
                         productInStorageService.updateProductInStorage(
                                 productInStorage.batch(),
                                 productInStorage.storage(),
@@ -147,6 +158,7 @@ public class OrderController {
             }
             valueToPay += productPrice * quantityOrdered;
             productBatchesMemoryList.add(productBatchesTempList);
+            productBatchQuantityMemoryList.add(productBatchesQuantityTempList);
         }
 
         Payment payment = paymentService
@@ -203,7 +215,11 @@ public class OrderController {
 //                    .createProductOrder(order, )
 //        }
 
-        //for()
+//        for(List<Integer> item : productBatchesMemoryList) {
+//            for(Integer i : item) {
+//                productOrderService.createProductOrder(order, i, )
+//            }
+//        }
 
 
 

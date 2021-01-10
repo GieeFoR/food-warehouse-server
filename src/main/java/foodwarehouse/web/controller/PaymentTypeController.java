@@ -31,7 +31,7 @@ public class PaymentTypeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin') || hasRole(`Customer`)")
+    @PreAuthorize("hasRole('Admin') || hasRole('Customer')")
     public SuccessResponse<List<PaymentTypeResponse>> getPaymentTypes() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
