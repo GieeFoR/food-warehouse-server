@@ -15,8 +15,8 @@ final public class MessageResultSetMapper implements ResultSetMapper<Message> {
                 new EmployeeResultSetMapper().resultSetMap(rs, prefix+MessageTable.NAME+"_RECEIVER_"),
                 rs.getString(prefix+ MessageTable.NAME+"."+MessageTable.Columns.CONTENT),
                 rs.getString(prefix+ MessageTable.NAME+"."+MessageTable.Columns.STATE),
-                rs.getDate(prefix+ MessageTable.NAME+"."+MessageTable.Columns.SEND_DATE),
-                rs.getDate(prefix+ MessageTable.NAME+"."+MessageTable.Columns.READ_DATE)
+                rs.getTimestamp(prefix+ MessageTable.NAME+"."+MessageTable.Columns.SEND_DATE),
+                rs.getTimestamp(prefix+ MessageTable.NAME+"."+MessageTable.Columns.READ_DATE)
         );
     }
 }

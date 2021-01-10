@@ -40,4 +40,16 @@ public class ProductInStorageService {
     public List<ProductInStorage> findProductInStorageAll() {
         return productInStorageRepository.findProductInStorageAll();
     }
+
+    public List<ProductInStorage> findProductInStorageAllByProductId(int productId) {
+        return productInStorageRepository.findProductInStorageAllByProductId(productId);
+    }
+
+    public List<ProductInStorage> findProductInStorageAllByBatchId(int batchId) {
+        return productInStorageRepository.findProductInStorageAllByBatchId(batchId);
+    }
+
+    public float findProductPrice(int batchId) {
+        return productInStorageRepository.findProductPrice(batchId);
+    }
 }

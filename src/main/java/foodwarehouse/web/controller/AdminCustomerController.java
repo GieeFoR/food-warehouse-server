@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customer")
-public class CustomerController {
+public class AdminCustomerController {
 
     private final CustomerService customerService;
     private final UserService userService;
     private final AddressService addressService;
     private final ConnectionService connectionService;
 
-    public CustomerController(
+    public AdminCustomerController(
             CustomerService customerService,
             UserService userService,
             AddressService addressService,

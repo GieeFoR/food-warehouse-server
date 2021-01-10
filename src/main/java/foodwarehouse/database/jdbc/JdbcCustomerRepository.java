@@ -126,4 +126,23 @@ public class JdbcCustomerRepository implements CustomerRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<Customer> findCustomerByUsername(String username) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_BY_USERNAME);
+            callableStatement.setString(1, username);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            Customer customer = null;
+            if(resultSet.next()) {
+                customer = new CustomerResultSetMapper().resultSetMap(resultSet, "");
+            }
+
+            return Optional.ofNullable(customer);
+        }
+        catch(SQLException sqlException) {
+            return Optional.empty();
+        }
+    }
 }

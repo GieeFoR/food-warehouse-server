@@ -38,4 +38,8 @@ public class EmployeeService {
     public Optional<Employee> findEmployeeById(int employeeId) {
         return employeeRepository.findEmployeeById(employeeId);
     }
+
+    public Optional<Employee> findSupplierWithMinDelivery() {
+        return employeeRepository.findSupplierWithMinDelivery();
+    }
 }

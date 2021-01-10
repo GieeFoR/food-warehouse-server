@@ -18,4 +18,10 @@ public interface ProductInStorageRepository {
     List<ProductInStorage> findProductInStorageAll();
 
     Optional<ProductInStorage> findProductInStorageById(ProductBatch productBatch, Storage storage);
+
+    List<ProductInStorage> findProductInStorageAllByProductId(int productId);
+
+    List<ProductInStorage> findProductInStorageAllByBatchId(int productId);
+
+    float findProductPrice(int batchId);
 }

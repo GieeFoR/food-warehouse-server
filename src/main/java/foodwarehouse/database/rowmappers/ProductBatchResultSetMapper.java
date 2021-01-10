@@ -13,7 +13,7 @@ final public class ProductBatchResultSetMapper implements ResultSetMapper<Produc
                 rs.getInt(prefix+ProductBatchTable.NAME+"."+ProductBatchTable.Columns.BATCH_ID),
                 new ProductResultSetMapper().resultSetMap(rs, prefix + ProductBatchTable.NAME + "_"),
                 rs.getInt(prefix+ProductBatchTable.NAME+"."+ProductBatchTable.Columns.BATCH_NO),
-                rs.getDate(prefix+ProductBatchTable.NAME+"."+ProductBatchTable.Columns.EAT_BY_DATE),
+                rs.getTimestamp(prefix+ProductBatchTable.NAME+"."+ProductBatchTable.Columns.EAT_BY_DATE),
                 rs.getInt(prefix+ProductBatchTable.NAME+"."+ProductBatchTable.Columns.DISCOUNT),
                 rs.getInt(prefix+ ProductBatchTable.NAME+"."+ProductBatchTable.Columns.PACKAGES_QUANTITY));
     }

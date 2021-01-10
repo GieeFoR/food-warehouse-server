@@ -24,5 +24,6 @@ final public class CustomerTable {
 
         static final public String READ_ALL = "CALL `GET_CUSTOMERS`()";
         static final public String READ_BY_ID = "CALL `GET_CUSTOMER_BY_ID`(?)";
+        static final public String READ_BY_USERNAME = "CALL `GET_CUSTOMER_BY_USERNAME`(?)";
     }
 }

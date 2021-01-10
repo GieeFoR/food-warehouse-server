@@ -33,4 +33,6 @@ public interface CustomerRepository {
     List<Customer> findAllCustomers();
 
     Optional<Customer> findCustomerById(int customerId);
+
+    Optional<Customer> findCustomerByUsername(String username);
 }

@@ -17,4 +17,6 @@ public interface EmployeeRepository {
     List<Employee> findAllEmployees();
 
     Optional<Employee> findEmployeeById(int employeeId);
+
+    Optional<Employee> findSupplierWithMinDelivery();
 }

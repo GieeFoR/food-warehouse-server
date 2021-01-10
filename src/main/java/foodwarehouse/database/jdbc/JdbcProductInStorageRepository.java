@@ -130,4 +130,57 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
             return Optional.empty();
         }
     }
+
+    @Override
+    public List<ProductInStorage> findProductInStorageAllByProductId(int productId) {
+        List<ProductInStorage> productInStorages = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_BY_PRODUCT_ID);
+            callableStatement.setInt(1, productId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return productInStorages;
+    }
+
+    @Override
+    public List<ProductInStorage> findProductInStorageAllByBatchId(int batchId) {
+        List<ProductInStorage> productInStorages = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_BY_BATCH_ID);
+            callableStatement.setInt(1, batchId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return productInStorages;
+    }
+
+    @Override
+    public float findProductPrice(int batchId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_BY_BATCH_ID);
+            callableStatement.setInt(1, batchId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getFloat(1);
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return 0;
+    }
 }
