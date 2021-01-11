@@ -39,4 +39,8 @@ public class StorageService {
     public Optional<Storage> findStorage(int storageId) {
         return storageRepository.findStorage(storageId);
     }
+
+    public Optional<Storage> findStorageByBatchId(int batchId) {
+        return storageRepository.findStorageByBatchId(batchId);
+    }
 }

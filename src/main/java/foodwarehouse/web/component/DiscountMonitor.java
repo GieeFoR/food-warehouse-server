@@ -28,6 +28,8 @@ public class DiscountMonitor {
             return;
         }
 
+        System.out.println("Przeliczam promocje");
+
         LocalDate now = LocalDate.now();
         LocalDate startDiscount = now.plusDays(14);
         LocalDate endDiscount = now.plusDays(4);
@@ -36,10 +38,7 @@ public class DiscountMonitor {
 
         for(ProductBatch pb : batches) {
             LocalDate productEatByDate = pb.eatByDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            if(productEatByDate.isAfter(startDiscount)) {
-                continue;
-            }
-            else if(productEatByDate.isBefore(startDiscount) && productEatByDate.isAfter(endDiscount)) {
+            if(productEatByDate.isBefore(startDiscount) && productEatByDate.isAfter(endDiscount)) {
                 Long temp = productEatByDate.toEpochDay() - now.toEpochDay() - 4L;
                 int discount = 20 + 5 * (10 - temp.intValue());
                 productBatchService.updateProductBatch(pb.batchId(), pb.product(), pb.batchNumber(), pb.eatByDate(), discount, pb.packagesQuantity());

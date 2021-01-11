@@ -114,6 +114,7 @@ public class JdbcOrderRepository implements OrderRepository {
             return true;
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return false;
         }
     }
@@ -132,6 +133,7 @@ public class JdbcOrderRepository implements OrderRepository {
             return Optional.ofNullable(order);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
@@ -148,7 +150,7 @@ public class JdbcOrderRepository implements OrderRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return orders;
     }
@@ -166,7 +168,7 @@ public class JdbcOrderRepository implements OrderRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return orders;
     }

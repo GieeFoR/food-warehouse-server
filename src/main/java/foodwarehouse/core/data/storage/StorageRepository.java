@@ -18,4 +18,6 @@ public interface StorageRepository {
     List<Storage> findAllStorages();
 
     Optional<Storage> findStorage(int storageId);
+
+    Optional<Storage> findStorageByBatchId(int batchId);
 }

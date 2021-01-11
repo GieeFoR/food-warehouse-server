@@ -21,5 +21,6 @@ final public class StorageTable {
 
         static final public String READ_ALL = "CALL `GET_STORAGES`()";
         static final public String READ_BY_ID = "CALL `GET_STORAGE_BY_ID`(?)";
+        static final public String READ_BY_BATCH_ID = "CALL `GET_STORAGE_BY_BATCH_ID`(?)";
     }
 }

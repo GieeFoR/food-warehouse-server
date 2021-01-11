@@ -142,7 +142,7 @@ public class PaymentController {
     }
 
     @PutMapping("/accept/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Customer')")
     public SuccessResponse<PaymentResponse> acceptPayment(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -161,7 +161,7 @@ public class PaymentController {
     }
 
     @PutMapping("/reject/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Customer')")
     public SuccessResponse<PaymentResponse> rejectPayment(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

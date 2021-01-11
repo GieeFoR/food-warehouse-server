@@ -138,4 +138,22 @@ public class JdbcStorageRepository implements StorageRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<Storage> findStorageByBatchId(int batchId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_BY_BATCH_ID);
+            callableStatement.setInt(1, batchId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            Storage storage = null;
+            if(resultSet.next()) {
+                storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(storage);
+        }
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
+    }
 }

@@ -6,16 +6,19 @@ import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.payment.Payment;
+import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.data.productOrder.ProductOrder;
+import foodwarehouse.core.data.storage.Storage;
 import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
+import foodwarehouse.web.response.order.CancelOrderResponse;
 import foodwarehouse.web.response.order.OrderResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,6 +43,7 @@ public class OrderController {
     private final EmployeeService employeeService;
     private final CustomerService customerService;
     private final ComplaintService complaintService;
+    private final StorageService storageService;
 
     public OrderController(
             ProductOrderService productOrderService,
@@ -53,6 +57,7 @@ public class OrderController {
             EmployeeService employeeService,
             CustomerService customerService,
             ComplaintService complaintService,
+            StorageService storageService,
             ConnectionService connectionService) {
         this.productOrderService = productOrderService;
         this.orderService = orderService;
@@ -66,6 +71,7 @@ public class OrderController {
         this.customerService = customerService;
         this.connectionService = connectionService;
         this.complaintService = complaintService;
+        this.storageService = storageService;
     }
 
     @PostMapping("/order")
@@ -244,5 +250,53 @@ public class OrderController {
         }
 
         return new SuccessResponse<>(result);
+    }
+
+    @PutMapping("/order/{id}")
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<CancelOrderResponse> cancelOrder(Authentication authentication, @PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        Order order = orderService.findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this ID."));
+
+        if(order.customer().customerId() != customer.customerId()) {
+            throw new RestException("Cannot cancel this order.");
+        }
+
+        paymentService.updatePaymentState(order.payment().paymentId(), PaymentState.CANCELED);
+
+        List<ProductOrder> productsInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
+
+        for(ProductOrder po : productsInOrder) {
+            Storage storage = storageService
+                    .findStorageByBatchId(po.batch().batchId())
+                    .orElseThrow(() -> new RestException("Cannot find storage."));
+
+            ProductInStorage productInStorage = productInStorageService
+                    .findProductInStorageById(po.batch(), storage)
+                    .orElseThrow(() -> new RestException("Cannot find product batch in storage."));
+
+            productInStorageService
+                    .updateProductInStorage(
+                            po.batch(),
+                            storage,
+                            po.quantity() + productInStorage.quantity());
+
+            productOrderService.deleteProductOrder(po.order().orderId(), po.batch().batchId());
+        }
+
+        orderService.deleteOrder(order.orderId());
+        deliveryService.deleteDelivery(order.delivery().deliveryId());
+        return new SuccessResponse<>(new CancelOrderResponse(true));
     }
 }

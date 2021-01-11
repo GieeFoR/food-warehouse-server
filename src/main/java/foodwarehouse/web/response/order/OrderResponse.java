@@ -1,7 +1,6 @@
 package foodwarehouse.web.response.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import foodwarehouse.core.data.complaint.Complaint;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.web.response.payment.PaymentResponse;
