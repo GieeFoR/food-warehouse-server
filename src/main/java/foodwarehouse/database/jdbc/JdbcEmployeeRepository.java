@@ -136,6 +136,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
             return Optional.ofNullable(employee);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }

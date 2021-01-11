@@ -46,7 +46,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
             callableStatement.setInt(2, supplier.employeeId());
 
             callableStatement.executeQuery();
-            int deliveryId = callableStatement.getInt(8);
+            int deliveryId = callableStatement.getInt(3);
             return Optional.of(new Delivery(deliveryId, address, supplier, null, null));
         }
         catch (SQLException sqlException) {

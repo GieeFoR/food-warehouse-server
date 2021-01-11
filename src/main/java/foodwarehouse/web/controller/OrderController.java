@@ -200,29 +200,14 @@ public class OrderController {
                 .createOrder(payment, customer, delivery, request.comment())
                 .orElseThrow(() -> new RestException("Cannot create order."));
 
-//        for(ProductInOrderData product : products) {
-//            int productId = product.productId();
-//            int productBatchId = product.discountId();
-//            int quantityOrdered = product.quantity();
-//
-//            if(productBatchId == -1) {
-//
-//            }
-//            else {
-//
-//            }
-//            productOrderService
-//                    .createProductOrder(order, )
-//        }
 
-//        for(List<Integer> item : productBatchesMemoryList) {
-//            for(Integer i : item) {
-//                productOrderService.createProductOrder(order, i, )
-//            }
-//        }
+        for(int i = 0; i < productBatchesMemoryList.size(); i++) {
+            for(int j = 0; j < productBatchesMemoryList.get(i).size(); j++) {
+                productOrderService.createProductOrder(order, productBatchesMemoryList.get(i).get(j), productBatchQuantityMemoryList.get(i).get(j));
+            }
+        }
 
-
-
-        return null;
+        return new SuccessResponse<>(
+                new OrderResponse(true));
     }
 }
