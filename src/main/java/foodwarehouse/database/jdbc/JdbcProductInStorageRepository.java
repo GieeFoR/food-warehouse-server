@@ -170,12 +170,12 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     @Override
     public float findProductPrice(int batchId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_BY_BATCH_ID);
+            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_PRODUCT_PRICE);
             callableStatement.setInt(1, batchId);
 
             ResultSet resultSet = callableStatement.executeQuery();
             if(resultSet.next()) {
-                return resultSet.getFloat(1);
+                return resultSet.getFloat("RESULT");
             }
         }
         catch(SQLException sqlException) {
