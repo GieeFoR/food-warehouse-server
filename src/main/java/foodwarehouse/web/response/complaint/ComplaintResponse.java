@@ -1,4 +1,4 @@
-package foodwarehouse.web.response.order;
+package foodwarehouse.web.response.complaint;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.complaint.Complaint;

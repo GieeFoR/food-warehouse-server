@@ -9,6 +9,7 @@ import foodwarehouse.core.service.CustomerService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
+import foodwarehouse.web.response.account.NameResponse;
 import foodwarehouse.web.response.address.AddressResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,5 +53,22 @@ public class AccountController {
         addressList.add(customer.address());
 
         return new SuccessResponse<>(addressList.stream().map(AddressResponse::fromAddress).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/name")
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<NameResponse> getName(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return customerService
+                .findCustomerByUsername(authentication.getName())
+                .map(NameResponse::fromCustomer)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find user."));
     }
 }

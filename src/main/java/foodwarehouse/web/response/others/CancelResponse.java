@@ -1,7 +1,7 @@
-package foodwarehouse.web.response.order;
+package foodwarehouse.web.response.others;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record CancelOrderResponse(
+public record CancelResponse(
         @JsonProperty(value = "canceled", required = true) boolean isCanceled) {
 }

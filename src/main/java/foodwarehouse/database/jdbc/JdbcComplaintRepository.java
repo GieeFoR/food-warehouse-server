@@ -86,4 +86,32 @@ public class JdbcComplaintRepository implements ComplaintRepository {
         }
         return complaints;
     }
+
+    @Override
+    public List<Complaint> findCustomerComplaints(int customerId) {
+        List<Complaint> complaints = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_CUSTOMER_COMPLAINTS);
+            callableStatement.setInt(1, customerId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return complaints;
+    }
+
+    @Override
+    public void cancelComplaint(int complaintId) {
+
+    }
+
+    @Override
+    public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
+
+    }
 }

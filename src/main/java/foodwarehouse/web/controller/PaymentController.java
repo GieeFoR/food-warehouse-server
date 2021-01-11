@@ -63,7 +63,6 @@ public class PaymentController {
 
 
     @GetMapping("/customer")
-    //@PreAuthorize("hasRole('Admin') || hasRole('Customer')")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<List<PaymentResponse>> getCustomerPayments(Authentication authentication) {
         //check if database is reachable
@@ -84,7 +83,7 @@ public class PaymentController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<PaymentResponse> getPaymentTypeById(@PathVariable int id) {
+    public SuccessResponse<PaymentResponse> getPaymentById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -101,7 +100,7 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<PaymentResponse> createPaymentType(@RequestBody CreatePaymentRequest request) {
+    public SuccessResponse<PaymentResponse> createPayment(@RequestBody CreatePaymentRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -142,7 +141,7 @@ public class PaymentController {
     }
 
     @PutMapping("/accept/{id}")
-    @PreAuthorize("hasRole('Admin') || hasRole('Customer')")
+    @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<PaymentResponse> acceptPayment(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -161,7 +160,7 @@ public class PaymentController {
     }
 
     @PutMapping("/reject/{id}")
-    @PreAuthorize("hasRole('Admin') || hasRole('Customer')")
+    @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<PaymentResponse> rejectPayment(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

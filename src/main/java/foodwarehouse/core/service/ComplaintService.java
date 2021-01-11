@@ -2,6 +2,7 @@ package foodwarehouse.core.service;
 
 import foodwarehouse.core.data.complaint.Complaint;
 import foodwarehouse.core.data.complaint.ComplaintRepository;
+import foodwarehouse.core.data.complaint.ComplaintState;
 import foodwarehouse.core.data.order.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,5 +32,17 @@ public class ComplaintService {
 
     public List<Complaint> findComplaints() {
         return complaintRepository.findComplaints();
+    }
+
+    public List<Complaint> findCustomerComplaints(int customerId) {
+        return complaintRepository.findCustomerComplaints(customerId);
+    }
+
+    public void cancelComplaint(int complaintId) {
+        complaintRepository.cancelComplaint(complaintId);
+    }
+
+    public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
+        complaintRepository.addDecisionToComplaint(complaintId, decision, complaintState);
     }
 }

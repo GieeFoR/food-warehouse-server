@@ -18,7 +18,7 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
-import foodwarehouse.web.response.order.CancelOrderResponse;
+import foodwarehouse.web.response.others.CancelResponse;
 import foodwarehouse.web.response.order.OrderResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -39,10 +39,8 @@ public class OrderController {
     private final ConnectionService connectionService;
     private final DeliveryService deliveryService;
     private final AddressService addressService;
-    private final ProductBatchService productBatchService;
     private final EmployeeService employeeService;
     private final CustomerService customerService;
-    private final ComplaintService complaintService;
     private final StorageService storageService;
 
     public OrderController(
@@ -51,26 +49,23 @@ public class OrderController {
             PaymentService paymentService,
             PaymentTypeService paymentTypeService,
             ProductInStorageService productInStorageService,
-            ProductBatchService productBatchService,
+            ConnectionService connectionService,
             DeliveryService deliveryService,
             AddressService addressService,
             EmployeeService employeeService,
             CustomerService customerService,
-            ComplaintService complaintService,
-            StorageService storageService,
-            ConnectionService connectionService) {
+            StorageService storageService) {
+
         this.productOrderService = productOrderService;
         this.orderService = orderService;
         this.paymentService = paymentService;
         this.paymentTypeService = paymentTypeService;
         this.productInStorageService = productInStorageService;
-        this.productBatchService = productBatchService;
+        this.connectionService = connectionService;
         this.deliveryService = deliveryService;
         this.addressService = addressService;
         this.employeeService = employeeService;
         this.customerService = customerService;
-        this.connectionService = connectionService;
-        this.complaintService = complaintService;
         this.storageService = storageService;
     }
 
@@ -254,7 +249,7 @@ public class OrderController {
 
     @PutMapping("/order/{id}")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<CancelOrderResponse> cancelOrder(Authentication authentication, @PathVariable int id) {
+    public SuccessResponse<CancelResponse> cancelOrder(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -297,6 +292,6 @@ public class OrderController {
 
         orderService.deleteOrder(order.orderId());
         deliveryService.deleteDelivery(order.delivery().deliveryId());
-        return new SuccessResponse<>(new CancelOrderResponse(true));
+        return new SuccessResponse<>(new CancelResponse(true));
     }
 }

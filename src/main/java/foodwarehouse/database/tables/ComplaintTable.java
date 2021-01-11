@@ -16,7 +16,12 @@ final public class ComplaintTable {
     static final public class Procedures {
         static final public String INSERT = "CALL `INSERT_COMPLAINT`(?,?,?)";
 
+        static final public String CANCEL = "CALL `COMPLAINT_CANCEL`(?)";
+        static final public String ACCEPT = "CALL `COMPLAINT_ACCEPT`(?,?)";
+        static final public String REJECT = "CALL `COMPLAINT_REJECT`(?,?)";
+
         static final public String READ_BY_ID = "CALL `GET_COMPLAINT_BY_ID`(?)";
-        static  final public String READ_ALL = "CALL `GET_COMPLAINTS`()";
+        static final public String READ_ALL = "CALL `GET_COMPLAINTS`()";
+        static final public String READ_CUSTOMER_COMPLAINTS = "CALL `GET_CUSTOMER_COMPLAINTS`(?)";
     }
 }
