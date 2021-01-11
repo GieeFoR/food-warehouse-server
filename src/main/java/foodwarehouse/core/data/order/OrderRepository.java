@@ -21,4 +21,6 @@ public interface OrderRepository {
     Optional<Order> findOrderById(int orderId);
 
     List<Order> findOrders();
+
+    List<Order> findCustomerOrders(int customerId);
 }

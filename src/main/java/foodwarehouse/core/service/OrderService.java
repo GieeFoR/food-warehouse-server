@@ -58,4 +58,8 @@ public class OrderService {
     public List<Order> findOrders() {
         return orderRepository.findOrders();
     }
+
+    public List<Order> findCustomerOrders(int customerId) {
+        return orderRepository.findCustomerOrders(customerId);
+    }
 }

@@ -140,7 +140,25 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findOrders() {
         List<Order> orders = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(CarTable.Procedures.READ_ALL);
+            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_ALL);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return orders;
+    }
+
+    @Override
+    public List<Order> findCustomerOrders(int customerId) {
+        List<Order> orders = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_CUSTOMER_ALL);
+            callableStatement.setInt(1, customerId);
 
             ResultSet resultSet = callableStatement.executeQuery();
             while(resultSet.next()) {

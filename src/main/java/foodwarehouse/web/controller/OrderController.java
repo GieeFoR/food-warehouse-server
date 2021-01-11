@@ -18,13 +18,11 @@ import foodwarehouse.web.request.order.ProductInOrderData;
 import foodwarehouse.web.response.order.OrderResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collector;
 
 @RestController
 @RequestMapping("/store")
@@ -200,14 +198,38 @@ public class OrderController {
                 .createOrder(payment, customer, delivery, request.comment())
                 .orElseThrow(() -> new RestException("Cannot create order."));
 
+        List<ProductBatch> productBatchesToReturn = new LinkedList<>();
 
         for(int i = 0; i < productBatchesMemoryList.size(); i++) {
             for(int j = 0; j < productBatchesMemoryList.get(i).size(); j++) {
+                productBatchesToReturn.add(productBatchesMemoryList.get(i).get(j));
                 productOrderService.createProductOrder(order, productBatchesMemoryList.get(i).get(j), productBatchQuantityMemoryList.get(i).get(j));
             }
         }
 
         return new SuccessResponse<>(
-                new OrderResponse(true));
+                OrderResponse.from(order, productBatchesToReturn, null)
+        );
+    }
+
+    @GetMapping("/order")
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<OrderResponse> getOrders(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        List<Order> orders = orderService.findCustomerOrders(customer.customerId());
+
+
+
+        return null;
     }
 }

@@ -22,5 +22,6 @@ final public class OrderTable {
 
         static final public String READ_ALL = "CALL `GET_ORDERS`()";
         static final public String READ_BY_ID = "CALL `GET_ORDER_BY_ID`(?)";
+        static final public String READ_CUSTOMER_ALL = "CALL `GET_CUSTOMER_ORDERS`(?)";
     }
 }

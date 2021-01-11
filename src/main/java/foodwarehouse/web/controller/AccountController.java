@@ -1,6 +1,7 @@
 package foodwarehouse.web.controller;
 
 
+import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.service.AddressService;
 import foodwarehouse.core.service.ConnectionService;
@@ -14,6 +15,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/account")
@@ -31,7 +36,7 @@ public class AccountController {
 
     @GetMapping("/address")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<AddressResponse> getAddress(Authentication authentication) {
+    public SuccessResponse<List<AddressResponse>> getAddress(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -43,6 +48,9 @@ public class AccountController {
                 .findCustomerByUsername(authentication.getName())
                 .orElseThrow(() -> new RestException("Cannot find user."));
 
-        return new SuccessResponse<>(AddressResponse.fromAddress(customer.address()));
+        List<Address> addressList = new LinkedList<>();
+        addressList.add(customer.address());
+
+        return new SuccessResponse<>(addressList.stream().map(AddressResponse::fromAddress).collect(Collectors.toList()));
     }
 }
