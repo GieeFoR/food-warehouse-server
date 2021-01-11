@@ -12,6 +12,6 @@ final public class ProductInStorageResultSetMapper implements ResultSetMapper<Pr
         return new ProductInStorage(
                 new ProductBatchResultSetMapper().resultSetMap(rs, prefix + ProductInStorageTable.NAME + "_"),
                 new StorageResultSetMapper().resultSetMap(rs, prefix + ProductInStorageTable.NAME + "_"),
-                rs.getInt(ProductInStorageTable.Columns.QUANTITY));
+                rs.getInt(prefix+ProductInStorageTable.NAME+"."+ProductInStorageTable.Columns.QUANTITY));
     }
 }

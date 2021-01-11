@@ -13,22 +13,13 @@ public record OrderResponse(
         @JsonProperty(value = "order", required = true)         OrderDataResponse orderDataResponse,
         @JsonProperty(value ="products", required = true)       List<OrderProductResponse> orderProductsResponse,
         @JsonProperty(value = "payment", required = true)       PaymentResponse paymentState,
-        @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse,
-        @JsonProperty(value = "complaint")                      ComplaintResponse complaintResponse) {
+        @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse) {
 
-        public static OrderResponse from(Order order, List<ProductBatch> products, Complaint complaint) {
-                ComplaintResponse complaintResponse = null;
-
-                if(complaint != null) {
-                        complaintResponse = ComplaintResponse.fromComplaint(complaint);
-                }
-
+        public static OrderResponse from(Order order, List<ProductBatch> products) {
                 return new OrderResponse(
                         OrderDataResponse.fromOrder(order),
                         products.stream().map(OrderProductResponse::fromProductBatch).collect(Collectors.toList()),
                         PaymentResponse.fromPayment(order.payment()),
-                        OrderDeliveryResponse.fromDelivery(order.delivery()),
-                        complaintResponse
-                );
+                        OrderDeliveryResponse.fromDelivery(order.delivery()));
         }
 }

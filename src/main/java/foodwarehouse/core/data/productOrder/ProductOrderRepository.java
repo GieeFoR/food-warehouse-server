@@ -13,9 +13,11 @@ public interface ProductOrderRepository {
 
     Optional<ProductOrder> updateProductOrder(Order order, ProductBatch productBatch, int quantity);
 
-    boolean deleteProductOrder(Order order, ProductBatch productBatch);
+    boolean deleteProductOrder(int orderId, int batchId);
 
-    Optional<ProductOrder> findProductOrderById(Order order, ProductBatch productBatch);
+    Optional<ProductOrder> findProductOrderById(int orderId, int batchId);
 
     List<ProductOrder> findProductOrderAll();
+
+    List<ProductOrder> findProductOrderByOrderId(int orderId);
 }

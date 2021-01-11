@@ -10,10 +10,10 @@ final public class MakerResultSetMapper implements ResultSetMapper<Maker> {
     @Override
     public Maker resultSetMap(ResultSet rs, String prefix) throws SQLException {
         return new Maker(
-                rs.getInt(MakerTable.Columns.MAKER_ID),
+                rs.getInt(prefix+MakerTable.NAME+"."+MakerTable.Columns.MAKER_ID),
                 new AddressResultSetMapper().resultSetMap(rs, prefix+MakerTable.NAME+"_"),
-                rs.getString(MakerTable.Columns.FIRM_NAME),
-                rs.getString(MakerTable.Columns.TELEPHONE_NO),
-                rs.getString(MakerTable.Columns.E_MAIL));
+                rs.getString(prefix+MakerTable.NAME+"."+MakerTable.Columns.FIRM_NAME),
+                rs.getString(prefix+MakerTable.NAME+"."+MakerTable.Columns.TELEPHONE_NO),
+                rs.getString(prefix+MakerTable.NAME+"."+MakerTable.Columns.E_MAIL));
     }
 }

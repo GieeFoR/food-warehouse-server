@@ -9,6 +9,7 @@ import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.paymentType.PaymentType;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
+import foodwarehouse.core.data.productOrder.ProductOrder;
 import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/store")
@@ -38,6 +39,7 @@ public class OrderController {
     private final ProductBatchService productBatchService;
     private final EmployeeService employeeService;
     private final CustomerService customerService;
+    private final ComplaintService complaintService;
 
     public OrderController(
             ProductOrderService productOrderService,
@@ -50,6 +52,7 @@ public class OrderController {
             AddressService addressService,
             EmployeeService employeeService,
             CustomerService customerService,
+            ComplaintService complaintService,
             ConnectionService connectionService) {
         this.productOrderService = productOrderService;
         this.orderService = orderService;
@@ -62,6 +65,7 @@ public class OrderController {
         this.employeeService = employeeService;
         this.customerService = customerService;
         this.connectionService = connectionService;
+        this.complaintService = complaintService;
     }
 
     @PostMapping("/order")
@@ -198,23 +202,23 @@ public class OrderController {
                 .createOrder(payment, customer, delivery, request.comment())
                 .orElseThrow(() -> new RestException("Cannot create order."));
 
-        List<ProductBatch> productBatchesToReturn = new LinkedList<>();
+        //List<ProductBatch> productBatchesToReturn = new LinkedList<>();
 
         for(int i = 0; i < productBatchesMemoryList.size(); i++) {
             for(int j = 0; j < productBatchesMemoryList.get(i).size(); j++) {
-                productBatchesToReturn.add(productBatchesMemoryList.get(i).get(j));
+                //productBatchesToReturn.add(productBatchesMemoryList.get(i).get(j));
                 productOrderService.createProductOrder(order, productBatchesMemoryList.get(i).get(j), productBatchQuantityMemoryList.get(i).get(j));
             }
         }
 
         return new SuccessResponse<>(
-                OrderResponse.from(order, productBatchesToReturn, null)
+                OrderResponse.from(order, productBatchesMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()))
         );
     }
 
     @GetMapping("/order")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<OrderResponse> getOrders(Authentication authentication) {
+    public SuccessResponse<List<OrderResponse>> getOrders(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -227,9 +231,18 @@ public class OrderController {
                 .orElseThrow(() -> new RestException("Cannot find customer."));
 
         List<Order> orders = orderService.findCustomerOrders(customer.customerId());
+        List<OrderResponse> result = new LinkedList<>();
 
+        for (Order order : orders) {
+            List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+            List<ProductBatch> productBatches = new LinkedList<>();
 
+            for (ProductOrder po : productOrders) {
+                productBatches.add(po.batch());
+            }
+            result.add(OrderResponse.from(order, productBatches));
+        }
 
-        return null;
+        return new SuccessResponse<>(result);
     }
 }

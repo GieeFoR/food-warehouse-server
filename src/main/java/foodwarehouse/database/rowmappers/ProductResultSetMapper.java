@@ -13,15 +13,15 @@ final public class ProductResultSetMapper implements ResultSetMapper<Product> {
         Blob blob = rs.getBlob(ProductTable.Columns.IMAGE);
 
         return new Product(
-                rs.getInt(ProductTable.Columns.PRODUCT_ID),
+                rs.getInt(prefix+ProductTable.NAME+"."+ProductTable.Columns.PRODUCT_ID),
                 new MakerResultSetMapper().resultSetMap(rs, prefix + ProductTable.NAME + "_"),
-                rs.getString(ProductTable.Columns.PRODUCT_NAME),
-                rs.getString(ProductTable.Columns.SHORT_DESC),
-                rs.getString(ProductTable.Columns.LONG_DESC),
-                rs.getString(ProductTable.Columns.CATEGORY),
-                rs.getBoolean(ProductTable.Columns.NEED_COLD),
-                rs.getFloat(ProductTable.Columns.BUY_PRICE),
-                rs.getFloat(ProductTable.Columns.SELL_PRICE),
+                rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.PRODUCT_NAME),
+                rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.SHORT_DESC),
+                rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.LONG_DESC),
+                rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.CATEGORY),
+                rs.getBoolean(prefix+ProductTable.NAME+"."+ProductTable.Columns.NEED_COLD),
+                rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.BUY_PRICE),
+                rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.SELL_PRICE),
                 new String(blob.getBytes(1, (int) blob.length())));
                 //new String(blob.toBy);
     }

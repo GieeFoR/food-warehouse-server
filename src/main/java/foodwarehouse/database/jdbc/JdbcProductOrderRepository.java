@@ -71,26 +71,27 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     }
 
     @Override
-    public boolean deleteProductOrder(Order order, ProductBatch productBatch) {
+    public boolean deleteProductOrder(int orderId, int productBatchId) {
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductOrderTable.Procedures.DELETE);
-            callableStatement.setInt(1, order.orderId());
-            callableStatement.setInt(2, productBatch.batchId());
+            callableStatement.setInt(1, orderId);
+            callableStatement.setInt(2, productBatchId);
 
             callableStatement.executeQuery();
             return true;
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return false;
         }
     }
 
     @Override
-    public Optional<ProductOrder> findProductOrderById(Order order, ProductBatch productBatch) {
+    public Optional<ProductOrder> findProductOrderById(int orderId, int productBatchId) {
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductOrderTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, order.orderId());
-            callableStatement.setInt(2, productBatch.batchId());
+            callableStatement.setInt(1, orderId);
+            callableStatement.setInt(2, productBatchId);
 
             ResultSet resultSet = callableStatement.executeQuery();
             ProductOrder productOrder = null;
@@ -100,6 +101,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
             return Optional.ofNullable(productOrder);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
@@ -116,7 +118,25 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
+        }
+        return productOrders;
+    }
+
+    @Override
+    public List<ProductOrder> findProductOrderByOrderId(int orderId) {
+        List<ProductOrder> productOrders = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductOrderTable.Procedures.READ_BY_ORDER_ID);
+            callableStatement.setInt(1, orderId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productOrders.add(new ProductOrderResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
         }
         return productOrders;
     }

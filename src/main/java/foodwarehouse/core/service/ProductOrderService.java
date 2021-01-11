@@ -29,15 +29,19 @@ public class ProductOrderService {
         return productOrderRepository.updateProductOrder(order, productBatch, quantity);
     }
 
-    public boolean deleteProductOrder(Order order, ProductBatch productBatch) {
-        return productOrderRepository.deleteProductOrder(order, productBatch);
+    public boolean deleteProductOrder(int orderId, int batchId) {
+        return productOrderRepository.deleteProductOrder(orderId, batchId);
     }
 
-    public Optional<ProductOrder> findProductOrderById(Order order, ProductBatch productBatch) {
-        return productOrderRepository.findProductOrderById(order, productBatch);
+    public Optional<ProductOrder> findProductOrderById(int orderId, int batchId) {
+        return productOrderRepository.findProductOrderById(orderId, batchId);
     }
 
     public List<ProductOrder> findProductOrderAll() {
         return productOrderRepository.findProductOrderAll();
+    }
+
+    public List<ProductOrder> findProductOrderByOrderId(int orderId) {
+        return productOrderRepository.findProductOrderByOrderId(orderId);
     }
 }
