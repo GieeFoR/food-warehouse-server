@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/store")
 public class OrderController {
     private final ProductOrderService productOrderService;
     private final OrderService orderService;
@@ -69,7 +68,7 @@ public class OrderController {
         this.storageService = storageService;
     }
 
-    @PostMapping("/order")
+    @PostMapping("/store/order")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<OrderResponse> createOrder(Authentication authentication, @RequestBody CreateOrderRequest request) {
         //check if database is reachable
@@ -217,7 +216,7 @@ public class OrderController {
         );
     }
 
-    @GetMapping("/order")
+    @GetMapping("/account/orders")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<List<OrderResponse>> getOrders(Authentication authentication) {
         //check if database is reachable
@@ -247,7 +246,7 @@ public class OrderController {
         return new SuccessResponse<>(result);
     }
 
-    @PutMapping("/order/{id}")
+    @PutMapping("/account/order/{id}")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<CancelResponse> cancelOrder(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
