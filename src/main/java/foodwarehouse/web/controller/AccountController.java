@@ -12,6 +12,7 @@ import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
+import foodwarehouse.web.request.customer.UpdateCustomerByCustomerRequest;
 import foodwarehouse.web.request.customer.UpdateCustomerRequest;
 import foodwarehouse.web.request.user.UpdateUserRequest;
 import foodwarehouse.web.response.account.NameResponse;
@@ -97,7 +98,7 @@ public class AccountController {
 
     @PostMapping("/settings")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<CustomerResponse> updateCustomer(Authentication authentication, @RequestBody UpdateCustomerRequest request) {
+    public SuccessResponse<CustomerResponse> updateCustomer(Authentication authentication, @RequestBody UpdateCustomerByCustomerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -110,22 +111,22 @@ public class AccountController {
 
         //update user
         User user = userService.updateUser(
-                request.updateUserRequest().userId(),
-                request.updateUserRequest().username(),
-                request.updateUserRequest().password(),
-                request.updateUserRequest().email(),
+                customer.user().userId(),
+                request.updateUserByCustomerRequest().username(),
+                request.updateUserByCustomerRequest().password(),
+                request.updateUserByCustomerRequest().email(),
                 Permission.CUSTOMER)
                 .orElseThrow(() -> new RestException("Unable to update a user."));
 
         //update address
         Address address = addressService.updateAddress(
-                request.updateAddressRequest().addressId(),
-                request.updateAddressRequest().country(),
-                request.updateAddressRequest().town(),
-                request.updateAddressRequest().postalCode(),
-                request.updateAddressRequest().buildingNumber(),
-                request.updateAddressRequest().street(),
-                request.updateAddressRequest().apartmentNumber())
+                customer.address().addressId(),
+                request.updateAddressByCustomerRequest().country(),
+                request.updateAddressByCustomerRequest().town(),
+                request.updateAddressByCustomerRequest().postalCode(),
+                request.updateAddressByCustomerRequest().buildingNumber(),
+                request.updateAddressByCustomerRequest().street(),
+                request.updateAddressByCustomerRequest().apartmentNumber())
                 .orElseThrow(() -> new RestException("Unable to update an address."));
 
         //update customer
@@ -134,11 +135,11 @@ public class AccountController {
                 customer.customerId(),
                 user,
                 address,
-                request.updateCustomerData().name(),
-                request.updateCustomerData().surname(),
-                request.updateCustomerData().firmName(),
-                request.updateCustomerData().phoneNumber(),
-                request.updateCustomerData().tax_id(),
+                request.updateCustomerByCustomerData().name(),
+                request.updateCustomerByCustomerData().surname(),
+                request.updateCustomerByCustomerData().firmName(),
+                request.updateCustomerByCustomerData().phoneNumber(),
+                request.updateCustomerByCustomerData().tax_id(),
                 customer.discount())
                 .map(CustomerResponse::fromCustomer)
                 .map(SuccessResponse::new)
