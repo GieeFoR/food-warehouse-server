@@ -5,8 +5,8 @@ import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.web.response.payment.PaymentResponse;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record OrderResponse(
         @JsonProperty(value = "order", required = true)         OrderDataResponse orderDataResponse,
@@ -14,10 +14,17 @@ public record OrderResponse(
         @JsonProperty(value = "payment", required = true)       PaymentResponse paymentState,
         @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse) {
 
-        public static OrderResponse from(Order order, List<ProductBatch> products) {
+        public static OrderResponse from(Order order, List<ProductBatch> products, List<Integer> quantity) {
+
+                List<OrderProductResponse> orderProductResponses = new LinkedList<>();
+
+                for(int i = 0; i < products.size(); i++) {
+                        orderProductResponses.add(OrderProductResponse.fromProductBatch(products.get(i), quantity.get(i)));
+                }
+
                 return new OrderResponse(
                         OrderDataResponse.fromOrder(order),
-                        products.stream().map(OrderProductResponse::fromProductBatch).collect(Collectors.toList()),
+                        orderProductResponses,
                         PaymentResponse.fromPayment(order.payment()),
                         OrderDeliveryResponse.fromDelivery(order.delivery()));
         }

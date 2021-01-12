@@ -212,7 +212,7 @@ public class OrderController {
         }
 
         return new SuccessResponse<>(
-                OrderResponse.from(order, productBatchesMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()))
+                OrderResponse.from(order, productBatchesMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()), productBatchQuantityMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()))
         );
     }
 
@@ -236,11 +236,13 @@ public class OrderController {
         for (Order order : orders) {
             List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
             List<ProductBatch> productBatches = new LinkedList<>();
+            List<Integer> quantity = new LinkedList<>();
 
             for (ProductOrder po : productOrders) {
                 productBatches.add(po.batch());
+                quantity.add(po.quantity());
             }
-            result.add(OrderResponse.from(order, productBatches));
+            result.add(OrderResponse.from(order, productBatches, quantity));
         }
 
         return new SuccessResponse<>(result);
