@@ -15,10 +15,21 @@ public record OrderDeliveryResponse(
 
     public static OrderDeliveryResponse fromDelivery(Delivery delivery) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String removalDate = null;
+        if(delivery.removalFromStorage() != null) {
+            removalDate = sdf.format(delivery.removalFromStorage());
+        }
+
+        String deliveryDate = null;
+        if(delivery.deliveryDate() != null) {
+            deliveryDate = sdf.format(delivery.deliveryDate());
+        }
+
         return new OrderDeliveryResponse(
                 delivery.deliveryId(),
-                sdf.format(delivery.removalFromStorage()),
-                sdf.format(delivery.deliveryDate()),
+                removalDate,
+                deliveryDate,
                 AddressResponse.fromAddress(delivery.address()));
     }
 }
