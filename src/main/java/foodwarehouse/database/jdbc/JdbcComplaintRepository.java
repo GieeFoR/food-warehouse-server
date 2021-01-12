@@ -66,6 +66,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
             return Optional.ofNullable(complaint);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
@@ -82,7 +83,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return complaints;
     }
@@ -100,18 +101,55 @@ public class JdbcComplaintRepository implements ComplaintRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return complaints;
     }
 
     @Override
     public void cancelComplaint(int complaintId) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.CANCEL);
+            callableStatement.setInt(1, complaintId);
 
+            callableStatement.executeQuery();
+        }
+        catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+
+        }
     }
 
     @Override
     public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.UPDATE_STATE);
+            callableStatement.setInt(1, complaintId);
+            callableStatement.setString(2, decision);
+            callableStatement.setString(3, complaintState.value());
 
+            callableStatement.executeQuery();
+        }
+        catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+    }
+
+    @Override
+    public List<Complaint> findOrderComplaints(int orderId) {
+        List<Complaint> complaints = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_BY_ORDER_ID);
+            callableStatement.setInt(1, orderId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return complaints;
     }
 }

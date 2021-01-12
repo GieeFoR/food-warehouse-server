@@ -7,5 +7,5 @@ public record UpdateUserRequest(
         @JsonProperty(value = "username", required = true)       String username,
         @JsonProperty(value = "password", required = true)       String password,
         @JsonProperty(value = "email", required = true)          String email,
-        @JsonProperty(value = "permission", required = true)     String permission) {
+        @JsonProperty(value = "permission")                      String permission) {
 }

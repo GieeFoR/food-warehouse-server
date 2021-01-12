@@ -3,19 +3,23 @@ package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
+import foodwarehouse.core.data.user.Permission;
+import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.AddressService;
 import foodwarehouse.core.service.ConnectionService;
 import foodwarehouse.core.service.CustomerService;
+import foodwarehouse.core.service.UserService;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
+import foodwarehouse.web.request.customer.UpdateCustomerRequest;
+import foodwarehouse.web.request.user.UpdateUserRequest;
 import foodwarehouse.web.response.account.NameResponse;
 import foodwarehouse.web.response.address.AddressResponse;
+import foodwarehouse.web.response.customer.CustomerResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,11 +32,13 @@ public class AccountController {
     private final AddressService addressService;
     private final CustomerService customerService;
     private final ConnectionService connectionService;
+    private final UserService userService;
 
-    public AccountController(AddressService addressService, CustomerService customerService, ConnectionService connectionService) {
+    public AccountController(AddressService addressService, CustomerService customerService, ConnectionService connectionService, UserService userService) {
         this.addressService = addressService;
         this.customerService = customerService;
         this.connectionService = connectionService;
+        this.userService = userService;
     }
 
     @GetMapping("/address")
@@ -56,7 +62,7 @@ public class AccountController {
     }
 
     @GetMapping("/name")
-    @PreAuthorize("hasRole('Customer')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee') || hasRole('Supplier') ||hasRole('Customer')")
     public SuccessResponse<NameResponse> getName(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -70,5 +76,72 @@ public class AccountController {
                 .map(NameResponse::fromCustomer)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot find user."));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<CustomerResponse> getCustomer(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return customerService
+                .findCustomerByUsername(authentication.getName())
+                .map(CustomerResponse::fromCustomer)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+    }
+
+    @PostMapping("/settings")
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<CustomerResponse> updateCustomer(Authentication authentication, @RequestBody UpdateCustomerRequest request) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService.findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        //update user
+        User user = userService.updateUser(
+                request.updateUserRequest().userId(),
+                request.updateUserRequest().username(),
+                request.updateUserRequest().password(),
+                request.updateUserRequest().email(),
+                Permission.CUSTOMER)
+                .orElseThrow(() -> new RestException("Unable to update a user."));
+
+        //update address
+        Address address = addressService.updateAddress(
+                request.updateAddressRequest().addressId(),
+                request.updateAddressRequest().country(),
+                request.updateAddressRequest().town(),
+                request.updateAddressRequest().postalCode(),
+                request.updateAddressRequest().buildingNumber(),
+                request.updateAddressRequest().street(),
+                request.updateAddressRequest().apartmentNumber())
+                .orElseThrow(() -> new RestException("Unable to update an address."));
+
+        //update customer
+        //return response to client with updated customer
+        return customerService.updateCustomer(
+                customer.customerId(),
+                user,
+                address,
+                request.updateCustomerData().name(),
+                request.updateCustomerData().surname(),
+                request.updateCustomerData().firmName(),
+                request.updateCustomerData().phoneNumber(),
+                request.updateCustomerData().tax_id(),
+                customer.discount())
+                .map(CustomerResponse::fromCustomer)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Unable to update a customer."));
     }
 }

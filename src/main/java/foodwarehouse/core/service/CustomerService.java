@@ -24,8 +24,17 @@ public class CustomerService {
         return customerRepository.createCustomer(user, address, name, surname, firmName, phoneNumber, taxId);
     }
 
-    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
-        return customerRepository.updateCustomer(customerId, user, address, name, surname, firmName, phoneNumber, taxId);
+    public Optional<Customer> updateCustomer(
+            int customerId,
+            User user,
+            Address address,
+            String name,
+            String surname,
+            String firmName,
+            String phoneNumber,
+            String taxId,
+            int discount) {
+        return customerRepository.updateCustomer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, discount);
     }
 
     public boolean deleteCustomer(int customerId) {

@@ -18,4 +18,6 @@ public interface ComplaintRepository {
     void cancelComplaint(int complaintId);
 
     void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState);
+
+    List<Complaint> findOrderComplaints(int orderId);
 }

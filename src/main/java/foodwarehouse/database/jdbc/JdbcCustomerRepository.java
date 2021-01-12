@@ -57,7 +57,17 @@ public class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> updateCustomer(int customerId, User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
+    public Optional<Customer> updateCustomer(
+            int customerId,
+            User user,
+            Address address,
+            String name,
+            String surname,
+            String firmName,
+            String phoneNumber,
+            String taxId,
+            int discount) {
+
         try {
             CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.UPDATE);
             callableStatement.setInt(1, customerId);
@@ -66,9 +76,9 @@ public class JdbcCustomerRepository implements CustomerRepository {
             callableStatement.setString(4, firmName);
             callableStatement.setString(5, phoneNumber);
             callableStatement.setString(6, taxId);
+            callableStatement.setInt(7, discount);
 
             callableStatement.executeQuery();
-            int discount = callableStatement.getInt(7);
 
             return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, discount));
         }

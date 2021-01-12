@@ -9,7 +9,8 @@ public record CustomerDataResponse(
         @JsonProperty(value = "surname", required = true)        String surname,
         @JsonProperty(value = "phone_number", required = true)   String phoneNumber,
         @JsonProperty(value = "firm_name")                       String firmName,
-        @JsonProperty(value = "tax_id")                          String tax_id) {
+        @JsonProperty(value = "tax_id")                          String tax_id,
+        @JsonProperty(value = "discount")                        int discount) {
 
     public static CustomerDataResponse fromCustomer(Customer customer) {
         return new CustomerDataResponse(
@@ -18,6 +19,7 @@ public record CustomerDataResponse(
                 customer.surname(),
                 customer.phoneNumber(),
                 customer.firmName(),
-                customer.taxId());
+                customer.taxId(),
+                customer.discount());
     }
 }

@@ -1,31 +1,39 @@
-package foodwarehouse.web.component;
+package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.service.ConnectionService;
 import foodwarehouse.core.service.ProductBatchService;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import foodwarehouse.web.common.SuccessResponse;
+import foodwarehouse.web.error.DatabaseException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-@Component
-public class DiscountMonitor {
+@RestController
+@RequestMapping("/discount")
+public class DiscountController {
 
     private final ProductBatchService productBatchService;
     private final ConnectionService connectionService;
 
-    public DiscountMonitor(ProductBatchService productBatchService, ConnectionService connectionService) {
+    public DiscountController(ProductBatchService productBatchService, ConnectionService connectionService) {
         this.productBatchService = productBatchService;
         this.connectionService = connectionService;
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void checkDiscount() {
+    @PutMapping
+    @PreAuthorize("hasRole('Admin')")
+    public SuccessResponse<Void> calculateDiscounts() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
-            return;
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
         }
 
         System.out.println("Calculating discounts!");
@@ -44,5 +52,6 @@ public class DiscountMonitor {
                 productBatchService.updateProductBatch(pb.batchId(), pb.product(), pb.batchNumber(), pb.eatByDate(), discount, pb.packagesQuantity());
             }
         }
+        return new SuccessResponse<>(null);
     }
 }

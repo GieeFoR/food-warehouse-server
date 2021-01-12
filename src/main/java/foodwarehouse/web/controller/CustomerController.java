@@ -1,6 +1,7 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.address.Address;
+import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.AddressService;
@@ -23,14 +24,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customer")
-public class AdminCustomerController {
+public class CustomerController {
 
     private final CustomerService customerService;
     private final UserService userService;
     private final AddressService addressService;
     private final ConnectionService connectionService;
 
-    public AdminCustomerController(
+    public CustomerController(
             CustomerService customerService,
             UserService userService,
             AddressService addressService,
@@ -131,6 +132,9 @@ public class AdminCustomerController {
             throw new DatabaseException(exceptionMessage);
         }
 
+        Customer customer = customerService.findCustomerById(request.updateCustomerData().customerId())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
         //update user
         User user = userService.updateUser(
                     request.updateUserRequest().userId(),
@@ -161,7 +165,8 @@ public class AdminCustomerController {
                     request.updateCustomerData().surname(),
                     request.updateCustomerData().firmName(),
                     request.updateCustomerData().phoneNumber(),
-                    request.updateCustomerData().tax_id())
+                    request.updateCustomerData().tax_id(),
+                    customer.discount())
                 .map(CustomerResponse::fromCustomer)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Unable to update a customer."));

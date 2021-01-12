@@ -1,6 +1,7 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.address.Address;
+import foodwarehouse.core.data.complaint.Complaint;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.employee.Employee;
@@ -41,6 +42,7 @@ public class OrderController {
     private final EmployeeService employeeService;
     private final CustomerService customerService;
     private final StorageService storageService;
+    private final ComplaintService complaintService;
 
     public OrderController(
             ProductOrderService productOrderService,
@@ -53,7 +55,8 @@ public class OrderController {
             AddressService addressService,
             EmployeeService employeeService,
             CustomerService customerService,
-            StorageService storageService) {
+            StorageService storageService,
+            ComplaintService complaintService) {
 
         this.productOrderService = productOrderService;
         this.orderService = orderService;
@@ -66,6 +69,7 @@ public class OrderController {
         this.employeeService = employeeService;
         this.customerService = customerService;
         this.storageService = storageService;
+        this.complaintService = complaintService;
     }
 
     @PostMapping("/store/order")
@@ -163,6 +167,24 @@ public class OrderController {
             productBatchQuantityMemoryList.add(productBatchesQuantityTempList);
         }
 
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        valueToPay *= (float) (100 - customer.discount()) / 100;
+
+        customer = customerService.updateCustomer(
+                customer.customerId(),
+                customer.user(),
+                customer.address(),
+                customer.name(),
+                customer.surname(),
+                customer.firmName(),
+                customer.phoneNumber(),
+                customer.taxId(),
+                0)
+        .orElseThrow(() -> new RestException("Cannot update user discount."));
+
         Payment payment = paymentService
                 .createPayment(paymentType, valueToPay)
                 .orElseThrow(() -> new RestException("Cannot create a new payment."));
@@ -194,31 +216,33 @@ public class OrderController {
                 .createDelivery(address, supplier)
                 .orElseThrow(() -> new RestException("Cannot create a delivery."));
 
-        Customer customer = customerService
-                .findCustomerByUsername(authentication.getName())
-                .orElseThrow(() -> new RestException("Cannot find customer."));
-
         Order order = orderService
                 .createOrder(payment, customer, delivery, request.comment())
                 .orElseThrow(() -> new RestException("Cannot create order."));
 
-        //List<ProductBatch> productBatchesToReturn = new LinkedList<>();
-
         for(int i = 0; i < productBatchesMemoryList.size(); i++) {
             for(int j = 0; j < productBatchesMemoryList.get(i).size(); j++) {
-                //productBatchesToReturn.add(productBatchesMemoryList.get(i).get(j));
                 productOrderService.createProductOrder(order, productBatchesMemoryList.get(i).get(j), productBatchQuantityMemoryList.get(i).get(j));
             }
         }
 
         return new SuccessResponse<>(
-                OrderResponse.from(order, productBatchesMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()), productBatchQuantityMemoryList.stream().flatMap(List::stream).collect(Collectors.toList()))
-        );
+                OrderResponse.from(
+                                order,
+                                productBatchesMemoryList
+                                        .stream()
+                                        .flatMap(List::stream)
+                                        .collect(Collectors.toList()),
+                        new LinkedList<>(),
+                        productBatchQuantityMemoryList
+                                .stream()
+                                .flatMap(List::stream)
+                                .collect(Collectors.toList())));
     }
 
     @GetMapping("/account/orders")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<List<OrderResponse>> getOrders(Authentication authentication) {
+    public SuccessResponse<List<OrderResponse>> getCustomerOrders(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -238,11 +262,13 @@ public class OrderController {
             List<ProductBatch> productBatches = new LinkedList<>();
             List<Integer> quantity = new LinkedList<>();
 
+            List<Complaint> complaints = complaintService.findOrderComplaints(order.orderId());
+
             for (ProductOrder po : productOrders) {
                 productBatches.add(po.batch());
                 quantity.add(po.quantity());
             }
-            result.add(OrderResponse.from(order, productBatches, quantity));
+            result.add(OrderResponse.from(order, productBatches, complaints, quantity));
         }
 
         return new SuccessResponse<>(result);

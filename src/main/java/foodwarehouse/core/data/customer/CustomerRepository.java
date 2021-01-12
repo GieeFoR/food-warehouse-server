@@ -26,7 +26,8 @@ public interface CustomerRepository {
             String surname,
             String firmName,
             String phoneNumber,
-            String taxId);
+            String taxId,
+            int discount);
 
     boolean deleteCustomer(int customerId);
 

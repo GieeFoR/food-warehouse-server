@@ -45,4 +45,8 @@ public class ComplaintService {
     public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
         complaintRepository.addDecisionToComplaint(complaintId, decision, complaintState);
     }
+
+    public List<Complaint> findOrderComplaints(int orderId) {
+        return complaintRepository.findOrderComplaints(orderId);
+    }
 }
