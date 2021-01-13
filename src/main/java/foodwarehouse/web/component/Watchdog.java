@@ -1,8 +1,13 @@
 package foodwarehouse.web.component;
 
 import foodwarehouse.core.data.productBatch.ProductBatch;
+import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.service.ConnectionService;
 import foodwarehouse.core.service.ProductBatchService;
+import foodwarehouse.core.service.ProductInStorageService;
+import foodwarehouse.core.service.ProductService;
+import foodwarehouse.startup.ExpiredBatches;
+import foodwarehouse.startup.RunningOutProducts;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +16,17 @@ import java.time.ZoneId;
 import java.util.List;
 
 @Component
-public class DiscountMonitor {
+public class Watchdog {
 
     private final ProductBatchService productBatchService;
+    private final ProductInStorageService productInStorageService;
+    private final ProductService productService;
     private final ConnectionService connectionService;
 
-    public DiscountMonitor(ProductBatchService productBatchService, ConnectionService connectionService) {
+    public Watchdog(ProductBatchService productBatchService, ProductInStorageService productInStorageService, ProductService productService, ConnectionService connectionService) {
         this.productBatchService = productBatchService;
+        this.productInStorageService = productInStorageService;
+        this.productService = productService;
         this.connectionService = connectionService;
     }
 
@@ -44,5 +53,14 @@ public class DiscountMonitor {
                 productBatchService.updateProductBatch(pb.batchId(), pb.product(), pb.batchNumber(), pb.eatByDate(), discount, pb.packagesQuantity());
             }
         }
+        System.out.println("Calculating discounts has ended!");
+
+        System.out.println("Looking for expired products batches!");
+        ExpiredBatches.storeExpiredBatches(productInStorageService.findExpiredProductsInStorages());
+        System.out.println("Amount of found expired batches: " + ExpiredBatches.getExpiredBatches().size());
+
+        System.out.println("Looking for running out products!");
+        RunningOutProducts.storeRunningOutProducts(productService.findRunningOutProducts());
+        System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
     }
 }

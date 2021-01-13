@@ -41,4 +41,6 @@ public interface ProductRepository {
     List<Product> findAvailableProducts();
 
     int countAmountOfProducts(int productId);
+
+    List<Product> findRunningOutProducts();
 }

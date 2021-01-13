@@ -1,7 +1,6 @@
 package foodwarehouse.startup;
 
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -9,16 +8,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-@Scope("application")
 public class ExpiredBatches {
 
-    List<ProductInStorage> expiredBatches = new LinkedList<>();
+    private final static List<ProductInStorage> expiredBatches = new LinkedList<>();
 
-    public void storeExpiredBatches(ProductInStorage productInStorage) {
-        expiredBatches.add(productInStorage);
+    public static void storeExpiredBatches(List<ProductInStorage> productsInStorages) {
+        expiredBatches.addAll(productsInStorages);
     }
 
-    public List<ProductInStorage> getExpiredBatches() {
+    public static void removeExpiredBatches(ProductInStorage product) {
+        expiredBatches.remove(product);
+    }
+
+    public static List<ProductInStorage> getExpiredBatches() {
         return Collections.unmodifiableList(expiredBatches);
     }
 }

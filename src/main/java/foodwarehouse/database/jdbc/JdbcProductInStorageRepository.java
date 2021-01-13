@@ -113,6 +113,23 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     }
 
     @Override
+    public List<ProductInStorage> findExpiredProductInStorage() {
+        List<ProductInStorage> productInStorages = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_EXPIRED_BATCHES);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            sqlException.getMessage();
+        }
+        return productInStorages;
+    }
+
+    @Override
     public Optional<ProductInStorage> findProductInStorageById(ProductBatch productBatch, Storage storage) {
         try {
             CallableStatement callableStatement = connection.prepareCall(ProductInStorageTable.Procedures.READ_BY_ID);

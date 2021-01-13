@@ -17,6 +17,8 @@ public interface ProductInStorageRepository {
 
     List<ProductInStorage> findProductInStorageAll();
 
+    List<ProductInStorage> findExpiredProductInStorage();
+
     Optional<ProductInStorage> findProductInStorageById(ProductBatch productBatch, Storage storage);
 
     List<ProductInStorage> findProductInStorageAllByProductId(int productId);

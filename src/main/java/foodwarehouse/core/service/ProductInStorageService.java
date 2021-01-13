@@ -41,6 +41,10 @@ public class ProductInStorageService {
         return productInStorageRepository.findProductInStorageAll();
     }
 
+    public List<ProductInStorage> findExpiredProductsInStorages() {
+        return productInStorageRepository.findExpiredProductInStorage();
+    }
+
     public List<ProductInStorage> findProductInStorageAllByProductId(int productId) {
         return productInStorageRepository.findProductInStorageAllByProductId(productId);
     }

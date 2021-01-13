@@ -56,7 +56,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<ProductResponse> getCarById(@PathVariable int id) {
+    public SuccessResponse<ProductResponse> getProductById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -73,7 +73,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<ProductResponse> createCar(@RequestBody CreateProductRequest request) {
+    public SuccessResponse<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";

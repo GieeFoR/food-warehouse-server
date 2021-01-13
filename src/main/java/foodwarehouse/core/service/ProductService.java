@@ -67,4 +67,9 @@ public class ProductService {
     public int countAmountOfProduct(int productId) {
         return productRepository.countAmountOfProducts(productId);
     }
+
+    public List<Product> findRunningOutProducts() {
+        return productRepository.findRunningOutProducts();
+    }
+
 }

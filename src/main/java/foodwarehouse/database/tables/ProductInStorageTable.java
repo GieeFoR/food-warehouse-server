@@ -23,5 +23,7 @@ final public class ProductInStorageTable {
         static final public String READ_BY_BATCH_ID = "CALL `GET_PRODUCT_IN_STORAGE_BY_BATCH_ID`(?)";
 
         static final public String READ_PRODUCT_PRICE = "CALL `GET_PRODUCT_PRICE`(?)";
+
+        static final public String READ_EXPIRED_BATCHES = "CALL `GET_EXPIRED_PRODUCTS_IN_STORAGES`()";
     }
 }

@@ -6,8 +6,12 @@ import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
+import foodwarehouse.web.error.RestException;
+import foodwarehouse.web.response.product.ProductResponse;
 import foodwarehouse.web.response.product.StoreProductResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -61,5 +65,21 @@ public class StoreController {
             result.add(StoreProductResponse.fromProductAndDiscountList(p, discountedProducts, discountedProductsQuantity, quantity));
         }
         return new SuccessResponse<>(result);
+    }
+
+    @GetMapping("/product/{id}")
+    public SuccessResponse<ProductResponse> getProductById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return productService
+                .findProductById(id)
+                .map(ProductResponse::fromProduct)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find product with this ID."));
     }
 }

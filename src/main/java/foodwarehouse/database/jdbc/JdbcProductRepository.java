@@ -115,6 +115,7 @@ public class JdbcProductRepository implements ProductRepository {
             return true;
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return false;
         }
     }
@@ -133,6 +134,7 @@ public class JdbcProductRepository implements ProductRepository {
             return Optional.ofNullable(product);
         }
         catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
@@ -149,7 +151,7 @@ public class JdbcProductRepository implements ProductRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return products;
     }
@@ -166,7 +168,7 @@ public class JdbcProductRepository implements ProductRepository {
             }
         }
         catch(SQLException sqlException) {
-            sqlException.getMessage();
+            System.out.println(sqlException.getMessage());
         }
         return products;
     }
@@ -187,5 +189,22 @@ public class JdbcProductRepository implements ProductRepository {
             System.out.println(sqlException.getMessage());
         }
         return result;
+    }
+
+    @Override
+    public List<Product> findRunningOutProducts() {
+        List<Product> products = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.READ_RUNNING_OUT);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return products;
     }
 }
