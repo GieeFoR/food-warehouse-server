@@ -68,7 +68,7 @@ public class StoreController {
     }
 
     @GetMapping("/product/{id}")
-    public SuccessResponse<ProductResponse> getProductById(@PathVariable int id) {
+    public SuccessResponse<StoreProductResponse> getProductById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -76,10 +76,26 @@ public class StoreController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        return productService
+        int quantity = productService.countAmountOfProduct(id);
+        List<ProductBatch> discountedProducts = productBatchService
+                .findProductBatchesWithDiscountAndProductId(id);
+
+        List<Integer> discountedProductsQuantity = new LinkedList<>();
+
+        for(ProductBatch pb : discountedProducts) {
+            discountedProductsQuantity.add(productBatchService.countProductBatchAmount(pb.batchId()));
+        }
+
+        Product product = productService
                 .findProductById(id)
-                .map(ProductResponse::fromProduct)
-                .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot find product with this ID."));
+
+        return new SuccessResponse<>(
+                StoreProductResponse
+                        .fromProductAndDiscountList(
+                                product,
+                                discountedProducts,
+                                discountedProductsQuantity,
+                                quantity));
     }
 }
