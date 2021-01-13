@@ -274,6 +274,42 @@ public class OrderController {
         return new SuccessResponse<>(result);
     }
 
+    @GetMapping("/account/order/{id}")
+    @PreAuthorize("hasRole('Customer')")
+    public SuccessResponse<OrderResponse> getCustomerOrderById(Authentication authentication, @PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        Order order = orderService.findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this ID."));
+
+        if(order.customer().customerId() != customer.customerId()) {
+            throw new RestException("Cannot return order with this ID.");
+        }
+
+        List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+        List<ProductBatch> productBatches = new LinkedList<>();
+        List<Integer> quantity = new LinkedList<>();
+
+        List<Complaint> complaints = complaintService.findOrderComplaints(order.orderId());
+
+        for (ProductOrder po : productOrders) {
+            productBatches.add(po.batch());
+            quantity.add(po.quantity());
+        }
+        OrderResponse result = OrderResponse.from(order, productBatches, complaints, quantity);
+
+        return new SuccessResponse<>(result);
+    }
+
     @PutMapping("/account/order/{id}")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<CancelResponse> cancelOrder(Authentication authentication, @PathVariable int id) {
