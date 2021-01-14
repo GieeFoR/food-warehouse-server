@@ -67,4 +67,9 @@ public class OrderService {
     public int amountOfOrdersBetween(String startDate, String endDate) {
         return orderRepository.amountOfOrdersBetween(startDate, endDate);
     }
+
+    public List<Order> findOrdersBetweenDates(String startDate, String endDate) {
+        return orderRepository.findOrdersBetweenDates(startDate, endDate);
+    }
+
 }

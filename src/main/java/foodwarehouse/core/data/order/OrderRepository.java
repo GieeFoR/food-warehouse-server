@@ -26,4 +26,6 @@ public interface OrderRepository {
     List<Order> findCustomerOrders(int customerId);
 
     int amountOfOrdersBetween(String startDate, String endDate);
+
+    List<Order> findOrdersBetweenDates(String startDate, String endDate);
 }

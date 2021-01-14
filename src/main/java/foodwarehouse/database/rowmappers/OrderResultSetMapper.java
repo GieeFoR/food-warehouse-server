@@ -2,6 +2,7 @@ package foodwarehouse.database.rowmappers;
 
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.order.OrderState;
+import foodwarehouse.database.tables.ComplaintTable;
 import foodwarehouse.database.tables.OrderTable;
 
 import java.sql.ResultSet;
@@ -16,6 +17,7 @@ final public class OrderResultSetMapper implements ResultSetMapper<Order> {
                 new CustomerResultSetMapper().resultSetMap(rs,prefix + OrderTable.NAME + "_"),
                 new DeliveryResultSetMapper().resultSetMap(rs,prefix + OrderTable.NAME + "_"),
                 rs.getString(prefix+OrderTable.NAME+"."+OrderTable.Columns.COMMENT),
-                OrderState.from(rs.getString(prefix+OrderTable.NAME+"."+OrderTable.Columns.ORDER_STATE)).get());
+                OrderState.from(rs.getString(prefix+OrderTable.NAME+"."+OrderTable.Columns.ORDER_STATE)).get(),
+                rs.getDate(prefix+ OrderTable.NAME+"."+OrderTable.Columns.ORDER_DATE));
     }
 }

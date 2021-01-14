@@ -9,6 +9,7 @@ import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
+import foodwarehouse.core.data.product.Product;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.data.productOrder.ProductOrder;
@@ -19,10 +20,8 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
-import foodwarehouse.web.response.order.OrderStatisticsObject;
-import foodwarehouse.web.response.order.OrderStatisticsResponse;
+import foodwarehouse.web.response.order.*;
 import foodwarehouse.web.response.others.CancelResponse;
-import foodwarehouse.web.response.order.OrderResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +33,7 @@ import java.util.stream.Collectors;
 @RestController
 public class OrderController {
     private final ProductOrderService productOrderService;
+    private final ProductBatchService productBatchService;
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final PaymentTypeService paymentTypeService;
@@ -46,21 +46,9 @@ public class OrderController {
     private final StorageService storageService;
     private final ComplaintService complaintService;
 
-    public OrderController(
-            ProductOrderService productOrderService,
-            OrderService orderService,
-            PaymentService paymentService,
-            PaymentTypeService paymentTypeService,
-            ProductInStorageService productInStorageService,
-            ConnectionService connectionService,
-            DeliveryService deliveryService,
-            AddressService addressService,
-            EmployeeService employeeService,
-            CustomerService customerService,
-            StorageService storageService,
-            ComplaintService complaintService) {
-
+    public OrderController(ProductOrderService productOrderService, ProductBatchService productBatchService, OrderService orderService, PaymentService paymentService, PaymentTypeService paymentTypeService, ProductInStorageService productInStorageService, ConnectionService connectionService, DeliveryService deliveryService, AddressService addressService, EmployeeService employeeService, CustomerService customerService, StorageService storageService, ComplaintService complaintService) {
         this.productOrderService = productOrderService;
+        this.productBatchService = productBatchService;
         this.orderService = orderService;
         this.paymentService = paymentService;
         this.paymentTypeService = paymentTypeService;
@@ -361,7 +349,7 @@ public class OrderController {
     }
 
     @GetMapping("/statistic/order")
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin')")
     public SuccessResponse<OrderStatisticsResponse> getOrderStatistics() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -402,5 +390,142 @@ public class OrderController {
                         amounts,
                         dates,
                         objects));
+    }
+
+    @GetMapping("/statistic/profit")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin')")
+    public SuccessResponse<ProfitStatisticsResponse> getProfitStatistics() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        SimpleDateFormat toDB = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat toSend = new SimpleDateFormat("yyyy-MM");
+
+        Calendar gc = new GregorianCalendar();
+        gc.add(Calendar.YEAR, -1);
+        gc.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = gc.getTime();
+        gc.add(Calendar.MONTH, 1);
+        gc.add(Calendar.DAY_OF_MONTH, -1);
+        Date endDate = gc.getTime();
+
+        List<Float> profits = new LinkedList<>();
+        List<String> dates = new LinkedList<>();
+
+
+
+        while(startDate.before(new Date())) {
+
+            List<Order> orders = orderService.findOrdersBetweenDates(toDB.format(startDate), toDB.format(endDate));
+
+            float profit = 0;
+//            for(Order order : orders) {
+//                List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
+//
+//                LocalDate orderDate = order.orderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//
+//                LocalDate startDiscount = orderDate.plusDays(3);
+//                LocalDate endDiscount = orderDate.plusDays(15);
+//
+//                for(ProductOrder productOrder : batchesInOrder) {
+//                    ProductBatch productBatch = productOrder.batch();
+//                    Product product = productBatch.product();
+//
+//                    int discount = 0;
+//
+//                    LocalDate productEatByDate = productBatch.eatByDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//                    if(productEatByDate.isBefore(endDiscount) && productEatByDate.isAfter(startDiscount)) {
+//                        long temp = productEatByDate.toEpochDay() - orderDate.toEpochDay() - 4L;
+//                        discount = 20 + 5 * (10 - (int) temp);
+//                    }
+//
+//                    profit += (product.sellPrice() - product.buyPrice()) * (100 - discount) / 100 * productOrder.quantity();
+//                }
+//            }
+
+            for(Order order : orders) {
+                List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
+
+                float losses = 0;
+                for(ProductOrder productOrder : batchesInOrder) {
+                    ProductBatch productBatch = productOrder.batch();
+                    Product product = productBatch.product();
+
+
+                    losses += product.buyPrice() * productOrder.quantity();
+                }
+                profit += order.payment().value() - losses;
+            }
+
+            profits.add(profit);
+            dates.add(toSend.format(startDate));
+
+            gc.add(Calendar.DAY_OF_MONTH, 1);
+            startDate = gc.getTime();
+            gc.add(Calendar.MONTH, 1);
+            gc.add(Calendar.DAY_OF_MONTH, -1);
+            endDate = gc.getTime();
+        }
+
+        return new SuccessResponse<>(
+                new ProfitStatisticsResponse(profits, dates));
+    }
+
+    @GetMapping("/statistic/product")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin')")
+    public SuccessResponse<ProductStatisticsResponse> getProductStatistics() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        SimpleDateFormat toDB = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat toSend = new SimpleDateFormat("yyyy-MM");
+
+        Calendar gc = new GregorianCalendar();
+        Date endDate = gc.getTime();
+
+        gc.add(Calendar.MONTH, -1);
+        Date startDate = gc.getTime();
+
+        List<Integer> regularQuantities = new LinkedList<>();
+        List<Integer> discountQuantities = new LinkedList<>();
+        List<Integer> allQuantities = new LinkedList<>();
+        List<String> labels = new LinkedList<>();
+
+
+
+
+//            for(Order order : orders) {
+//                List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
+//
+//                LocalDate orderDate = order.orderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//
+//                LocalDate startDiscount = orderDate.plusDays(3);
+//                LocalDate endDiscount = orderDate.plusDays(15);
+//
+//                for(ProductOrder productOrder : batchesInOrder) {
+//                    ProductBatch productBatch = productOrder.batch();
+//                    Product product = productBatch.product();
+//
+//                    int discount = 0;
+//
+//                    LocalDate productEatByDate = productBatch.eatByDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//                    if(productEatByDate.isBefore(endDiscount) && productEatByDate.isAfter(startDiscount)) {
+//                        long temp = productEatByDate.toEpochDay() - orderDate.toEpochDay() - 4L;
+//                        discount = 20 + 5 * (10 - (int) temp);
+//                    }
+//
+//                    profit += (product.sellPrice() - product.buyPrice()) * (100 - discount) / 100 * productOrder.quantity();
+//                }
+//            }
+        return new SuccessResponse<>(
+                null);
     }
 }

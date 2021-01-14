@@ -51,7 +51,7 @@ public class JdbcOrderRepository implements OrderRepository {
 
             callableStatement.executeQuery();
             int orderId = callableStatement.getInt(5);
-            return Optional.of(new Order(orderId, payment, customer, delivery, comment, OrderState.PENDING));
+            return Optional.of(new Order(orderId, payment, customer, delivery, comment, OrderState.PENDING, new Date()));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
@@ -73,8 +73,9 @@ public class JdbcOrderRepository implements OrderRepository {
             callableStatement.setString(2, orderState.value());
 
             callableStatement.executeQuery();
+            Date orderDate = callableStatement.getDate(3);
 
-            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState));
+            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState, orderDate));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
@@ -96,8 +97,9 @@ public class JdbcOrderRepository implements OrderRepository {
             callableStatement.setInt(2, payment.paymentId());
 
             callableStatement.executeQuery();
+            Date orderDate = callableStatement.getDate(3);
 
-            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState));
+            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState, orderDate));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
@@ -190,5 +192,24 @@ public class JdbcOrderRepository implements OrderRepository {
             System.out.println(sqlException.getMessage());
         }
         return -1;
+    }
+
+    @Override
+    public List<Order> findOrdersBetweenDates(String startDate, String endDate) {
+        List<Order> orders = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.FIND_BETWEEN_DATES);
+            callableStatement.setString(1, startDate);
+            callableStatement.setString(2, endDate);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return orders;
     }
 }

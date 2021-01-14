@@ -10,6 +10,7 @@ final public class OrderTable {
         static final public String DELIVERY_ID = "DELIVERY_ID";
         static final public String COMMENT = "COMMENT";
         static final public String ORDER_STATE = "ORDER_STATE";
+        static final public String ORDER_DATE = "ORDER_DATE";
     }
 
     static final public class Procedures {
@@ -25,5 +26,6 @@ final public class OrderTable {
         static final public String READ_CUSTOMER_ALL = "CALL `GET_CUSTOMER_ORDERS`(?)";
 
         static final public String STATISTICS = "CALL `ORDER_STATISTICS`(?,?)";
+        static final public String FIND_BETWEEN_DATES = "CALL `ORDERS_BETWEEN`(?,?)";
     }
 }

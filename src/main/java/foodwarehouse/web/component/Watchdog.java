@@ -30,7 +30,7 @@ public class Watchdog {
         this.storageService = storageService;
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void checkDiscount() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
