@@ -72,4 +72,9 @@ public class ProductService {
         return productRepository.findRunningOutProducts();
     }
 
+    public List<Product> topTenProducts() {
+        return productRepository.topTenProducts();
+    }
+
+
 }

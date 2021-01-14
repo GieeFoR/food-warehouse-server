@@ -29,6 +29,6 @@ final public class ProductTable {
         static final public String READ_BY_ID = "CALL `GET_PRODUCT_BY_ID`(?)";
 
         static final public String GET_PRODUCT_QUANTITY_WITH_REGULAR_PRICE_AND_PRODUCT_ID = "CALL `GET_PRODUCT_QUANTITY_WITH_REGULAR_PRICE_AND_PRODUCT_ID`(?)";
-
+        static final public String READ_TOP_10 = "CALL `GET_TOP_10_PRODUCTS`()";
     }
 }

@@ -207,4 +207,21 @@ public class JdbcProductRepository implements ProductRepository {
         }
         return products;
     }
+
+    @Override
+    public List<Product> topTenProducts() {
+        List<Product> products = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(ProductTable.Procedures.READ_TOP_10);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return products;
+    }
 }

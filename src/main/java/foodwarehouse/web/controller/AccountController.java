@@ -63,7 +63,7 @@ public class AccountController {
     }
 
     @GetMapping("/name")
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee') || hasRole('Supplier') ||hasRole('Customer')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee') || hasRole('Supplier') || hasRole('Customer')")
     public SuccessResponse<NameResponse> getName(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

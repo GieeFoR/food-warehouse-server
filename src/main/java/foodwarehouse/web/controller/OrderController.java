@@ -10,6 +10,8 @@ import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
 import foodwarehouse.core.data.product.Product;
+import foodwarehouse.core.data.product.ProductStatistics;
+import foodwarehouse.core.data.product.ProductSumStatistics;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.data.productOrder.ProductOrder;
@@ -22,18 +24,21 @@ import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
 import foodwarehouse.web.response.order.*;
 import foodwarehouse.web.response.others.CancelResponse;
+import org.springframework.boot.actuate.endpoint.web.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 public class OrderController {
     private final ProductOrderService productOrderService;
-    private final ProductBatchService productBatchService;
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final PaymentTypeService paymentTypeService;
@@ -45,10 +50,10 @@ public class OrderController {
     private final CustomerService customerService;
     private final StorageService storageService;
     private final ComplaintService complaintService;
+    private final ProductService productService;
 
-    public OrderController(ProductOrderService productOrderService, ProductBatchService productBatchService, OrderService orderService, PaymentService paymentService, PaymentTypeService paymentTypeService, ProductInStorageService productInStorageService, ConnectionService connectionService, DeliveryService deliveryService, AddressService addressService, EmployeeService employeeService, CustomerService customerService, StorageService storageService, ComplaintService complaintService) {
+    public OrderController(ProductOrderService productOrderService, OrderService orderService, PaymentService paymentService, PaymentTypeService paymentTypeService, ProductInStorageService productInStorageService, ConnectionService connectionService, DeliveryService deliveryService, AddressService addressService, EmployeeService employeeService, CustomerService customerService, StorageService storageService, ComplaintService complaintService, ProductService productService) {
         this.productOrderService = productOrderService;
-        this.productBatchService = productBatchService;
         this.orderService = orderService;
         this.paymentService = paymentService;
         this.paymentTypeService = paymentTypeService;
@@ -60,6 +65,7 @@ public class OrderController {
         this.customerService = customerService;
         this.storageService = storageService;
         this.complaintService = complaintService;
+        this.productService = productService;
     }
 
     @PostMapping("/store/order")
@@ -423,30 +429,6 @@ public class OrderController {
             List<Order> orders = orderService.findOrdersBetweenDates(toDB.format(startDate), toDB.format(endDate));
 
             float profit = 0;
-//            for(Order order : orders) {
-//                List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
-//
-//                LocalDate orderDate = order.orderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//
-//                LocalDate startDiscount = orderDate.plusDays(3);
-//                LocalDate endDiscount = orderDate.plusDays(15);
-//
-//                for(ProductOrder productOrder : batchesInOrder) {
-//                    ProductBatch productBatch = productOrder.batch();
-//                    Product product = productBatch.product();
-//
-//                    int discount = 0;
-//
-//                    LocalDate productEatByDate = productBatch.eatByDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//                    if(productEatByDate.isBefore(endDiscount) && productEatByDate.isAfter(startDiscount)) {
-//                        long temp = productEatByDate.toEpochDay() - orderDate.toEpochDay() - 4L;
-//                        discount = 20 + 5 * (10 - (int) temp);
-//                    }
-//
-//                    profit += (product.sellPrice() - product.buyPrice()) * (100 - discount) / 100 * productOrder.quantity();
-//                }
-//            }
-
             for(Order order : orders) {
                 List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
 
@@ -486,7 +468,7 @@ public class OrderController {
         }
 
         SimpleDateFormat toDB = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat toSend = new SimpleDateFormat("yyyy-MM");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         Calendar gc = new GregorianCalendar();
         Date endDate = gc.getTime();
@@ -499,33 +481,55 @@ public class OrderController {
         List<Integer> allQuantities = new LinkedList<>();
         List<String> labels = new LinkedList<>();
 
+        List<Order> orders = orderService.findOrdersBetweenDates(toDB.format(startDate), toDB.format(endDate));
+
+        List<ProductStatistics> productStatistics = new LinkedList<>();
+
+        for(Order order : orders) {
+            String date = toDB.format(order.orderDate());
+            LocalDate orderDate = LocalDate.parse(date, formatter);
+
+            List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
+
+            for(ProductOrder productOrder : batchesInOrder) {
+                String eatByDate = toDB.format(productOrder.batch().eatByDate());
+                LocalDate productEatByDate = LocalDate.parse(eatByDate, formatter);
+                LocalDate startDiscount = productEatByDate.minusDays(15);
+
+                if(orderDate.isBefore(startDiscount)) {
+                    productStatistics.add(new ProductStatistics(productOrder.batch().product(), productOrder.quantity(), 0));
+                }
+                else {
+                    productStatistics.add(new ProductStatistics(productOrder.batch().product(), 0, productOrder.quantity()));
+                }
+            }
+        }
+
+        List<ProductSumStatistics> p = new LinkedList<>();
+        for(ProductStatistics productStatistic : productStatistics) {
+            Optional<ProductSumStatistics> productSumStatistics = p.stream().filter(o -> o.getProduct().productId() == productStatistic.product().productId()).findFirst();
+            if(productSumStatistics.isPresent()) {
+                productSumStatistics.get().addQuantity(productStatistic.regularQuantity(), productStatistic.discountQuantity());
+            }
+            else {
+                p.add(new ProductSumStatistics(productStatistic.product(), productStatistic.regularQuantity(), productStatistic.discountQuantity()));
+            }
+        }
+
+        p.sort(Collections.reverseOrder());
+        for(ProductSumStatistics productSumStatistics : p) {
+            regularQuantities.add(productSumStatistics.getRegularQuantity());
+            discountQuantities.add(productSumStatistics.getDiscountQuantity());
+            allQuantities.add(productSumStatistics.getAllQuantity());
+            labels.add(productSumStatistics.getProduct().name());
+        }
 
 
-
-//            for(Order order : orders) {
-//                List<ProductOrder> batchesInOrder = productOrderService.findProductOrderByOrderId(order.orderId());
-//
-//                LocalDate orderDate = order.orderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//
-//                LocalDate startDiscount = orderDate.plusDays(3);
-//                LocalDate endDiscount = orderDate.plusDays(15);
-//
-//                for(ProductOrder productOrder : batchesInOrder) {
-//                    ProductBatch productBatch = productOrder.batch();
-//                    Product product = productBatch.product();
-//
-//                    int discount = 0;
-//
-//                    LocalDate productEatByDate = productBatch.eatByDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//                    if(productEatByDate.isBefore(endDiscount) && productEatByDate.isAfter(startDiscount)) {
-//                        long temp = productEatByDate.toEpochDay() - orderDate.toEpochDay() - 4L;
-//                        discount = 20 + 5 * (10 - (int) temp);
-//                    }
-//
-//                    profit += (product.sellPrice() - product.buyPrice()) * (100 - discount) / 100 * productOrder.quantity();
-//                }
-//            }
         return new SuccessResponse<>(
-                null);
+                new ProductStatisticsResponse(
+                        labels,
+                        regularQuantities,
+                        discountQuantities,
+                        allQuantities));
     }
 }
