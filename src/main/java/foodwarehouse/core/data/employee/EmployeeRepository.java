@@ -18,5 +18,7 @@ public interface EmployeeRepository {
 
     Optional<Employee> findEmployeeById(int employeeId);
 
+    Optional<Employee> findEmployeeByUsername(String username);
+
     Optional<Employee> findSupplierWithMinDelivery();
 }

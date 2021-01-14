@@ -124,6 +124,24 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     }
 
     @Override
+    public Optional<Employee> findEmployeeByUsername(String username) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.READ_BY_USERNAME);
+            callableStatement.setString(1, username);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            Employee employee = null;
+            if(resultSet.next()) {
+                employee = new EmployeeResultSetMapper().resultSetMap(resultSet, "");
+            }
+            return Optional.ofNullable(employee);
+        }
+        catch (SQLException sqlException) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<Employee> findSupplierWithMinDelivery() {
         try {
             CallableStatement callableStatement = connection.prepareCall(EmployeeTable.Procedures.FIND_WITH_MIN_DELIVERY);

@@ -5,10 +5,7 @@ import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
-import foodwarehouse.core.service.AddressService;
-import foodwarehouse.core.service.ConnectionService;
-import foodwarehouse.core.service.CustomerService;
-import foodwarehouse.core.service.UserService;
+import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
@@ -22,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,12 +31,14 @@ public class AccountController {
     private final AddressService addressService;
     private final CustomerService customerService;
     private final ConnectionService connectionService;
+    private final EmployeeService employeeService;
     private final UserService userService;
 
-    public AccountController(AddressService addressService, CustomerService customerService, ConnectionService connectionService, UserService userService) {
+    public AccountController(AddressService addressService, CustomerService customerService, ConnectionService connectionService, EmployeeService employeeService, UserService userService) {
         this.addressService = addressService;
         this.customerService = customerService;
         this.connectionService = connectionService;
+        this.employeeService = employeeService;
         this.userService = userService;
     }
 
@@ -63,8 +63,8 @@ public class AccountController {
     }
 
     @GetMapping("/name")
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee') || hasRole('Supplier') || hasRole('Customer')")
-    public SuccessResponse<NameResponse> getName(Authentication authentication) {
+    @PreAuthorize("hasRole('Customer') || hasRole('Admin') || hasRole('Manager') || hasRole('Employee') || hasRole('Supplier')")
+    public SuccessResponse<NameResponse> getName(HttpServletRequest request, Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -72,11 +72,20 @@ public class AccountController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        return customerService
-                .findCustomerByUsername(authentication.getName())
-                .map(NameResponse::fromCustomer)
-                .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot find user."));
+        if(request.isUserInRole("Customer")) {
+            return customerService
+                    .findCustomerByUsername(authentication.getName())
+                    .map(NameResponse::fromCustomer)
+                    .map(SuccessResponse::new)
+                    .orElseThrow(() -> new RestException("Cannot find user."));
+        }
+        else {
+            return employeeService
+                    .findEmployeeByUsername(authentication.getName())
+                    .map(NameResponse::fromEmployee)
+                    .map(SuccessResponse::new)
+                    .orElseThrow(() -> new RestException("Cannot find user."));
+        }
     }
 
     @GetMapping

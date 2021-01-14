@@ -39,6 +39,10 @@ public class EmployeeService {
         return employeeRepository.findEmployeeById(employeeId);
     }
 
+    public Optional<Employee> findEmployeeByUsername(String username) {
+        return employeeRepository.findEmployeeByUsername(username);
+    }
+
     public Optional<Employee> findSupplierWithMinDelivery() {
         return employeeRepository.findSupplierWithMinDelivery();
     }
