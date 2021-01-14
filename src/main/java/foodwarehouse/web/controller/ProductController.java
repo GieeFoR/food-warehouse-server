@@ -103,7 +103,7 @@ public class ProductController {
 
     @PutMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<ProductResponse> updateCar(@RequestBody UpdateProductRequest request) {
+    public SuccessResponse<ProductResponse> updateProduct(@RequestBody UpdateProductRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -134,7 +134,7 @@ public class ProductController {
 
     @DeleteMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<List<DeleteResponse>> deleteCars(@RequestBody List<Integer> request) {
+    public SuccessResponse<List<DeleteResponse>> deleteProducts(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -154,7 +154,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<DeleteResponse> deleteCarById(@PathVariable int id) {
+    public SuccessResponse<DeleteResponse> deleteProductById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
