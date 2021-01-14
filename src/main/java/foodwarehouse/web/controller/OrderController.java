@@ -19,14 +19,16 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
+import foodwarehouse.web.response.order.OrderStatisticsObject;
+import foodwarehouse.web.response.order.OrderStatisticsResponse;
 import foodwarehouse.web.response.others.CancelResponse;
 import foodwarehouse.web.response.order.OrderResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -356,5 +358,49 @@ public class OrderController {
         orderService.deleteOrder(order.orderId());
         deliveryService.deleteDelivery(order.delivery().deliveryId());
         return new SuccessResponse<>(new CancelResponse(true));
+    }
+
+    @GetMapping("/statistic/order")
+    @PreAuthorize("hasRole('Manager')")
+    public SuccessResponse<OrderStatisticsResponse> getOrderStatistics() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        SimpleDateFormat toDB = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat toSend = new SimpleDateFormat("yyyy-MM");
+
+        Calendar gc = new GregorianCalendar();
+        gc.add(Calendar.YEAR, -1);
+        gc.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = gc.getTime();
+        gc.add(Calendar.MONTH, 1);
+        gc.add(Calendar.DAY_OF_MONTH, -1);
+        Date endDate = gc.getTime();
+
+        List<OrderStatisticsObject> objects = new LinkedList<>();
+        List<Integer> amounts = new LinkedList<>();
+        List<String> dates = new LinkedList<>();
+        while(startDate.before(new Date())) {
+            int ordersAmount = orderService.amountOfOrdersBetween(toDB.format(startDate), toDB.format(endDate));
+            objects.add(new OrderStatisticsObject(toSend.format(startDate), ordersAmount));
+            amounts.add(ordersAmount);
+            dates.add(toSend.format(startDate));
+
+            gc.add(Calendar.DAY_OF_MONTH, 1);
+            startDate = gc.getTime();
+            gc.add(Calendar.MONTH, 1);
+            gc.add(Calendar.DAY_OF_MONTH, -1);
+            endDate = gc.getTime();
+        }
+
+        return new SuccessResponse<>(
+                new OrderStatisticsResponse(
+                        amounts,
+                        dates,
+                        objects));
     }
 }

@@ -43,4 +43,8 @@ public class StorageService {
     public Optional<Storage> findStorageByBatchId(int batchId) {
         return storageRepository.findStorageByBatchId(batchId);
     }
+
+    public List<Storage> findStoragesRunningOutOfSpace() {
+        return storageRepository.findStoragesRunningOutOfSpace();
+    }
 }

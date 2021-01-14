@@ -4,6 +4,7 @@ import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.service.ProductBatchService;
 import foodwarehouse.core.service.ProductInStorageService;
 import foodwarehouse.core.service.ProductService;
+import foodwarehouse.core.service.StorageService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,13 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
     private final ProductInStorageService productInStorageService;
     private final ProductService productService;
     private final ProductBatchService productBatchService;
+    private final StorageService storageService;
 
-    public ApplicationReady(ProductInStorageService productInStorageService, ProductService productService, ProductBatchService productBatchService) {
+    public ApplicationReady(ProductInStorageService productInStorageService, ProductService productService, ProductBatchService productBatchService, StorageService storageService) {
         this.productInStorageService = productInStorageService;
         this.productService = productService;
         this.productBatchService = productBatchService;
+        this.storageService = storageService;
     }
 
     @Override
@@ -52,5 +55,9 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
         System.out.println("Looking for running out products!");
         RunningOutProducts.storeRunningOutProducts(productService.findRunningOutProducts());
         System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
+
+        System.out.println("Looking for storages running out space!");
+        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
+        System.out.println("Amount of found storages running out space: " + StoragesRunningOutOfSpace.getRunningOutOfSpace().size());
     }
 }

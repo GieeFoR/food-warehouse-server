@@ -5,6 +5,7 @@ import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.payment.Payment;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,6 @@ public interface OrderRepository {
     List<Order> findOrders();
 
     List<Order> findCustomerOrders(int customerId);
+
+    int amountOfOrdersBetween(String startDate, String endDate);
 }

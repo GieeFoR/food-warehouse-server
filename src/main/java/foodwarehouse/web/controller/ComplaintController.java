@@ -11,7 +11,6 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.complaint.CreateComplaintRequest;
 import foodwarehouse.web.response.complaint.ComplaintResponse;
-import foodwarehouse.web.response.others.CancelResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

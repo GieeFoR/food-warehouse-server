@@ -2,12 +2,10 @@ package foodwarehouse.web.component;
 
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
-import foodwarehouse.core.service.ConnectionService;
-import foodwarehouse.core.service.ProductBatchService;
-import foodwarehouse.core.service.ProductInStorageService;
-import foodwarehouse.core.service.ProductService;
+import foodwarehouse.core.service.*;
 import foodwarehouse.startup.ExpiredBatches;
 import foodwarehouse.startup.RunningOutProducts;
+import foodwarehouse.startup.StoragesRunningOutOfSpace;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,12 +20,14 @@ public class Watchdog {
     private final ProductInStorageService productInStorageService;
     private final ProductService productService;
     private final ConnectionService connectionService;
+    private final StorageService storageService;
 
-    public Watchdog(ProductBatchService productBatchService, ProductInStorageService productInStorageService, ProductService productService, ConnectionService connectionService) {
+    public Watchdog(ProductBatchService productBatchService, ProductInStorageService productInStorageService, ProductService productService, ConnectionService connectionService, StorageService storageService) {
         this.productBatchService = productBatchService;
         this.productInStorageService = productInStorageService;
         this.productService = productService;
         this.connectionService = connectionService;
+        this.storageService = storageService;
     }
 
     @Scheduled(cron = "0 0 1 * * ?")
@@ -62,5 +62,9 @@ public class Watchdog {
         System.out.println("Looking for running out products!");
         RunningOutProducts.storeRunningOutProducts(productService.findRunningOutProducts());
         System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
+
+        System.out.println("Looking for storages running out space!");
+        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
+        System.out.println("Amount of found storages running out space: " + StoragesRunningOutOfSpace.getRunningOutOfSpace().size());
     }
 }

@@ -20,6 +20,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -171,5 +172,23 @@ public class JdbcOrderRepository implements OrderRepository {
             System.out.println(sqlException.getMessage());
         }
         return orders;
+    }
+
+    @Override
+    public int amountOfOrdersBetween(String startDate, String endDate) {
+        try {
+            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.STATISTICS);
+            callableStatement.setString(1, startDate);
+            callableStatement.setString(2, endDate);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return -1;
     }
 }

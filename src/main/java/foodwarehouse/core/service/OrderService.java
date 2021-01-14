@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +62,9 @@ public class OrderService {
 
     public List<Order> findCustomerOrders(int customerId) {
         return orderRepository.findCustomerOrders(customerId);
+    }
+
+    public int amountOfOrdersBetween(String startDate, String endDate) {
+        return orderRepository.amountOfOrdersBetween(startDate, endDate);
     }
 }

@@ -156,4 +156,22 @@ public class JdbcStorageRepository implements StorageRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public List<Storage> findStoragesRunningOutOfSpace() {
+        List<Storage> storages = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_RUNNING_OUT_OF_SPACE);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+
+            while(resultSet.next()) {
+                storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch (SQLException sqlException) {
+            storages = null;
+        }
+        return storages;
+    }
 }

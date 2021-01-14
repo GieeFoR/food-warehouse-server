@@ -20,4 +20,6 @@ public interface StorageRepository {
     Optional<Storage> findStorage(int storageId);
 
     Optional<Storage> findStorageByBatchId(int batchId);
+
+    List<Storage> findStoragesRunningOutOfSpace();
 }
