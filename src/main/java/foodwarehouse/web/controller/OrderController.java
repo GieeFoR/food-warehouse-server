@@ -236,6 +236,36 @@ public class OrderController {
                                 .collect(Collectors.toList())));
     }
 
+    @GetMapping("/order")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    public SuccessResponse<List<OrderResponse>> getOrders() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        List<Order> orders = orderService.findOrders();
+        List<OrderResponse> result = new LinkedList<>();
+
+        for (Order order : orders) {
+            List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+            List<ProductBatch> productBatches = new LinkedList<>();
+            List<Integer> quantity = new LinkedList<>();
+
+            List<Complaint> complaints = complaintService.findOrderComplaints(order.orderId());
+
+            for (ProductOrder po : productOrders) {
+                productBatches.add(po.batch());
+                quantity.add(po.quantity());
+            }
+            result.add(OrderResponse.from(order, productBatches, complaints, quantity));
+        }
+
+        return new SuccessResponse<>(result);
+    }
+
     @GetMapping("/account/orders")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<List<OrderResponse>> getCustomerOrders(Authentication authentication) {
