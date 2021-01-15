@@ -236,7 +236,7 @@ public class OrderController {
 
     @GetMapping("/order")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
-    public SuccessResponse<List<OrderResponse>> getOrders() {
+    public SuccessResponse<List<EntireOrderResponse>> getOrders() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -245,7 +245,7 @@ public class OrderController {
         }
 
         List<Order> orders = orderService.findOrders();
-        List<OrderResponse> result = new LinkedList<>();
+        List<EntireOrderResponse> result = new LinkedList<>();
 
         for (Order order : orders) {
             List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
@@ -258,7 +258,7 @@ public class OrderController {
                 productBatches.add(po.batch());
                 quantity.add(po.quantity());
             }
-            result.add(OrderResponse.from(order, productBatches, complaints, quantity));
+            result.add(EntireOrderResponse.from(order, productBatches, complaints, quantity));
         }
 
         return new SuccessResponse<>(result);
