@@ -1,13 +1,10 @@
 package foodwarehouse.database.jdbc;
 
-import foodwarehouse.core.data.product.Product;
 import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productInStorage.ProductInStorage;
 import foodwarehouse.core.data.productInStorage.ProductInStorageRepository;
 import foodwarehouse.core.data.storage.Storage;
-import foodwarehouse.database.rowmappers.ProductBatchResultSetMapper;
 import foodwarehouse.database.rowmappers.ProductInStorageResultSetMapper;
-import foodwarehouse.database.tables.ProductBatchTable;
 import foodwarehouse.database.tables.ProductInStorageTable;
 import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;

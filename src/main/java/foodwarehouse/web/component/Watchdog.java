@@ -37,6 +37,8 @@ public class Watchdog {
             return;
         }
 
+
+
         System.out.println("Calculating discounts!");
 
         LocalDate now = LocalDate.now();
@@ -55,14 +57,17 @@ public class Watchdog {
         }
         System.out.println("Calculating discounts has ended!");
 
+        ExpiredBatches.clear();
         System.out.println("Looking for expired products batches!");
         ExpiredBatches.storeExpiredBatches(productInStorageService.findExpiredProductsInStorages());
         System.out.println("Amount of found expired batches: " + ExpiredBatches.getExpiredBatches().size());
 
+        RunningOutProducts.clear();
         System.out.println("Looking for running out products!");
         RunningOutProducts.storeRunningOutProducts(productService.findRunningOutProducts());
         System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
 
+        StoragesRunningOutOfSpace.clear();
         System.out.println("Looking for storages running out space!");
         StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
         System.out.println("Amount of found storages running out space: " + StoragesRunningOutOfSpace.getRunningOutOfSpace().size());

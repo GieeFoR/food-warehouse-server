@@ -23,4 +23,8 @@ public class StoragesRunningOutOfSpace {
     public static List<Storage> getRunningOutOfSpace() {
         return Collections.unmodifiableList(runningOutOfSpace);
     }
+
+    public static void clear() {
+        runningOutOfSpace.clear();
+    }
 }

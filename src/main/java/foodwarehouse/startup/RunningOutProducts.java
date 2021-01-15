@@ -24,4 +24,7 @@ public class RunningOutProducts {
         return Collections.unmodifiableList(runningOutProducts);
     }
 
+    public static void clear() {
+        runningOutProducts.clear();
+    }
 }

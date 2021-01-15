@@ -23,4 +23,8 @@ public class ExpiredBatches {
     public static List<ProductInStorage> getExpiredBatches() {
         return Collections.unmodifiableList(expiredBatches);
     }
+
+    public static void clear() {
+        expiredBatches.clear();
+    }
 }

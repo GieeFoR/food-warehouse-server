@@ -12,8 +12,6 @@ public record ProductDataResponse(
         @JsonProperty(value = "description")                    String longDesc,
         @JsonProperty(value = "category", required = true)      String category,
         @JsonProperty(value = "needs_cold", required = true)    boolean needColdStorage,
-        @JsonProperty(value = "buy_price",required = true)      float buyPrice,
-        @JsonProperty(value = "sell_price", required = true)    float sellPrice,
         @JsonProperty(value = "image", required = true)         String image) {
 
     public static ProductDataResponse fromProduct(Product product) {
@@ -24,8 +22,6 @@ public record ProductDataResponse(
                 product.longDesc(),
                 product.category(),
                 product.needColdStorage(),
-                product.buyPrice(),
-                product.sellPrice(),
                 product.image());
     }
 }
