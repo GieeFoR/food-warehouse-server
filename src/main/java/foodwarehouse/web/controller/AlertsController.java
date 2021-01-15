@@ -10,6 +10,7 @@ import foodwarehouse.startup.StoragesRunningOutOfSpace;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.response.alert.AlertResponse;
+import foodwarehouse.web.response.alert.EmployeeAlertResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -73,5 +74,21 @@ public class AlertsController {
                     ExpiredBatches.getExpiredBatches(),
                     RunningOutProducts.getRunningOutProducts(),
                     StoragesRunningOutOfSpace.getRunningOutOfSpace()));
+    }
+
+    @GetMapping("/employee")
+    @PreAuthorize("hasRole('Employee')")
+    public SuccessResponse<EmployeeAlertResponse> getEmployeeAlerts() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return new SuccessResponse<>(
+                EmployeeAlertResponse.fromLists(
+                        ExpiredBatches.getExpiredBatches(),
+                        StoragesRunningOutOfSpace.getRunningOutOfSpace()));
     }
 }

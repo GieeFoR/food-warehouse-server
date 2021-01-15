@@ -6,6 +6,7 @@ import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.delivery.Delivery;
 import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.order.Order;
+import foodwarehouse.core.data.order.OrderState;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
@@ -371,7 +372,7 @@ public class OrderController {
                 .findEmployeeByUsername(authentication.getName())
                 .orElseThrow(() -> new RestException("Cannot find employee."));
 
-        Order order = orderService.findOrderById(employee.employeeId())
+        Order order = orderService.findOrderById(id)
                 .orElseThrow(() -> new RestException("Cannot find order with this ID."));
 
         if(order.delivery().supplier().employeeId() != employee.employeeId()) {
@@ -387,6 +388,71 @@ public class OrderController {
             quantity.add(po.quantity());
         }
         SupplierOrderResponse result = SupplierOrderResponse.from(order, productBatches, quantity);
+        return new SuccessResponse<>(result);
+    }
+
+    @GetMapping("/employee/order")
+    @PreAuthorize("hasRole('Employee')")
+    public SuccessResponse<List<EmployeeOrderResponse>> getEmployeeActiveOrders() {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        List<Order> orders = orderService
+                .findOrders()
+                .stream()
+                .filter(o ->
+                        o.state().equals(OrderState.REGISTERED) ||
+                        o.state().equals(OrderState.COMPLETING) ||
+                        o.state().equals(OrderState.READY_TO_DELIVER))
+                .collect(Collectors.toList());
+        List<EmployeeOrderResponse> result = new LinkedList<>();
+
+        for (Order order : orders) {
+            List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+            List<ProductBatch> productBatches = new LinkedList<>();
+            List<Integer> quantity = new LinkedList<>();
+
+            for (ProductOrder po : productOrders) {
+                productBatches.add(po.batch());
+                quantity.add(po.quantity());
+            }
+            result.add(EmployeeOrderResponse.from(order, productBatches, quantity));
+        }
+        return new SuccessResponse<>(result);
+    }
+
+    @GetMapping("/employee/order/{id}")
+    @PreAuthorize("hasRole('Employee')")
+    public SuccessResponse<EmployeeOrderResponse> getEmployeeActiveOrderById(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrderById(id)
+                .filter(o ->
+                        o.state().equals(OrderState.REGISTERED) ||
+                                o.state().equals(OrderState.COMPLETING) ||
+                                o.state().equals(OrderState.READY_TO_DELIVER))
+                .orElseThrow(() -> new RestException("Cannot find order with this ID."));
+
+        List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+        List<ProductBatch> productBatches = new LinkedList<>();
+        List<Integer> quantity = new LinkedList<>();
+
+        for (ProductOrder po : productOrders) {
+            productBatches.add(po.batch());
+            quantity.add(po.quantity());
+        }
+        EmployeeOrderResponse result = EmployeeOrderResponse.from(order, productBatches, quantity);
+
         return new SuccessResponse<>(result);
     }
 

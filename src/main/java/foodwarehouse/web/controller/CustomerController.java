@@ -172,6 +172,34 @@ public class CustomerController {
                 .orElseThrow(() -> new RestException("Unable to update a customer."));
     }
 
+    @PutMapping("/discount/{id}")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    public SuccessResponse<CustomerResponse> updateDiscountCustomer(@RequestBody Integer request, @PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService.findCustomerById(id)
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        return customerService.updateCustomer(
+                customer.customerId(),
+                customer.user(),
+                customer.address(),
+                customer.name(),
+                customer.surname(),
+                customer.firmName(),
+                customer.phoneNumber(),
+                customer.taxId(),
+                request)
+                .map(CustomerResponse::fromCustomer)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Unable to set discount."));
+    }
+
     @DeleteMapping
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<DeleteResponse>> deleteCustomers(@RequestBody List<Integer> request) {
