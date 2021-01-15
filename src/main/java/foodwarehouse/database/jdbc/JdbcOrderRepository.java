@@ -212,4 +212,22 @@ public class JdbcOrderRepository implements OrderRepository {
         }
         return orders;
     }
+
+    @Override
+    public List<Order> findSupplierActiveOrders(int employeeId) {
+        List<Order> orders = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_SUPPLIER_ACTIVE);
+            callableStatement.setInt(1, employeeId);
+
+            ResultSet resultSet = callableStatement.executeQuery();
+            while(resultSet.next()) {
+                orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return orders;
+    }
 }

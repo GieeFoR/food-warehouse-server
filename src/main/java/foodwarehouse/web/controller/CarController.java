@@ -36,7 +36,7 @@ public class CarController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<CarResponse>> getCars() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -55,7 +55,7 @@ public class CarController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> getCarById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -72,7 +72,7 @@ public class CarController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> createCar(@RequestBody CreateCarRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -100,7 +100,7 @@ public class CarController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> updateCar(@RequestBody UpdateCarRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -129,7 +129,7 @@ public class CarController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<DeleteResponse>> deleteCars(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -149,7 +149,7 @@ public class CarController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<DeleteResponse> deleteCarById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

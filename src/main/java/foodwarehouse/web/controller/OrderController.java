@@ -68,7 +68,7 @@ public class OrderController {
 
     @PostMapping("/store/order")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<OrderResponse> createOrder(Authentication authentication, @RequestBody CreateOrderRequest request) {
+    public SuccessResponse<CustomerOrderResponse> createOrder(Authentication authentication, @RequestBody CreateOrderRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -221,7 +221,7 @@ public class OrderController {
         }
 
         return new SuccessResponse<>(
-                OrderResponse.from(
+                CustomerOrderResponse.from(
                                 order,
                                 productBatchesMemoryList
                                         .stream()
@@ -294,7 +294,7 @@ public class OrderController {
 
     @GetMapping("/account/orders")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<List<OrderResponse>> getCustomerOrders(Authentication authentication) {
+    public SuccessResponse<List<CustomerOrderResponse>> getCustomerOrders(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -307,7 +307,7 @@ public class OrderController {
                 .orElseThrow(() -> new RestException("Cannot find customer."));
 
         List<Order> orders = orderService.findCustomerOrders(customer.customerId());
-        List<OrderResponse> result = new LinkedList<>();
+        List<CustomerOrderResponse> result = new LinkedList<>();
 
         for (Order order : orders) {
             List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
@@ -320,15 +320,81 @@ public class OrderController {
                 productBatches.add(po.batch());
                 quantity.add(po.quantity());
             }
-            result.add(OrderResponse.from(order, productBatches, complaints, quantity));
+            result.add(CustomerOrderResponse.from(order, productBatches, complaints, quantity));
         }
 
         return new SuccessResponse<>(result);
     }
 
+    @GetMapping("/supplier/order")
+    @PreAuthorize("hasRole('Supplier')")
+    public SuccessResponse<List<SupplierOrderResponse>> getSupplierActiveOrders(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        List<Order> orders = orderService.findSupplierActiveOrders(employee.employeeId());
+        List<SupplierOrderResponse> result = new LinkedList<>();
+
+        for (Order order : orders) {
+            List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+            List<ProductBatch> productBatches = new LinkedList<>();
+            List<Integer> quantity = new LinkedList<>();
+
+            for (ProductOrder po : productOrders) {
+                productBatches.add(po.batch());
+                quantity.add(po.quantity());
+            }
+            result.add(SupplierOrderResponse.from(order, productBatches, quantity));
+        }
+        return new SuccessResponse<>(result);
+    }
+
+
+
+    @GetMapping("/supplier/order/{id}")
+    @PreAuthorize("hasRole('Supplier')")
+    public SuccessResponse<SupplierOrderResponse> getSupplierActiveOrderById(Authentication authentication, @PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        Order order = orderService.findOrderById(employee.employeeId())
+                .orElseThrow(() -> new RestException("Cannot find order with this ID."));
+
+        if(order.delivery().supplier().employeeId() != employee.employeeId()) {
+            throw new RestException("Cannot show this order.");
+        }
+
+        List<ProductOrder> productOrders = productOrderService.findProductOrderByOrderId(order.orderId());
+        List<ProductBatch> productBatches = new LinkedList<>();
+        List<Integer> quantity = new LinkedList<>();
+
+        for (ProductOrder po : productOrders) {
+            productBatches.add(po.batch());
+            quantity.add(po.quantity());
+        }
+        SupplierOrderResponse result = SupplierOrderResponse.from(order, productBatches, quantity);
+        return new SuccessResponse<>(result);
+    }
+
     @GetMapping("/account/order/{id}")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<OrderResponse> getCustomerOrderById(Authentication authentication, @PathVariable int id) {
+    public SuccessResponse<CustomerOrderResponse> getCustomerOrderById(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -357,7 +423,7 @@ public class OrderController {
             productBatches.add(po.batch());
             quantity.add(po.quantity());
         }
-        OrderResponse result = OrderResponse.from(order, productBatches, complaints, quantity);
+        CustomerOrderResponse result = CustomerOrderResponse.from(order, productBatches, complaints, quantity);
 
         return new SuccessResponse<>(result);
     }

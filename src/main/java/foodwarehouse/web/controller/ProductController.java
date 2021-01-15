@@ -36,7 +36,7 @@ public class ProductController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<ProductResponse>> getProducts() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -55,7 +55,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<ProductResponse> getProductById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -72,7 +72,7 @@ public class ProductController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -102,7 +102,7 @@ public class ProductController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<ProductResponse> updateProduct(@RequestBody UpdateProductRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -133,7 +133,7 @@ public class ProductController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<DeleteResponse>> deleteProducts(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -153,7 +153,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<DeleteResponse> deleteProductById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

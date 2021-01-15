@@ -38,7 +38,7 @@ public class StorageController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<StorageResponse>> getStorages() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -57,7 +57,7 @@ public class StorageController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<StorageResponse> getStorageById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -74,7 +74,7 @@ public class StorageController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<StorageResponse> createStorage(@RequestBody CreateStorageRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -110,7 +110,7 @@ public class StorageController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<StorageResponse> updateStorage(@RequestBody UpdateStorageRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -148,7 +148,7 @@ public class StorageController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<DeleteResponse>> deleteStorages(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -168,7 +168,7 @@ public class StorageController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<DeleteResponse> deleteStorageById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

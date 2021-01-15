@@ -72,4 +72,8 @@ public class OrderService {
         return orderRepository.findOrdersBetweenDates(startDate, endDate);
     }
 
+    public List<Order> findSupplierActiveOrders(int employeeId) {
+        return orderRepository.findSupplierActiveOrders(employeeId);
+    }
+
 }

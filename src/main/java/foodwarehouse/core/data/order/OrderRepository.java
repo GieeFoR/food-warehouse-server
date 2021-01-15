@@ -28,4 +28,6 @@ public interface OrderRepository {
     int amountOfOrdersBetween(String startDate, String endDate);
 
     List<Order> findOrdersBetweenDates(String startDate, String endDate);
+
+    List<Order> findSupplierActiveOrders(int employeeId);
 }

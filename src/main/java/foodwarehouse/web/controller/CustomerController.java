@@ -43,7 +43,7 @@ public class CustomerController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<CustomerResponse>> getCustomers() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -62,7 +62,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CustomerResponse> getCustomerById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -79,7 +79,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CustomerResponse> createCustomer(@RequestBody CreateCustomerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

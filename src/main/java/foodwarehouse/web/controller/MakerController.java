@@ -36,7 +36,7 @@ public class MakerController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<MakerResponse>> getMakers() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -55,7 +55,7 @@ public class MakerController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<MakerResponse> getMakerById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -72,7 +72,7 @@ public class MakerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<MakerResponse> createMaker(@RequestBody CreateMakerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -103,7 +103,7 @@ public class MakerController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<MakerResponse> updateMaker(@RequestBody UpdateMakerRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -137,7 +137,7 @@ public class MakerController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<DeleteResponse>> deleteMakers(@RequestBody List<Integer> request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {

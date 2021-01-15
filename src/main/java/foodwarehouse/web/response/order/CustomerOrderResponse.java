@@ -11,14 +11,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record OrderResponse(
+public record CustomerOrderResponse(
         @JsonProperty(value = "order", required = true)         OrderDataResponse orderDataResponse,
-        @JsonProperty(value ="products", required = true)       List<OrderProductResponse> orderProductsResponse,
+        @JsonProperty(value = "products", required = true)       List<OrderProductResponse> orderProductsResponse,
         @JsonProperty(value = "payment", required = true)       PaymentResponse paymentState,
         @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse,
         @JsonProperty(value = "complaints", required = true)    List<ComplaintResponse> complaintsResponse) {
 
-        public static OrderResponse from(Order order, List<ProductBatch> products, List<Complaint> complaints, List<Integer> quantity) {
+        public static CustomerOrderResponse from(Order order, List<ProductBatch> products, List<Complaint> complaints, List<Integer> quantity) {
 
                 List<OrderProductResponse> orderProductResponses = new LinkedList<>();
 
@@ -26,7 +26,7 @@ public record OrderResponse(
                         orderProductResponses.add(OrderProductResponse.fromProductBatch(products.get(i), quantity.get(i)));
                 }
 
-                return new OrderResponse(
+                return new CustomerOrderResponse(
                         OrderDataResponse.fromOrder(order),
                         orderProductResponses,
                         PaymentResponse.fromPayment(order.payment()),
