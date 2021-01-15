@@ -1,5 +1,6 @@
 package foodwarehouse.web.controller;
 
+import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.ConnectionService;
@@ -13,6 +14,7 @@ import foodwarehouse.web.request.employee.UpdateEmployeeRequest;
 import foodwarehouse.web.response.others.DeleteResponse;
 import foodwarehouse.web.response.employee.EmployeeResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -67,6 +69,23 @@ public class EmployeeController {
                 .map(EmployeeResponse::fromEmployee)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot find user with this ID."));
+    }
+
+    @GetMapping("/account")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
+    public SuccessResponse<EmployeeResponse> getEmployeeOwnData(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        return employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .map(EmployeeResponse::fromEmployee)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot find employee."));
     }
 
     @PostMapping
