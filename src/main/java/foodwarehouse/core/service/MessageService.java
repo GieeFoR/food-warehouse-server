@@ -23,12 +23,12 @@ public class MessageService {
         return messageRepository.createMessage(sender, receiver, content);
     }
 
-    public Optional<Message> updateMessageContent(int messageId, String content) {
-        return messageRepository.updateMessageContent(messageId, content);
+    public Optional<Message> updateMessageContent(int messageId, Employee sender, Employee receiver, String content) {
+        return messageRepository.updateMessageContent(messageId, sender, receiver, content);
     }
 
-    public Optional<Message> updateMessageRead(int messageId) {
-        return messageRepository.updateMessageRead(messageId);
+    public void updateMessageRead(int messageId) {
+        messageRepository.updateMessageRead(messageId);
     }
 
     public boolean deleteMessage(int messageId) {

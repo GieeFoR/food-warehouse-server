@@ -9,9 +9,9 @@ public interface MessageRepository {
 
     Optional<Message> createMessage(Employee sender, Employee receiver, String content);
 
-    Optional<Message> updateMessageContent(int messageId, String content);
+    Optional<Message> updateMessageContent(int messageId, Employee sender, Employee receiver, String content);
 
-    Optional<Message> updateMessageRead(int messageId);
+    void updateMessageRead(int messageId);
 
     boolean deleteMessage(int messageId);
 

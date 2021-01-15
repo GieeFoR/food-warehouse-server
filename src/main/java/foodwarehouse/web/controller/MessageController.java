@@ -99,7 +99,7 @@ public class MessageController {
 
     @PutMapping("/read/{id}")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
-    public SuccessResponse<MessageResponse> readMessage(Authentication authentication, @PathVariable int id) {
+    public SuccessResponse<Void> readMessage(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -119,11 +119,10 @@ public class MessageController {
             throw new RestException("Cannot update this message.");
         }
 
-        return messageService
-                .updateMessageRead(id)
-                .map(MessageResponse::fromMessage)
-                .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot update this message."));
+        messageService
+                .updateMessageRead(id);
+
+        return new SuccessResponse<>(null);
     }
 
     @GetMapping("/{id}")
@@ -145,7 +144,7 @@ public class MessageController {
 
     @PostMapping
     @PreAuthorize("hasRole('Admin')")
-    public SuccessResponse<MessageSentResponse> createMessage(@RequestBody CreateMessageRequest createMessageRequest) {
+    public SuccessResponse<MessageSentResponse> createMessage(Authentication authentication, @RequestBody CreateMessageRequest createMessageRequest) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -154,8 +153,8 @@ public class MessageController {
         }
 
         Employee sender = employeeService
-                .findEmployeeById(createMessageRequest.sender())
-                .orElseThrow(() -> new RestException("Cannot find sender."));
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
 
         Employee receiver = employeeService
                 .findEmployeeById(createMessageRequest.receiver())
