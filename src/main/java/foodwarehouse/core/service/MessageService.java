@@ -42,4 +42,12 @@ public class MessageService {
     public List<Message> findAllMessages() {
         return messageRepository.findAllMessages();
     }
+
+    public List<Message> findEmployeeMessages(int employeeId) {
+        return messageRepository.findEmployeeMessages(employeeId);
+    }
+
+    public int countUnreadReceivedMessages(int employeeId) {
+        return messageRepository.countUnreadReceivedMessages(employeeId);
+    }
 }

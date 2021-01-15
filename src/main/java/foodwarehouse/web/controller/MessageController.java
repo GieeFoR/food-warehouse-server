@@ -1,6 +1,7 @@
 package foodwarehouse.web.controller;
 
 import foodwarehouse.core.data.employee.Employee;
+import foodwarehouse.core.data.message.Message;
 import foodwarehouse.core.service.ConnectionService;
 import foodwarehouse.core.service.EmployeeService;
 import foodwarehouse.core.service.MessageService;
@@ -10,6 +11,7 @@ import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.message.CreateMessageRequest;
 import foodwarehouse.web.response.message.MessageResponse;
 import foodwarehouse.web.response.message.MessageSentResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +36,7 @@ public class MessageController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('Admin')")
     public SuccessResponse<List<MessageResponse>> getMessages() {
         //check if database is reachable
@@ -51,6 +53,77 @@ public class MessageController {
                 .collect(Collectors.toList());
 
         return new SuccessResponse<>(messages);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
+    public SuccessResponse<List<MessageResponse>> getUnreadMessages(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        final var messages = messageService
+                .findEmployeeMessages(employee.employeeId())
+                .stream()
+                .map(MessageResponse::fromMessage)
+                .collect(Collectors.toList());
+
+        return new SuccessResponse<>(messages);
+    }
+
+    @GetMapping("/unread")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
+    public SuccessResponse<Integer> getAmountOfUnreadMessages(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        return new SuccessResponse<>(
+                messageService
+                        .countUnreadReceivedMessages(employee.employeeId()));
+    }
+
+    @PutMapping("/read/{id}")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
+    public SuccessResponse<MessageResponse> readMessage(Authentication authentication, @PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService
+                .findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        Message message = messageService
+                .findMessageById(id)
+                .orElseThrow(() -> new RestException("Cannot find message."));
+
+        if(message.receiver().employeeId() != employee.employeeId()) {
+            throw new RestException("Cannot update this message.");
+        }
+
+        return messageService
+                .updateMessageRead(id)
+                .map(MessageResponse::fromMessage)
+                .map(SuccessResponse::new)
+                .orElseThrow(() -> new RestException("Cannot update this message."));
     }
 
     @GetMapping("/{id}")

@@ -22,5 +22,7 @@ final public class MessageTable {
 
         static final public String READ_ALL = "CALL `GET_MESSAGES`()";
         static final public String READ_BY_ID = "CALL `GET_MESSAGE_BY_ID`(?)";
+        static final public String READ_EMPLOYEE_ALL = "CALL `GET_EMPLOYEE_MESSAGES`(?)";
+        static final public String COUNT_UNREAD_RECEIVED = "CALL `COUNT_UNREAD_RECEIVED_MESSAGES`(?)";
     }
 }

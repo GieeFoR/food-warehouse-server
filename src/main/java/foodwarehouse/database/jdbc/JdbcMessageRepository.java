@@ -70,9 +70,44 @@ public class JdbcMessageRepository implements MessageRepository {
             }
         }
         catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
             messages = null;
         }
-
         return messages;
+    }
+
+    @Override
+    public List<Message> findEmployeeMessages(int employeeId) {
+        List<Message> messages = new LinkedList<>();
+        try {
+            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_EMPLOYEE_ALL);
+            ResultSet resultSet = callableStatement.executeQuery();
+
+            while(resultSet.next()) {
+                messages.add(new MessageResultSetMapper().resultSetMap(resultSet, ""));
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+            messages = null;
+        }
+        return messages;
+    }
+
+    @Override
+    public int countUnreadReceivedMessages(int employeeId) {
+        int result = 0;
+        try {
+            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.COUNT_UNREAD_RECEIVED);
+            ResultSet resultSet = callableStatement.executeQuery();
+
+            if(resultSet.next()) {
+                return resultSet.getInt("RESULT");
+            }
+        }
+        catch(SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+        }
+        return result;
     }
 }

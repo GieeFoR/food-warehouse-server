@@ -2,7 +2,6 @@ package foodwarehouse.core.data.message;
 
 import foodwarehouse.core.data.employee.Employee;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +18,8 @@ public interface MessageRepository {
     Optional<Message> findMessageById(int messageId);
 
     List<Message> findAllMessages();
+
+    List<Message> findEmployeeMessages(int employeeId);
+
+    int countUnreadReceivedMessages(int employeeId);
 }
