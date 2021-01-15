@@ -357,8 +357,6 @@ public class OrderController {
         return new SuccessResponse<>(result);
     }
 
-
-
     @GetMapping("/supplier/order/{id}")
     @PreAuthorize("hasRole('Supplier')")
     public SuccessResponse<SupplierOrderResponse> getSupplierActiveOrderById(Authentication authentication, @PathVariable int id) {
