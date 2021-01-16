@@ -143,7 +143,7 @@ public class MessageController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
     public SuccessResponse<MessageSentResponse> createMessage(Authentication authentication, @RequestBody CreateMessageRequest createMessageRequest) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
