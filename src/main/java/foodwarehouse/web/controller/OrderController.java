@@ -718,4 +718,164 @@ public class OrderController {
                         discountQuantities,
                         allQuantities));
     }
+
+    @PutMapping("/order/complieting/{id}")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Employee')")
+    public SuccessResponse<Void> setOrderState_Completing(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(!order.state().equals(OrderState.REGISTERED)) {
+            throw new RestException("Cannot change state of this order.");
+        }
+
+        orderService.updateOrderState(
+                order.orderId(),
+                order.payment(),
+                order.customer(),
+                order.delivery(),
+                order.comment(),
+                OrderState.COMPLETING);
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/order/ready-to-deliver/{id}")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Employee')")
+    public SuccessResponse<Void> setOrderState_ReadyToDeliver(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(!order.state().equals(OrderState.COMPLETING)) {
+            throw new RestException("Cannot change state of this order.");
+        }
+
+        orderService.updateOrderState(
+                order.orderId(),
+                order.payment(),
+                order.customer(),
+                order.delivery(),
+                order.comment(),
+                OrderState.READY_TO_DELIVER);
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/order/out-for-delivery/{id}")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Supplier')")
+    public SuccessResponse<Void> setOrderState_OutForDelivery(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(!order.state().equals(OrderState.READY_TO_DELIVER)) {
+            throw new RestException("Cannot change state of this order.");
+        }
+
+        orderService.updateOrderState(
+                order.orderId(),
+                order.payment(),
+                order.customer(),
+                order.delivery(),
+                order.comment(),
+                OrderState.OUT_FOR_DELIVERY);
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/order/delivered/{id}")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Supplier')")
+    public SuccessResponse<Void> setOrderState_Delivered(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(!order.state().equals(OrderState.OUT_FOR_DELIVERY)) {
+            throw new RestException("Cannot change state of this order.");
+        }
+
+        orderService.updateOrderState(
+                order.orderId(),
+                order.payment(),
+                order.customer(),
+                order.delivery(),
+                order.comment(),
+                OrderState.DELIVERED);
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/order/returned/{id}")
+    @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Supplier')")
+    public SuccessResponse<Void> setOrderState_Returned(@PathVariable int id) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(!order.state().equals(OrderState.OUT_FOR_DELIVERY)) {
+            throw new RestException("Cannot change state of this order.");
+        }
+
+        orderService.updateOrderState(
+                order.orderId(),
+                order.payment(),
+                order.customer(),
+                order.delivery(),
+                order.comment(),
+                OrderState.RETURNED);
+
+        return new SuccessResponse<>(null);
+    }
 }

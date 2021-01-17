@@ -9,6 +9,7 @@ import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.batch.CreateProductInStorage;
+import foodwarehouse.web.request.batch.DeleteProductFromStorageRequest;
 import foodwarehouse.web.response.batch.BatchResponse;
 import foodwarehouse.web.response.batch.EmployeeBatchResponse;
 import foodwarehouse.web.response.product.ProductEmployeeResponse;
@@ -133,10 +134,20 @@ public class BatchController {
                 .orElseThrow(() -> new RestException("Cannot find storage."));
 
         if(productBatches.isPresent()) {
-            productInStorageService.createProductInStorage(
-                    productBatches.get(),
-                    storage,
-                    request.quantity());
+            Optional <ProductInStorage> productInStorage = productInStorageService.findProductInStorageById(productBatches.get(), storage);
+            if(productInStorage.isPresent()) {
+                productInStorageService.updateProductInStorage(
+                        productBatches.get(),
+                        storage,
+                        productInStorage.get().quantity() + request.quantity());
+            }
+            else {
+                productInStorageService.createProductInStorage(
+                        productBatches.get(),
+                        storage,
+                        request.quantity());
+            }
+
         }
         else {
             Product product = productService
@@ -155,6 +166,64 @@ public class BatchController {
                     storage,
                     request.quantity());
         }
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
+    public SuccessResponse<Void> updateProductsInStorages(@RequestBody CreateProductInStorage request) throws ParseException {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        ProductBatch productBatch = productBatchService.findProductBatchById(request.batchId())
+                .orElseThrow(() -> new RestException("Cannot find batch."));
+        Storage storage = storageService.findStorage(request.storageId())
+                .orElseThrow(() -> new RestException("Cannot find storage."));
+        Product product = productService.findProductById(request.productId())
+                .orElseThrow(() -> new RestException("Cannot find product."));
+
+        productBatchService.updateProductBatch(
+                request.batchId(),
+                product,
+                request.batchNo(),
+                sdf.parse(request.eatByDate()),
+                productBatch.discount(),
+                request.packagesQuantity());
+
+        productInStorageService.updateProductInStorage(
+                productBatch,
+                storage,
+                request.quantity());
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/delete")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
+    public SuccessResponse<Void> deleteProductsFromStorage(@RequestBody DeleteProductFromStorageRequest request) throws ParseException {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        ProductBatch productBatch = productBatchService.findProductBatchById(request.batchId())
+                .orElseThrow(() -> new RestException("Cannot find batch."));
+        Storage storage = storageService.findStorage(request.storageId())
+                .orElseThrow(() -> new RestException("Cannot find storage."));
+
+        productInStorageService.updateProductInStorage(
+                productBatch,
+                storage,
+                0);
 
         return new SuccessResponse<>(null);
     }

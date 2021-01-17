@@ -1,11 +1,12 @@
 package foodwarehouse.web.controller;
 
+import foodwarehouse.core.data.customer.Customer;
+import foodwarehouse.core.data.order.Order;
+import foodwarehouse.core.data.order.OrderState;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.core.data.payment.PaymentState;
 import foodwarehouse.core.data.paymentType.PaymentType;
-import foodwarehouse.core.service.ConnectionService;
-import foodwarehouse.core.service.PaymentService;
-import foodwarehouse.core.service.PaymentTypeService;
+import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
@@ -32,14 +33,15 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final PaymentTypeService paymentTypeService;
     private final ConnectionService connectionService;
+    private final OrderService orderService;
+    private final CustomerService customerService;
 
-    public PaymentController(
-            PaymentService paymentService,
-            PaymentTypeService paymentTypeService,
-            ConnectionService connectionService) {
+    public PaymentController(PaymentService paymentService, PaymentTypeService paymentTypeService, ConnectionService connectionService, OrderService orderService, CustomerService customerService) {
         this.paymentService = paymentService;
         this.paymentTypeService = paymentTypeService;
         this.connectionService = connectionService;
+        this.orderService = orderService;
+        this.customerService = customerService;
     }
 
     @GetMapping
@@ -141,13 +143,46 @@ public class PaymentController {
     }
 
     @PutMapping("/accept/{id}")
-    @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<PaymentResponse> acceptPayment(@PathVariable int id) {
+    @PreAuthorize("hasRole('Customer') || hasRole('Supplier')")
+    public SuccessResponse<PaymentResponse> acceptPayment(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
             System.out.println(exceptionMessage);
             throw new DatabaseException(exceptionMessage);
+        }
+
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(authentication.getPrincipal().equals("Customer")) {
+            Customer customer = customerService.findCustomerByUsername(authentication.getName())
+                    .orElseThrow(() -> new RestException("Cannot find customer"));
+
+            if(order.customer().customerId() != customer.customerId()) {
+                throw new RestException("Cannot accept this payment.");
+            }
+
+            orderService.updateOrderState(
+                    order.orderId(),
+                    order.payment(),
+                    order.customer(),
+                    order.delivery(),
+                    order.comment(),
+                    OrderState.REGISTERED);
+        }
+        else {
+            orderService.updateOrderState(
+                    order.orderId(),
+                    order.payment(),
+                    order.customer(),
+                    order.delivery(),
+                    order.comment(),
+                    OrderState.DELIVERED);
         }
 
 
@@ -162,8 +197,8 @@ public class PaymentController {
     }
 
     @PutMapping("/reject/{id}")
-    @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<PaymentResponse> rejectPayment(@PathVariable int id) {
+    @PreAuthorize("hasRole('Customer') || hasRole('Supplier')")
+    public SuccessResponse<PaymentResponse> rejectPayment(Authentication authentication, @PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -171,19 +206,56 @@ public class PaymentController {
             throw new DatabaseException(exceptionMessage);
         }
 
+        Order order = orderService
+                .findOrders()
+                .stream()
+                .filter(o -> o.payment().paymentId() == id)
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+
+        if(authentication.getPrincipal().equals("Customer")) {
+            Customer customer = customerService.findCustomerByUsername(authentication.getName())
+                    .orElseThrow(() -> new RestException("Cannot find customer"));
+
+            if(order.customer().customerId() != customer.customerId()) {
+                throw new RestException("Cannot accept this payment.");
+            }
+        }
+
         Payment rejectedPayment = paymentService.updatePaymentState(id, PaymentState.REJECTED)
                 .orElseThrow(() -> new RestException("Cannot update a payment state."));
 
-        Payment newPayment = paymentService.createPayment(new PaymentType(1, "Za pobraniem gotówką"), rejectedPayment.value())
-                .orElseThrow(() -> new RestException("Cannot create a new payment"));
+        if(authentication.getPrincipal().equals("Customer")) {
+            Payment newPayment = paymentService.createPayment(new PaymentType(1, "Za pobraniem gotówką"), rejectedPayment.value())
+                    .orElseThrow(() -> new RestException("Cannot create a new payment"));
 
-        return paymentService
-                .updatePaymentState(
-                        newPayment.paymentId(),
-                        PaymentState.WAITING)
-                .map(PaymentResponse::fromPayment)
-                .map(SuccessResponse::new)
-                .orElseThrow(() -> new RestException("Cannot update a payment state."));
+            orderService.updateOrderState(
+                    order.orderId(),
+                    order.payment(),
+                    order.customer(),
+                    order.delivery(),
+                    order.comment(),
+                    OrderState.REGISTERED);
+
+            return paymentService
+                    .updatePaymentState(
+                            newPayment.paymentId(),
+                            PaymentState.WAITING)
+                    .map(PaymentResponse::fromPayment)
+                    .map(SuccessResponse::new)
+                    .orElseThrow(() -> new RestException("Cannot update a payment state."));
+        }
+        else {
+            orderService.updateOrderState(
+                    order.orderId(),
+                    order.payment(),
+                    order.customer(),
+                    order.delivery(),
+                    order.comment(),
+                    OrderState.RETURNED);
+
+            return new SuccessResponse<>(PaymentResponse.fromPayment(rejectedPayment));
+        }
     }
 
     @PutMapping("/cancel/{id}")
