@@ -1,5 +1,6 @@
 package foodwarehouse.web.controller;
 
+import foodwarehouse.core.data.complaint.ComplaintState;
 import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.service.ComplaintService;
@@ -10,6 +11,7 @@ import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.complaint.CreateComplaintRequest;
+import foodwarehouse.web.request.complaint.MakeComplaintDecisionRequest;
 import foodwarehouse.web.response.complaint.ComplaintResponse;
 import foodwarehouse.web.response.complaint.CustomerComplaintResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -115,7 +117,7 @@ public class ComplaintController {
 
     @PostMapping("/complaint")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
-    public SuccessResponse<List<ComplaintResponse>> makeDecisionComplaints(Authentication authentication) {
+    public SuccessResponse<Void> makeDecisionComplaints(@RequestBody MakeComplaintDecisionRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -123,16 +125,11 @@ public class ComplaintController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        Customer customer = customerService
-                .findCustomerByUsername(authentication.getName())
-                .orElseThrow(() -> new RestException("Cannot find customer."));
+        ComplaintState state = ComplaintState.from(request.complaintState())
+                .orElseThrow(() -> new RestException("Wrong complaint state."));
 
-        final var result = complaintService
-                .findCustomerComplaints(customer.customerId())
-                .stream()
-                .map(ComplaintResponse::fromComplaint)
-                .collect(Collectors.toList());
+        complaintService.addDecisionToComplaint(request.complaintId(), request.decision(), state);
 
-        return new SuccessResponse<>(result);
+        return new SuccessResponse<>(null);
     }
 }

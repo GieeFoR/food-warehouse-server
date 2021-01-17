@@ -27,6 +27,6 @@ public record ComplaintResponse(
                 sdf.format(complaint.sendDate()),
                 complaint.state().value(),
                 complaint.decision(),
-                sdf.format(complaint.decisionDate()));
+                complaint.decisionDate() == null ? null : sdf.format(complaint.decisionDate()));
     }
 }
