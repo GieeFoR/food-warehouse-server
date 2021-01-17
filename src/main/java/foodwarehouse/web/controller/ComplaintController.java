@@ -129,7 +129,6 @@ public class ComplaintController {
                 .orElseThrow(() -> new RestException("Wrong complaint state."));
 
         complaintService.addDecisionToComplaint(request.complaintId(), request.decision(), state);
-
         return new SuccessResponse<>(null);
     }
 }
