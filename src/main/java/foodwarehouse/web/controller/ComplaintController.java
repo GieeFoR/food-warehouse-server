@@ -96,7 +96,7 @@ public class ComplaintController {
 
     @GetMapping("/complaint")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
-    public SuccessResponse<List<ComplaintResponse>> getComplaints(Authentication authentication) {
+    public SuccessResponse<List<ComplaintResponse>> getComplaints() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -104,12 +104,8 @@ public class ComplaintController {
             throw new DatabaseException(exceptionMessage);
         }
 
-        Customer customer = customerService
-                .findCustomerByUsername(authentication.getName())
-                .orElseThrow(() -> new RestException("Cannot find customer."));
-
         final var result = complaintService
-                .findCustomerComplaints(customer.customerId())
+                .findComplaints()
                 .stream()
                 .map(ComplaintResponse::fromComplaint)
                 .collect(Collectors.toList());
