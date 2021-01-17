@@ -47,7 +47,7 @@ public class BatchController {
         this.productService = productService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<BatchResponse>> getProductsInStorages() {
         //check if database is reachable
