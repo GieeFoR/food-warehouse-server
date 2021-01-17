@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import foodwarehouse.core.data.complaint.Complaint;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.core.data.productBatch.ProductBatch;
-import foodwarehouse.web.response.complaint.ComplaintResponse;
+import foodwarehouse.web.response.complaint.CustomerComplaintResponse;
 import foodwarehouse.web.response.payment.PaymentResponse;
 
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ public record CustomerOrderResponse(
         @JsonProperty(value = "products", required = true)       List<OrderProductResponse> orderProductsResponse,
         @JsonProperty(value = "payment", required = true)       PaymentResponse paymentState,
         @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse,
-        @JsonProperty(value = "complaints", required = true)    List<ComplaintResponse> complaintsResponse) {
+        @JsonProperty(value = "complaints", required = true)    List<CustomerComplaintResponse> complaintsResponse) {
 
         public static CustomerOrderResponse from(Order order, List<ProductBatch> products, List<Complaint> complaints, List<Integer> quantity) {
 
@@ -31,6 +31,6 @@ public record CustomerOrderResponse(
                         orderProductResponses,
                         PaymentResponse.fromPayment(order.payment()),
                         OrderDeliveryResponse.fromDelivery(order.delivery()),
-                        complaints.stream().map(ComplaintResponse::fromComplaint).collect(Collectors.toList()));
+                        complaints.stream().map(CustomerComplaintResponse::fromComplaint).collect(Collectors.toList()));
         }
 }

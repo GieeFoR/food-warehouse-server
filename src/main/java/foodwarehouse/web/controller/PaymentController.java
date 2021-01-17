@@ -150,6 +150,8 @@ public class PaymentController {
             throw new DatabaseException(exceptionMessage);
         }
 
+
+
         return paymentService
                 .updatePaymentState(
                         id,

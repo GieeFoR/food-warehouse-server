@@ -11,6 +11,7 @@ import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
 import foodwarehouse.web.request.complaint.CreateComplaintRequest;
 import foodwarehouse.web.response.complaint.ComplaintResponse;
+import foodwarehouse.web.response.complaint.CustomerComplaintResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/order/complaint")
 public class ComplaintController {
     private final OrderService orderService;
     private final ComplaintService complaintService;
@@ -37,9 +37,9 @@ public class ComplaintController {
         this.connectionService = connectionService;
     }
 
-    @PostMapping
+    @PostMapping("/order/complaint")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<ComplaintResponse> createComplaint(@RequestBody CreateComplaintRequest request) {
+    public SuccessResponse<CustomerComplaintResponse> createComplaint(@RequestBody CreateComplaintRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -52,12 +52,12 @@ public class ComplaintController {
 
         return complaintService
                 .createComplaint(order, request.content())
-                .map(ComplaintResponse::fromComplaint)
+                .map(CustomerComplaintResponse::fromComplaint)
                 .map(SuccessResponse::new)
                 .orElseThrow(() -> new RestException("Cannot create a complaint."));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/order/complaint/{id}")
     @PreAuthorize("hasRole('Customer')")
     public SuccessResponse<Void> cancelComplaint(@PathVariable int id) {
         //check if database is reachable
@@ -71,9 +71,55 @@ public class ComplaintController {
         return new SuccessResponse<>(null);
     }
 
-    @GetMapping
+    @GetMapping("/order/complaint")
     @PreAuthorize("hasRole('Customer')")
-    public SuccessResponse<List<ComplaintResponse>> getCustomerComplaints(Authentication authentication) {
+    public SuccessResponse<List<CustomerComplaintResponse>> getCustomerComplaints(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        final var result = complaintService
+                .findCustomerComplaints(customer.customerId())
+                .stream()
+                .map(CustomerComplaintResponse::fromComplaint)
+                .collect(Collectors.toList());
+
+        return new SuccessResponse<>(result);
+    }
+
+    @GetMapping("/complaint")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    public SuccessResponse<List<ComplaintResponse>> getComplaints(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Customer customer = customerService
+                .findCustomerByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find customer."));
+
+        final var result = complaintService
+                .findCustomerComplaints(customer.customerId())
+                .stream()
+                .map(ComplaintResponse::fromComplaint)
+                .collect(Collectors.toList());
+
+        return new SuccessResponse<>(result);
+    }
+
+    @PostMapping("/complaint")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    public SuccessResponse<List<ComplaintResponse>> makeDecisionComplaints(Authentication authentication) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
