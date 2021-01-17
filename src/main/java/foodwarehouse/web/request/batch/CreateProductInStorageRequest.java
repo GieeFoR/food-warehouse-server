@@ -2,7 +2,7 @@ package foodwarehouse.web.request.batch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record CreateProductInStorage(
+public record CreateProductInStorageRequest(
         @JsonProperty(value = "batch_id")                               int batchId,
         @JsonProperty(value = "batch_no", required = true)              int batchNo,
         @JsonProperty(value = "eat_by_date", required = true)           String eatByDate,

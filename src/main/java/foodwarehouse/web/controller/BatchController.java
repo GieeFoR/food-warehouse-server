@@ -8,14 +8,14 @@ import foodwarehouse.core.service.*;
 import foodwarehouse.web.common.SuccessResponse;
 import foodwarehouse.web.error.DatabaseException;
 import foodwarehouse.web.error.RestException;
-import foodwarehouse.web.request.batch.CreateProductInStorage;
+import foodwarehouse.web.request.batch.CreateProductInStorageRequest;
 import foodwarehouse.web.request.batch.DeleteProductFromStorageRequest;
 import foodwarehouse.web.response.batch.BatchResponse;
 import foodwarehouse.web.response.batch.EmployeeBatchResponse;
+import foodwarehouse.web.response.batch.StorageBatchResponse;
 import foodwarehouse.web.response.product.ProductEmployeeResponse;
 import foodwarehouse.web.response.product.ProductResponse;
 import foodwarehouse.web.response.storage.StorageEmployeeResponse;
-import foodwarehouse.web.response.storage.StorageResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,14 +65,14 @@ public class BatchController {
         for(ProductInStorage productInStorage : productInStorageList) {
             Optional<BatchResponse> productBatchTemp = result.stream().filter(o -> o.batchId() == productInStorage.batch().batchId()).findFirst();
             if(productBatchTemp.isPresent()) {
-                productBatchTemp.get().storagesResponse().add(StorageResponse.fromStorage(productInStorage.storage()));
+                productBatchTemp.get().storageBatchResponse().add(StorageBatchResponse.from(productInStorage.storage(), productInStorage.quantity()));
             }
             else {
                 result.add(
                         new BatchResponse(
                                 productInStorage.batch().batchId(),
                                 productInStorage.batch().batchNumber(),
-                                new LinkedList<>(Collections.singleton(StorageResponse.fromStorage(productInStorage.storage()))),
+                                new LinkedList<>(Collections.singleton(StorageBatchResponse.from(productInStorage.storage(), productInStorage.quantity()))),
                                 ProductResponse.fromProduct(productInStorage.batch().product()),
                                 sdf.format(productInStorage.batch().eatByDate()),
                                 productInStorage.batch().discount(),
@@ -100,14 +100,14 @@ public class BatchController {
         for(ProductInStorage productInStorage : productInStorageList) {
             Optional<EmployeeBatchResponse> productBatchTemp = result.stream().filter(o -> o.batchId() == productInStorage.batch().batchId()).findFirst();
             if(productBatchTemp.isPresent()) {
-                productBatchTemp.get().storagesEmployeeResponse().add(StorageEmployeeResponse.fromStorage(productInStorage.storage()));
+                productBatchTemp.get().storagesEmployeeResponse().add(StorageEmployeeResponse.fromStorage(productInStorage.storage(), productInStorage.quantity()));
             }
             else {
                 result.add(
                         new EmployeeBatchResponse(
                                 productInStorage.batch().batchId(),
                                 productInStorage.batch().batchNumber(),
-                                new LinkedList<>(Collections.singleton(StorageEmployeeResponse.fromStorage(productInStorage.storage()))),
+                                new LinkedList<>(Collections.singleton(StorageEmployeeResponse.fromStorage(productInStorage.storage(), productInStorage.quantity()))),
                                 ProductEmployeeResponse.fromProduct(productInStorage.batch().product()),
                                 sdf.format(productInStorage.batch().eatByDate()),
                                 productInStorage.quantity(),
@@ -119,7 +119,7 @@ public class BatchController {
 
     @PostMapping
     @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
-    public SuccessResponse<Void> createProductsInStorages(@RequestBody CreateProductInStorage request) throws ParseException {
+    public SuccessResponse<Void> createProductsInStorages(@RequestBody CreateProductInStorageRequest request) throws ParseException {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -147,7 +147,6 @@ public class BatchController {
                         storage,
                         request.quantity());
             }
-
         }
         else {
             Product product = productService
@@ -172,7 +171,7 @@ public class BatchController {
 
     @PutMapping
     @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
-    public SuccessResponse<Void> updateProductsInStorages(@RequestBody CreateProductInStorage request) throws ParseException {
+    public SuccessResponse<Void> updateProductsInStorages(@RequestBody CreateProductInStorageRequest request) throws ParseException {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -207,7 +206,7 @@ public class BatchController {
 
     @PutMapping("/delete")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
-    public SuccessResponse<Void> deleteProductsFromStorage(@RequestBody DeleteProductFromStorageRequest request) throws ParseException {
+    public SuccessResponse<Void> deleteProductsFromStorage(@RequestBody DeleteProductFromStorageRequest request) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
             String exceptionMessage = "Cannot connect to database.";
@@ -224,6 +223,30 @@ public class BatchController {
                 productBatch,
                 storage,
                 0);
+
+        return new SuccessResponse<>(null);
+    }
+
+    @PutMapping("/delete-many")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
+    public SuccessResponse<Void> deleteListOfProductsFromStorages(@RequestBody List<Integer> request) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        for(Integer batch : request) {
+            List<ProductInStorage> productInStorage = productInStorageService.findProductInStorageAllByBatchId(batch);
+
+            for(ProductInStorage product : productInStorage) {
+                productInStorageService.updateProductInStorage(
+                        product.batch(),
+                        product.storage(),
+                        0);
+            }
+        }
 
         return new SuccessResponse<>(null);
     }
