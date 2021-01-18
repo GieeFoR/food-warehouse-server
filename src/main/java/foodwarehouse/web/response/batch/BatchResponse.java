@@ -12,5 +12,6 @@ public record BatchResponse(
         @JsonProperty(value = "product", required = true)           ProductResponse productResponse,
         @JsonProperty(value = "eat_by_date", required = true)       String eatByDate,
         @JsonProperty(value = "discount", required = true)          int discount,
-        @JsonProperty(value = "quantity", required = true)          int quantity) {
+        @JsonProperty(value = "quantity", required = true)          int quantity,
+        @JsonProperty(value = "packages_quantity", required = true) int packagesQuantity) {
 }

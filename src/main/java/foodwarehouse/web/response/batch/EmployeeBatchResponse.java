@@ -13,5 +13,6 @@ public record EmployeeBatchResponse(
         @JsonProperty(value = "product", required = true)           ProductEmployeeResponse productEmployeeResponse,
         @JsonProperty(value = "eat_by_date", required = true)       String eatByDate,
         @JsonProperty(value = "quantity", required = true)          int quantity,
-        @JsonProperty(value = "discount", required = true)          int discount) {
+        @JsonProperty(value = "discount", required = true)          int discount,
+        @JsonProperty(value = "packages_quantity", required = true) int packagesQuantity) {
 }

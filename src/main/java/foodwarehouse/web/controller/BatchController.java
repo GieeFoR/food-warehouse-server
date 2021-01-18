@@ -76,7 +76,8 @@ public class BatchController {
                                 ProductResponse.fromProduct(productInStorage.batch().product()),
                                 sdf.format(productInStorage.batch().eatByDate()),
                                 productInStorage.batch().discount(),
-                                productInStorage.quantity()));
+                                productInStorage.quantity(),
+                                productInStorage.batch().packagesQuantity()));
             }
         }
         return new SuccessResponse<>(result);
@@ -111,7 +112,8 @@ public class BatchController {
                                 ProductEmployeeResponse.fromProduct(productInStorage.batch().product()),
                                 sdf.format(productInStorage.batch().eatByDate()),
                                 productInStorage.quantity(),
-                                productInStorage.batch().discount()));
+                                productInStorage.batch().discount(),
+                                productInStorage.batch().packagesQuantity()));
             }
         }
         return new SuccessResponse<>(result);
