@@ -745,11 +745,8 @@ public class OrderController {
         }
 
         Order order = orderService
-                .findOrders()
-                .stream()
-                .filter(o -> o.payment().paymentId() == id)
-                .findFirst()
-                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+                .findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this id."));
 
         if(!order.state().equals(OrderState.REGISTERED)) {
             throw new RestException("Cannot change state of this order.");
@@ -777,11 +774,8 @@ public class OrderController {
         }
 
         Order order = orderService
-                .findOrders()
-                .stream()
-                .filter(o -> o.payment().paymentId() == id)
-                .findFirst()
-                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+                .findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this id."));
 
         if(!order.state().equals(OrderState.COMPLETING)) {
             throw new RestException("Cannot change state of this order.");
@@ -809,11 +803,8 @@ public class OrderController {
         }
 
         Order order = orderService
-                .findOrders()
-                .stream()
-                .filter(o -> o.payment().paymentId() == id)
-                .findFirst()
-                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+                .findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this id."));
 
         if(!order.state().equals(OrderState.READY_TO_DELIVER)) {
             throw new RestException("Cannot change state of this order.");
@@ -841,11 +832,8 @@ public class OrderController {
         }
 
         Order order = orderService
-                .findOrders()
-                .stream()
-                .filter(o -> o.payment().paymentId() == id)
-                .findFirst()
-                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+                .findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this id."));
 
         if(!order.state().equals(OrderState.OUT_FOR_DELIVERY)) {
             throw new RestException("Cannot change state of this order.");
@@ -873,11 +861,8 @@ public class OrderController {
         }
 
         Order order = orderService
-                .findOrders()
-                .stream()
-                .filter(o -> o.payment().paymentId() == id)
-                .findFirst()
-                .orElseThrow(() -> new RestException("Cannot find order with this payment."));
+                .findOrderById(id)
+                .orElseThrow(() -> new RestException("Cannot find order with this id."));
 
         if(!order.state().equals(OrderState.OUT_FOR_DELIVERY)) {
             throw new RestException("Cannot change state of this order.");
