@@ -1,5 +1,7 @@
 package foodwarehouse.web.controller;
 
+import foodwarehouse.core.data.car.Car;
+import foodwarehouse.core.data.customer.Customer;
 import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.service.CarService;
 import foodwarehouse.core.service.ConnectionService;
@@ -12,6 +14,7 @@ import foodwarehouse.web.request.car.UpdateCarRequest;
 import foodwarehouse.web.response.others.DeleteResponse;
 import foodwarehouse.web.response.car.CarResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/vehicle")
+@RequestMapping("")
 public class CarController {
 
     private final CarService carService;
@@ -35,7 +38,7 @@ public class CarController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping
+    @GetMapping("/vehicle")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<CarResponse>> getCars() {
         //check if database is reachable
@@ -54,7 +57,30 @@ public class CarController {
         return new SuccessResponse<>(cars);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/supplier/vehicle")
+    @PreAuthorize("hasRole('Supplier')")
+    public SuccessResponse<CarResponse> getSupplierCar(Authentication authentication) {
+        //check if database is reachable
+        if(!connectionService.isReachable()) {
+            String exceptionMessage = "Cannot connect to database.";
+            System.out.println(exceptionMessage);
+            throw new DatabaseException(exceptionMessage);
+        }
+
+        Employee employee = employeeService.findEmployeeByUsername(authentication.getName())
+                .orElseThrow(() -> new RestException("Cannot find employee."));
+
+        Car car = carService
+                .findCars()
+                .stream()
+                .filter(o -> o.driver().employeeId() == employee.employeeId())
+                .findFirst()
+                .orElseThrow(() -> new RestException("Cannot find car."));
+
+        return new SuccessResponse<>(CarResponse.fromCar(car));
+    }
+
+    @GetMapping("/vehicle/{id}")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> getCarById(@PathVariable int id) {
         //check if database is reachable
@@ -71,7 +97,7 @@ public class CarController {
                 .orElseThrow(() -> new RestException("Cannot find car with this ID."));
     }
 
-    @PostMapping
+    @PostMapping("/vehicle")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> createCar(@RequestBody CreateCarRequest request) {
         //check if database is reachable
@@ -99,7 +125,7 @@ public class CarController {
                 .orElseThrow(() -> new RestException("Cannot create a new car."));
     }
 
-    @PutMapping
+    @PutMapping("/vehicle")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<CarResponse> updateCar(@RequestBody UpdateCarRequest request) {
         //check if database is reachable
@@ -128,7 +154,7 @@ public class CarController {
                 .orElseThrow(() -> new RestException("Cannot update car."));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/vehicle")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<List<DeleteResponse>> deleteCars(@RequestBody List<Integer> request) {
         //check if database is reachable
@@ -148,7 +174,7 @@ public class CarController {
         return new SuccessResponse<>(result);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/vehicle/{id}")
     @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
     public SuccessResponse<DeleteResponse> deleteCarById(@PathVariable int id) {
         //check if database is reachable

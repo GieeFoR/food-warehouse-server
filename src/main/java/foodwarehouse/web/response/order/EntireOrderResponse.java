@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public record EntireOrderResponse(
         @JsonProperty(value = "order", required = true)         OrderDataResponse orderDataResponse,
         @JsonProperty(value = "products", required = true)      List<OrderProductResponse>orderProductsResponse,
-        @JsonProperty(value = "payment", required = true)       PaymentResponse paymentState,
+        @JsonProperty(value = "payment", required = true)       PaymentResponse paymentResponse,
         @JsonProperty(value = "delivery", required = true)      OrderDeliveryResponse orderDeliveryResponse,
         @JsonProperty(value = "complaints", required = true)    List<CustomerComplaintResponse> complaintsResponse,
         @JsonProperty(value = "customer", required = true)      CustomerDataResponse customerDataResponse) {
