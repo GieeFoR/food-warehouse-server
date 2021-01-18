@@ -36,7 +36,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
     public SuccessResponse<List<EmployeeResponse>> getEmployees() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
@@ -55,7 +55,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Supplier') || hasRole('Employee')")
     public SuccessResponse<EmployeeResponse> getEmployeeById(@PathVariable int id) {
         //check if database is reachable
         if(!connectionService.isReachable()) {
