@@ -28,24 +28,24 @@ public class OrderService {
         return orderRepository.createOrder(payment, customer, delivery, comment);
     }
 
-    public Optional<Order> updateOrderState(
+    public void updateOrderState(
             int orderId,
             Payment payment,
             Customer customer,
             Delivery delivery,
             String comment,
             OrderState orderState) {
-        return orderRepository.updateOrderState(orderId, payment, customer, delivery, comment, orderState);
+        orderRepository.updateOrderState(orderId, payment, customer, delivery, comment, orderState);
     }
 
-    public Optional<Order> updateOrderPayment(
+    public void updateOrderPayment(
             int orderId,
             Payment payment,
             Customer customer,
             Delivery delivery,
             String comment,
             OrderState orderState) {
-        return orderRepository.updateOrderState(orderId, payment, customer, delivery, comment, orderState);
+        orderRepository.updateOrderState(orderId, payment, customer, delivery, comment, orderState);
     }
 
     public boolean deleteOrder(int orderId) {

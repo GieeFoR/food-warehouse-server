@@ -60,7 +60,7 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Optional<Order> updateOrderState(
+    public void updateOrderState(
             int orderId,
             Payment payment,
             Customer customer,
@@ -73,18 +73,14 @@ public class JdbcOrderRepository implements OrderRepository {
             callableStatement.setString(2, orderState.value());
 
             callableStatement.executeQuery();
-            Date orderDate = callableStatement.getDate(3);
-
-            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState, orderDate));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
-            return Optional.empty();
         }
     }
 
     @Override
-    public Optional<Order> updateOrderPayment(
+    public void updateOrderPayment(
             int orderId,
             Payment payment,
             Customer customer,
@@ -97,13 +93,10 @@ public class JdbcOrderRepository implements OrderRepository {
             callableStatement.setInt(2, payment.paymentId());
 
             callableStatement.executeQuery();
-            Date orderDate = callableStatement.getDate(3);
 
-            return Optional.of(new Order(orderId, payment, customer, delivery, comment, orderState, orderDate));
         }
         catch (SQLException sqlException) {
             System.out.println(sqlException.getMessage());
-            return Optional.empty();
         }
     }
 
