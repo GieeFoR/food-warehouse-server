@@ -185,12 +185,6 @@ public class OrderController {
                 .createPayment(paymentType, valueToPay)
                 .orElseThrow(() -> new RestException("Cannot create a new payment."));
 
-        if(payment.paymentType().type().equals("Za pobraniem gotówką") || payment.paymentType().type().equals("Za pobraniem kartą")) {
-            paymentService.updatePaymentState(
-                    payment.paymentId(),
-                    PaymentState.WAITING);
-        }
-
         Address address;
         if(request.isNewAddress()) {
             address = addressService
@@ -221,6 +215,20 @@ public class OrderController {
         Order order = orderService
                 .createOrder(payment, customer, delivery, request.comment())
                 .orElseThrow(() -> new RestException("Cannot create order."));
+
+        if(payment.paymentType().type().equals("Za pobraniem gotówką") || payment.paymentType().type().equals("Za pobraniem kartą")) {
+            paymentService.updatePaymentState(
+                    payment.paymentId(),
+                    PaymentState.WAITING);
+
+            orderService.updateOrderState(
+                    order.orderId(),
+                    order.payment(),
+                    order.customer(),
+                    order.delivery(),
+                    order.comment(),
+                    OrderState.REGISTERED);
+        }
 
         for(int i = 0; i < productBatchesMemoryList.size(); i++) {
             for(int j = 0; j < productBatchesMemoryList.get(i).size(); j++) {
