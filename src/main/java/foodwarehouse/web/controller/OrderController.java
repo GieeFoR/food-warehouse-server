@@ -25,6 +25,7 @@ import foodwarehouse.web.request.order.CreateOrderRequest;
 import foodwarehouse.web.request.order.ProductInOrderData;
 import foodwarehouse.web.response.order.*;
 import foodwarehouse.web.response.others.CancelResponse;
+import foodwarehouse.web.response.payment.PaymentResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -183,6 +184,12 @@ public class OrderController {
         Payment payment = paymentService
                 .createPayment(paymentType, valueToPay)
                 .orElseThrow(() -> new RestException("Cannot create a new payment."));
+
+        if(payment.paymentType().type().equals("Za pobraniem gotówką") || payment.paymentType().type().equals("Za pobraniem kartą")) {
+            paymentService.updatePaymentState(
+                    payment.paymentId(),
+                    PaymentState.WAITING);
+        }
 
         Address address;
         if(request.isNewAddress()) {
@@ -719,7 +726,7 @@ public class OrderController {
                         allQuantities));
     }
 
-    @PutMapping("/order/complieting/{id}")
+    @PutMapping("/order/completing/{id}")
     @PreAuthorize("hasRole('Manager') || hasRole('Admin') || hasRole('Employee')")
     public SuccessResponse<Void> setOrderState_Completing(@PathVariable int id) {
         //check if database is reachable
