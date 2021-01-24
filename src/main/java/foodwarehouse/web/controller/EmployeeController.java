@@ -1,6 +1,5 @@
 package foodwarehouse.web.controller;
 
-import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.user.Permission;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.core.service.ConnectionService;

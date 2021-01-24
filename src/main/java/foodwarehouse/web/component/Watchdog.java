@@ -37,8 +37,6 @@ public class Watchdog {
             return;
         }
 
-
-
         System.out.println("Calculating discounts!");
 
         LocalDate now = LocalDate.now();

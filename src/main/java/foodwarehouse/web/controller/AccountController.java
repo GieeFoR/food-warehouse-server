@@ -15,6 +15,7 @@ import foodwarehouse.web.request.user.UpdateUserRequest;
 import foodwarehouse.web.response.account.NameResponse;
 import foodwarehouse.web.response.address.AddressResponse;
 import foodwarehouse.web.response.customer.CustomerResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
