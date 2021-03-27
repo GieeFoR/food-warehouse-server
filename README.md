@@ -1,4 +1,4 @@
-# projekt-java-server
+# food-warehouse-server
 
 ## Description
 
