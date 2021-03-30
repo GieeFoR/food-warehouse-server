@@ -3,7 +3,7 @@
 ## Brief Description
 
 We want to design an application that will support and facilitate the process of managing a food warehouse.
-This is the `server-side` of our application.
+This is the `server-side` of our application. Client side of project can be found [here](https://github.com/A640/food-warehouse-client)
 
 The aim of the project is to design and create a management system for
 food warehouse. It should facilitate warehouse management
