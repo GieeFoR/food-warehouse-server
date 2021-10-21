@@ -1,0 +1,5 @@
+UPDATE `MAKER`
+SET `FIRM_NAME` = ?,
+    `TELEPHONE_NO` = ?,
+    `E_MAIL` = ?
+WHERE `MAKER_ID` = ?;

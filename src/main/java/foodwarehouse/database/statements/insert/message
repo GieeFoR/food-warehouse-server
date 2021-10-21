@@ -1,0 +1,11 @@
+INSERT INTO `MESSAGE`(
+    `SENDER_ID`,
+    `RECEIVER_ID`,
+    `CONTENT`,
+    `MESSAGE_STATE`,
+    `SEND_DATE`,
+    `READ_DATE`)
+VALUES(?,?,?,
+    "SENT",
+    CURRENT_DATE(),
+    NULL);

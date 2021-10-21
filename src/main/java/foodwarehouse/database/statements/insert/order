@@ -1,0 +1,10 @@
+INSERT INTO `ORDER`(
+    `PAYMENT_ID`,
+    `CUSTOMER_ID`,
+    `DELIVERY_ID`,
+    `COMMENT`,
+    `ORDER_STATE`,
+    `ORDER_DATE`)
+VALUES(?,?,?,?
+    "PENDING",
+    CURRENT_DATE());

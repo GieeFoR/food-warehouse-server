@@ -1,0 +1,6 @@
+UPDATE `EMPLOYEE`
+SET `NAME` = ?,
+    `SURNAME` = ?,
+    `POSITION` = ?,
+    `SALARY` = ?
+WHERE `EMPLOYEE_ID` = ?;

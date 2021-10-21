@@ -1,0 +1,7 @@
+INSERT INTO `EMPLOYEE`(
+    `USER_ID`,
+    `NAME`,
+    `SURNAME`,
+    `POSITION`,
+    `SALARY`)
+VALUES(?,?,?,?,?);

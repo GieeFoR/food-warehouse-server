@@ -8,6 +8,7 @@ import foodwarehouse.core.data.order.OrderState;
 import foodwarehouse.core.data.payment.Payment;
 import foodwarehouse.database.rowmappers.DeliveryResultSetMapper;
 import foodwarehouse.database.rowmappers.OrderResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.CarTable;
 import foodwarehouse.database.tables.DeliveryTable;
 import foodwarehouse.database.tables.OrderTable;
@@ -16,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,17 +42,17 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.INSERT);
-            callableStatement.setInt(1, payment.paymentId());
-            callableStatement.setInt(2, customer.customerId());
-            callableStatement.setInt(3, delivery.deliveryId());
-            callableStatement.setString(4, comment);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("order"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, payment.paymentId());
+            statement.setInt(2, customer.customerId());
+            statement.setInt(3, delivery.deliveryId());
+            statement.setString(4, comment);
 
-            callableStatement.executeQuery();
-            int orderId = callableStatement.getInt(5);
+            statement.executeUpdate();
+            int orderId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new Order(orderId, payment, customer, delivery, comment, OrderState.PENDING, new Date()));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -68,13 +67,13 @@ public class JdbcOrderRepository implements OrderRepository {
             String comment,
             OrderState orderState) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.UPDATE_STATE);
-            callableStatement.setInt(1, orderId);
-            callableStatement.setString(2, orderState.value());
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("order_state"));
+            statement.setString(1, orderState.value());
+            statement.setInt(2, orderId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
     }
@@ -88,14 +87,13 @@ public class JdbcOrderRepository implements OrderRepository {
             String comment,
             OrderState orderState) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.UPDATE_PAYMENT);
-            callableStatement.setInt(1, orderId);
-            callableStatement.setInt(2, payment.paymentId());
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("order_payment"));
+            statement.setInt(1, payment.paymentId());
+            statement.setInt(2, orderId);
 
-            callableStatement.executeQuery();
-
+            statement.executeUpdate();
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
     }
@@ -103,13 +101,13 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public boolean deleteOrder(int orderId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.DELETE);
-            callableStatement.setInt(1, orderId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("order"));
+            statement.setInt(1, orderId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return true;
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return false;
         }
@@ -118,17 +116,17 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public Optional<Order> findOrderById(int orderId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, orderId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_byId"));
+            statement.setInt(1, orderId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Order order = null;
             if(resultSet.next()) {
                 order = new OrderResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(order);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -138,14 +136,14 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findOrders() {
         List<Order> orders = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return orders;
@@ -155,15 +153,15 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findCustomerOrders(int customerId) {
         List<Order> orders = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_CUSTOMER_ALL);
-            callableStatement.setInt(1, customerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_byCustomerId"));
+            statement.setInt(1, customerId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return orders;
@@ -172,16 +170,16 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public int amountOfOrdersBetween(String startDate, String endDate) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.STATISTICS);
-            callableStatement.setString(1, startDate);
-            callableStatement.setString(2, endDate);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_amountBetween"));
+            statement.setString(1, startDate);
+            statement.setString(2, endDate);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
                 return resultSet.getInt(1);
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return -1;
@@ -191,16 +189,16 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findOrdersBetweenDates(String startDate, String endDate) {
         List<Order> orders = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.FIND_BETWEEN_DATES);
-            callableStatement.setString(1, startDate);
-            callableStatement.setString(2, endDate);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_between"));
+            statement.setString(1, startDate);
+            statement.setString(2, endDate);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return orders;
@@ -210,15 +208,15 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findSupplierActiveOrders(int employeeId) {
         List<Order> orders = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(OrderTable.Procedures.READ_SUPPLIER_ACTIVE);
-            callableStatement.setInt(1, employeeId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_supplierActive"));
+            statement.setInt(1, employeeId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 orders.add(new OrderResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return orders;

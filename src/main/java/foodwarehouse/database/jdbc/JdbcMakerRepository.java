@@ -6,6 +6,7 @@ import foodwarehouse.core.data.maker.Maker;
 import foodwarehouse.core.data.maker.MakerRepository;
 import foodwarehouse.database.rowmappers.CarResultSetMapper;
 import foodwarehouse.database.rowmappers.MakerResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.CarTable;
 import foodwarehouse.database.tables.MakerTable;
 import foodwarehouse.web.error.RestException;
@@ -13,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -44,17 +43,17 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(MakerTable.Procedures.INSERT);
-            callableStatement.setInt(1, address.addressId());
-            callableStatement.setString(2, name);
-            callableStatement.setString(3, phone);
-            callableStatement.setString(4, email);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("maker"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, address.addressId());
+            statement.setString(2, name);
+            statement.setString(3, phone);
+            statement.setString(4, email);
 
-            callableStatement.executeQuery();
-            int makerId = callableStatement.getInt(5);
+            statement.executeUpdate();
+            int makerId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new Maker(makerId, address, name, phone, email));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -68,17 +67,17 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(MakerTable.Procedures.UPDATE);
-            callableStatement.setInt(1, makerId);
-            callableStatement.setString(2, name);
-            callableStatement.setString(3, phone);
-            callableStatement.setString(4, email);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("maker"));
+            statement.setString(1, name);
+            statement.setString(2, phone);
+            statement.setString(3, email);
+            statement.setInt(4, makerId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
 
             return Optional.of(new Maker(makerId, address, name, phone, email));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -86,13 +85,13 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public boolean deleteMaker(int makerId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MakerTable.Procedures.DELETE);
-            callableStatement.setInt(1, makerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("maker"));
+            statement.setInt(1, makerId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return true;
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return false;
         }
     }
@@ -100,17 +99,17 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public Optional<Maker> findMakerById(int makerId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MakerTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, makerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker_byId"));
+            statement.setInt(1, makerId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Maker maker = null;
             if(resultSet.next()) {
                 maker = new MakerResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(maker);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -119,14 +118,14 @@ public class JdbcMakerRepository implements MakerRepository {
     public List<Maker> findMakers() {
         List<Maker> makers = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(MakerTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 makers.add(new MakerResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             sqlException.getMessage();
         }
         return makers;

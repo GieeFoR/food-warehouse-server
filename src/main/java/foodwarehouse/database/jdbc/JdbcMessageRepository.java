@@ -6,6 +6,7 @@ import foodwarehouse.core.data.message.Message;
 import foodwarehouse.core.data.message.MessageRepository;
 import foodwarehouse.database.rowmappers.MakerResultSetMapper;
 import foodwarehouse.database.rowmappers.MessageResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.MakerTable;
 import foodwarehouse.database.tables.MessageTable;
 import foodwarehouse.web.error.RestException;
@@ -13,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,33 +39,32 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> createMessage(Employee sender, Employee receiver, String content) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.INSERT);
-            callableStatement.setInt(1, sender.employeeId());
-            callableStatement.setInt(2, receiver.employeeId());
-            callableStatement.setString(3, content);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("message"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, sender.employeeId());
+            statement.setInt(2, receiver.employeeId());
+            statement.setString(3, content);
 
-            callableStatement.executeQuery();
-            int messageId = callableStatement.getInt(4);
+            statement.executeUpdate();
+            int messageId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new Message(messageId, sender, receiver, content, "SENT", new Date(), null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
-    public Optional<Message> updateMessageContent(int messageId, Employee sender, Employee receiver, String content) {
+    public Optional<Message> updateMessageContent(int messageId, Employee sender, Employee receiver, String content, Date sendDate) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.UPDATE_CONTENT);
-            callableStatement.setInt(1, messageId);
-            callableStatement.setString(2, content);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("message"));
+            statement.setString(1, content);
+            statement.setInt(2, messageId);
 
-            callableStatement.executeQuery();
-            Date sendDate = callableStatement.getTimestamp(3);
+            statement.executeUpdate();
             return Optional.of(new Message(messageId, sender, receiver, content, "SENT", sendDate, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -75,12 +73,12 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public void updateMessageRead(int messageId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.UPDATE_READ);
-            callableStatement.setInt(1, messageId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("message_read"));
+            statement.setInt(1, messageId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
     }
@@ -88,13 +86,13 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public boolean deleteMessage(int messageId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.DELETE);
-            callableStatement.setInt(1, messageId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("message"));
+            statement.setInt(1, messageId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return true;
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return false;
         }
@@ -103,17 +101,17 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> findMessageById(int messageId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, messageId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_byId"));
+            statement.setInt(1, messageId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Message message = null;
             if(resultSet.next()) {
                 message = new MessageResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(message);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -123,14 +121,14 @@ public class JdbcMessageRepository implements MessageRepository {
     public List<Message> findAllMessages() {
         List<Message> messages = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_ALL);
-            ResultSet resultSet = callableStatement.executeQuery();
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message"));
+            ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 messages.add(new MessageResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             messages = null;
         }
@@ -141,15 +139,16 @@ public class JdbcMessageRepository implements MessageRepository {
     public List<Message> findEmployeeMessages(int employeeId) {
         List<Message> messages = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.READ_EMPLOYEE_ALL);
-            callableStatement.setInt(1, employeeId);
-            ResultSet resultSet = callableStatement.executeQuery();
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_byEmployeeId"));
+            statement.setInt(1, employeeId);
+            statement.setInt(2, employeeId);
+            ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 messages.add(new MessageResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             messages = null;
         }
@@ -160,15 +159,15 @@ public class JdbcMessageRepository implements MessageRepository {
     public int countUnreadReceivedMessages(int employeeId) {
         int result = 0;
         try {
-            CallableStatement callableStatement = connection.prepareCall(MessageTable.Procedures.COUNT_UNREAD_RECEIVED);
-            callableStatement.setInt(1, employeeId);
-            ResultSet resultSet = callableStatement.executeQuery();
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_countEmployeeUnread"));
+            statement.setInt(1, employeeId);
+            ResultSet resultSet = statement.executeQuery();
 
             if(resultSet.next()) {
                 return resultSet.getInt("RESULT");
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return result;

@@ -1,0 +1,6 @@
+INSERT INTO `MAKER`(
+    `ADDRESS_ID`,
+    `FIRM_NAME`,
+    `TELEPHONE_NO`,
+    `E_MAIL`)
+VALUES(?,?,?,?);
