@@ -1,0 +1,6 @@
+UPDATE `STORAGE`
+SET `MANAGER_ID` = ?,
+    `STORAGE_NAME` = ?,
+    `CAPACITY` = ?,
+    `IS_COLD_STORAGE` = ?
+WHERE `STORAGE_ID` = ?;

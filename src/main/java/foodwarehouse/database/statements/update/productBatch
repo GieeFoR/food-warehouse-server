@@ -1,0 +1,6 @@
+UPDATE `PRODUCT_BATCH`
+SET `BATCH_NO` = ?,
+    `EAT_BY_DATE` = ?,
+    `DISCOUNT` = ?,
+    `PACKAGES_QUANTITY` = ?
+WHERE `BATCH_ID` = ?;

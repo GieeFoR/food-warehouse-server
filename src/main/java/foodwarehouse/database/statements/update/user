@@ -1,0 +1,11 @@
+UPDATE `USER`
+SET `USERNAME` = ?,
+    `PERMISSION` = ?,
+    `E_MAIL` = ?
+WHERE `USER_ID` = ?;
+
+IF `IN_PASSWORD` != "" THEN
+    UPDATE `USER`
+    SET	`PASSWORD` = ?
+    WHERE `USER_ID` = ?;
+END IF;

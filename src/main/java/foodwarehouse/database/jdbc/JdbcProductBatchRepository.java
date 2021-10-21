@@ -5,6 +5,7 @@ import foodwarehouse.core.data.productBatch.ProductBatch;
 import foodwarehouse.core.data.productBatch.ProductBatchRepository;
 import foodwarehouse.database.rowmappers.ProductBatchResultSetMapper;
 import foodwarehouse.database.rowmappers.ProductResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.ProductBatchTable;
 import foodwarehouse.database.tables.ProductTable;
 import foodwarehouse.web.error.RestException;
@@ -12,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,17 +43,17 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
             int quantity) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.INSERT);
-            callableStatement.setInt(1, product.productId());
-            callableStatement.setInt(2, batchNo);
-            callableStatement.setDate(3, new java.sql.Date(eatByDate.getTime()));
-            callableStatement.setInt(4, quantity);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("productBatch"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, product.productId());
+            statement.setInt(2, batchNo);
+            statement.setDate(3, new java.sql.Date(eatByDate.getTime()));
+            statement.setInt(4, quantity);
 
-            callableStatement.executeQuery();
-            int productBatchId = callableStatement.getInt(5);
+            statement.executeUpdate();
+            int productBatchId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new ProductBatch(productBatchId, product, batchNo, eatByDate, 0, quantity));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -70,17 +69,18 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
             int quantity) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.UPDATE);
-            callableStatement.setInt(1, productBatchId);
-            callableStatement.setInt(2, batchNo);
-            callableStatement.setInt(3, discount);
-            callableStatement.setDate(4, new java.sql.Date(eatByDate.getTime()));
-            callableStatement.setInt(5, quantity);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("productBatch"));
+            statement.setInt(1, batchNo);
+            statement.setInt(2, discount);
+            statement.setDate(3, new java.sql.Date(eatByDate.getTime()));
+            statement.setInt(4, quantity);
+            statement.setInt(5, productBatchId);
 
-            callableStatement.executeQuery();
+
+            statement.executeUpdate();
             return Optional.of(new ProductBatch(productBatchId, product, batchNo, eatByDate, discount, quantity));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -89,13 +89,13 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     @Override
     public boolean deleteProductBatch(int productBatchId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.DELETE);
-            callableStatement.setInt(1, productBatchId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("productBatch"));
+            statement.setInt(1, productBatchId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return true;
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return false;
         }
     }
@@ -103,17 +103,17 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     @Override
     public Optional<ProductBatch> findProductBatchById(int productBatchId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, productBatchId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byId"));
+            statement.setInt(1, productBatchId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             ProductBatch productBatch = null;
             if(resultSet.next()) {
                 productBatch = new ProductBatchResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(productBatch);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -122,14 +122,14 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatches() {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 productBatches.add(new ProductBatchResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             sqlException.getMessage();
         }
         return productBatches;
@@ -139,15 +139,15 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatchesByProductId(int productId) {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_BY_PRODUCT_ID);
-            callableStatement.setInt(1, productId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byProductId"));
+            statement.setInt(1, productId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 productBatches.add(new ProductBatchResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             sqlException.getMessage();
         }
         return productBatches;
@@ -157,15 +157,15 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatchesWithDiscountAndProductId(int productId) {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.READ_ALL_WITH_DISCOUNT_BY_PRODUCT_ID);
-            callableStatement.setInt(1, productId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byProductIdWithDiscount"));
+            statement.setInt(1, productId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 productBatches.add(new ProductBatchResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             sqlException.getMessage();
         }
         return productBatches;
@@ -175,15 +175,15 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public int countProductBatchAmount(int productBatchId) {
         int result = 0;
         try {
-            CallableStatement callableStatement = connection.prepareCall(ProductBatchTable.Procedures.COUNT_PRODUCT_BATCH_QUANTITY);
-            callableStatement.setInt(1, productBatchId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_quantityById"));
+            statement.setInt(1, productBatchId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
                 result = resultSet.getInt("RESULT");
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return result;

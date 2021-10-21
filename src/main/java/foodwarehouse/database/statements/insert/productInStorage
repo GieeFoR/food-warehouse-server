@@ -1,0 +1,5 @@
+INSERT INTO `PRODUCT_IN_STORAGE`(
+    `BATCH_ID`,
+    `STORAGE_ID`,
+    `QUANTITY`)
+VALUES(?,?,?);

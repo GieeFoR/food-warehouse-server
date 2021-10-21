@@ -1,0 +1,6 @@
+INSERT INTO `USER`(
+    `USERNAME`,
+    `PASSWORD`,
+    `PERMISSION`,
+    `E_MAIL`)
+VALUES(?,?,?,?);

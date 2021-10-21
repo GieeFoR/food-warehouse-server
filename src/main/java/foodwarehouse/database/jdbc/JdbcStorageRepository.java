@@ -6,16 +6,15 @@ import foodwarehouse.core.data.storage.Storage;
 import foodwarehouse.core.data.storage.StorageRepository;
 import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
 import foodwarehouse.database.rowmappers.StorageResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.StorageTable;
 import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -44,19 +43,19 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.INSERT);
-            callableStatement.setInt(1, address.addressId());
-            callableStatement.setInt(2, manager.employeeId());
-            callableStatement.setString(3, name);
-            callableStatement.setInt(4, capacity);
-            callableStatement.setBoolean(5, isColdStorage);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("storage"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, address.addressId());
+            statement.setInt(2, manager.employeeId());
+            statement.setString(3, name);
+            statement.setInt(4, capacity);
+            statement.setBoolean(5, isColdStorage);
 
-            callableStatement.executeQuery();
-            int storageId = callableStatement.getInt(6);
+            statement.executeUpdate();
+            int storageId = statement.getGeneratedKeys().getInt(1);
 
             return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -71,17 +70,17 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.UPDATE);
-            callableStatement.setInt(1, storageId);
-            callableStatement.setInt(2, manager.employeeId());
-            callableStatement.setString(3, name);
-            callableStatement.setInt(4, capacity);
-            callableStatement.setBoolean(5, isColdStorage);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("storage"));
+            statement.setInt(1, manager.employeeId());
+            statement.setString(2, name);
+            statement.setInt(3, capacity);
+            statement.setBoolean(4, isColdStorage);
+            statement.setInt(5, storageId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -90,14 +89,14 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public boolean deleteStorage(int storageId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.DELETE);
-            callableStatement.setInt(1, storageId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("storage"));
+            statement.setInt(1, storageId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
 
             return true;
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return false;
         }
     }
@@ -106,15 +105,15 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findAllStorages() {
         List<Storage> storages = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             storages = null;
         }
 
@@ -124,17 +123,17 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public Optional<Storage> findStorage(int storageId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, storageId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byId"));
+            statement.setInt(1, storageId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Storage storage = null;
             if(resultSet.next()) {
                 storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(storage);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -142,17 +141,18 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public Optional<Storage> findStorageByBatchId(int batchId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_BY_BATCH_ID);
-            callableStatement.setInt(1, batchId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byBatchId"));
+            statement.setInt(1, batchId);
+            statement.setInt(2, batchId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Storage storage = null;
             if(resultSet.next()) {
                 storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(storage);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -161,15 +161,15 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findStoragesRunningOutOfSpace() {
         List<Storage> storages = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(StorageTable.Procedures.READ_RUNNING_OUT_OF_SPACE);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_runningOutOfSpace"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             storages = null;
         }
         return storages;

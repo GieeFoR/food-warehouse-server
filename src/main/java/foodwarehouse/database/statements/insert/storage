@@ -1,0 +1,7 @@
+INSERT INTO `STORAGE`(
+    `ADDRESS_ID`,
+    `MANAGER_ID`,
+    `STORAGE_NAME`,
+    `CAPACITY`,
+    `IS_COLD_STORAGE`)
+VALUES(?,?,?,?,?);

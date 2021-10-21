@@ -1,0 +1,5 @@
+INSERT INTO `PRODUCT_ORDER`(
+    `ORDER_ID`,
+    `BATCH_ID`,
+    `QUANTITY`)
+VALUES(?,?,?);

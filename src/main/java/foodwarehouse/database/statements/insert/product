@@ -1,0 +1,11 @@
+INSERT INTO `PRODUCT`(
+    `MAKER_ID`,
+    `PRODUCT_NAME`,
+    `SHORT_DESCRIPTION`,
+    `LONG_DESCRIPTION`,
+    `CATEGORY`,
+    `NEED_COLD_STORAGE`,
+    `BUY_PRICE`,
+    `SELL_PRICE`,
+    `IMAGE`)
+VALUES(?,?,?,?,?,?,?,?,?);
