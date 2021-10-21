@@ -24,15 +24,11 @@ public class JdbcConnectionRepository implements ConnectionRepository {
         final String CHECK_SQL_QUERY = "SELECT 1";
         boolean isConnected = true;
         try {
-            jdbcTemplate.update(connection -> {
-                final PreparedStatement statement = connection.prepareStatement(CHECK_SQL_QUERY);
-                return statement;
-            });
+            jdbcTemplate.update(connection -> connection.prepareStatement(CHECK_SQL_QUERY));
         } catch (CannotGetJdbcConnectionException e) {
             isConnected = false;
         }
-        finally {
-            return isConnected;
-        }
+
+        return isConnected;
     }
 }

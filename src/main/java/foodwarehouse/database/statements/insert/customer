@@ -1,0 +1,10 @@
+INSERT INTO `CUSTOMER`(
+    `USER_ID`,
+    `ADDRESS_ID`,
+    `NAME`,
+    `SURNAME`,
+    `FIRM_NAME`,
+    `TELEPHONE_NO`,
+    `TAX_ID`,
+    `DISCOUNT`)
+VALUES(?,?,?,?,?,?,?,NULL);

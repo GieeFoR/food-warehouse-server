@@ -1,0 +1,9 @@
+INSERT INTO `CAR`(
+    `DRIVER_ID`,
+    `BRAND`,
+    `MODEL`,
+    `YEAR_OF_PROD`,
+    `REGISTRATION_NO`,
+    `INSURANCE_EXP`,
+    `INSPECTION_EXP`)
+VALUES(?,?,?,?,?,?,?);

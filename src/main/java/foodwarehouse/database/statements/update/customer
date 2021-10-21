@@ -1,0 +1,8 @@
+UPDATE `CUSTOMER`
+SET `NAME` = ?,
+    `SURNAME` = ?,
+    `FIRM_NAME` = ?,
+    `TELEPHONE_NO` = ?,
+    `TAX_ID` = ?,
+    `DISCOUNT` = ?
+WHERE `CUSTOMER_ID` = ?;

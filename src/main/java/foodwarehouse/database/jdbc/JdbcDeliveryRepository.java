@@ -7,6 +7,7 @@ import foodwarehouse.core.data.delivery.DeliveryRepository;
 import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.database.rowmappers.CarResultSetMapper;
 import foodwarehouse.database.rowmappers.DeliveryResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.CarTable;
 import foodwarehouse.database.tables.DeliveryTable;
 import foodwarehouse.web.error.RestException;
@@ -14,10 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,15 +40,15 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> createDelivery(Address address, Employee supplier) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.INSERT);
-            callableStatement.setInt(1, address.addressId());
-            callableStatement.setInt(2, supplier.employeeId());
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("deliery"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, address.addressId());
+            statement.setInt(2, supplier.employeeId());
 
-            callableStatement.executeQuery();
-            int deliveryId = callableStatement.getInt(3);
+            statement.executeUpdate();
+            int deliveryId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new Delivery(deliveryId, address, supplier, null, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -58,16 +57,16 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateDelivery(int deliveryId, Address address, Employee supplier) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.UPDATE_DELIVERY);
-            callableStatement.setInt(1, deliveryId);
-            callableStatement.setInt(2, address.addressId());
-            callableStatement.setInt(3, supplier.employeeId());
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery"));
+            statement.setInt(1, address.addressId());
+            statement.setInt(2, supplier.employeeId());
+            statement.setInt(3, deliveryId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
 
             return Optional.of(new Delivery(deliveryId, address, supplier, null, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -76,15 +75,15 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateRemoveDate(int deliveryId, Address address, Employee supplier, Date date) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.UPDATE_REMOVE);
-            callableStatement.setInt(1, deliveryId);
-            callableStatement.setDate(2, new java.sql.Date(date.getTime()));
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery_removeDate"));
+            statement.setDate(1, new java.sql.Date(date.getTime()));
+            statement.setInt(2, deliveryId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
 
             return Optional.of(new Delivery(deliveryId, address, supplier, date, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -93,15 +92,15 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateCompleteDate(int deliveryId, Address address, Employee supplier, Date date) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.UPDATE_COMPLETE);
-            callableStatement.setInt(1, deliveryId);
-            callableStatement.setDate(2, new java.sql.Date(date.getTime()));
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery_completeDate"));
+            statement.setDate(1, new java.sql.Date(date.getTime()));
+            statement.setInt(2, deliveryId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
 
             return Optional.of(new Delivery(deliveryId, address, supplier, date, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -113,7 +112,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
             CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.DELETE);
             callableStatement.setInt(1, deliveryId);
 
-            callableStatement.executeQuery();
+            callableStatement.executeUpdate();
             return true;
         }
         catch (SQLException sqlException) {
@@ -124,17 +123,17 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> findDeliveryById(int deliveryId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(DeliveryTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, deliveryId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("delivery_byId"));
+            statement.setInt(1, deliveryId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Delivery delivery = null;
             if(resultSet.next()) {
                 delivery = new DeliveryResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(delivery);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -143,14 +142,14 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     public List<Delivery> findDeliveries() {
         List<Delivery> deliveries = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(CarTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("delivery"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 deliveries.add(new DeliveryResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             sqlException.getMessage();
         }
         return deliveries;

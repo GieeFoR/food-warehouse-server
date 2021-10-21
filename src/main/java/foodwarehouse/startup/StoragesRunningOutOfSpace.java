@@ -13,6 +13,7 @@ public class StoragesRunningOutOfSpace {
     private final static List<Storage> runningOutOfSpace = new LinkedList<>();
 
     public static void storeRunningOutOfSpace(List<Storage> storages) {
+        if(storages == null) return;
         runningOutOfSpace.addAll(storages);
     }
 

@@ -1,0 +1,12 @@
+INSERT INTO `foodwarehouse`.`COMPLAINT`(
+    `ORDER_ID`,
+    `CONTENT`,
+    `SEND_DATE`,
+    `COMPLAINT_STATE`,
+    `DECISION`,
+    `DECISION_DATE`)
+VALUES(?,?,
+    CURRENT_DATE(),
+    "REGISTERED",
+    NULL,
+    NULL);

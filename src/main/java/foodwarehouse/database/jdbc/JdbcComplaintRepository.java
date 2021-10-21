@@ -5,16 +5,15 @@ import foodwarehouse.core.data.complaint.ComplaintRepository;
 import foodwarehouse.core.data.complaint.ComplaintState;
 import foodwarehouse.core.data.order.Order;
 import foodwarehouse.database.rowmappers.ComplaintResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.ComplaintTable;
 import foodwarehouse.web.error.RestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileNotFoundException;
+import java.sql.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,15 +37,15 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public Optional<Complaint> createComplaint(Order order, String content) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.INSERT);
-            callableStatement.setInt(1, order.orderId());
-            callableStatement.setString(2, content);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("complaint"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, order.orderId());
+            statement.setString(2, content);
+            statement.executeUpdate();
 
-            callableStatement.executeQuery();
-            int complaintId = callableStatement.getInt(3);
+            int complaintId = statement.getGeneratedKeys().getInt(1);
             return Optional.of(new Complaint(complaintId, order, content, new Date(), ComplaintState.REGISTERED, null, null));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -55,17 +54,17 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public Optional<Complaint> findComplaintById(int complaintId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, complaintId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byId"));
+            statement.setInt(1, complaintId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Complaint complaint = null;
             if(resultSet.next()) {
                 complaint = new ComplaintResultSetMapper().resultSetMap(resultSet, "");
             }
             return Optional.ofNullable(complaint);
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
             return Optional.empty();
         }
@@ -75,14 +74,14 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findComplaints() {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return complaints;
@@ -92,15 +91,15 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findCustomerComplaints(int customerId) {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_CUSTOMER_COMPLAINTS);
-            callableStatement.setInt(1, customerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byCustomerId"));
+            statement.setInt(1, customerId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return complaints;
@@ -109,12 +108,13 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public void cancelComplaint(int complaintId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.CANCEL);
-            callableStatement.setInt(1, complaintId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_cancel"));
+            statement.setInt(1, complaintId);
+            statement.setInt(2, complaintId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
 
         }
@@ -123,14 +123,15 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.UPDATE_STATE);
-            callableStatement.setInt(1, complaintId);
-            callableStatement.setString(2, decision);
-            callableStatement.setString(3, complaintState.value());
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_decision"));
+            statement.setInt(1, complaintId);
+            statement.setString(2, decision);
+            statement.setString(3, complaintState.value());
+            statement.setInt(4, complaintId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
     }
@@ -139,15 +140,15 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findOrderComplaints(int orderId) {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(ComplaintTable.Procedures.READ_BY_ORDER_ID);
-            callableStatement.setInt(1, orderId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byOrderId"));
+            statement.setInt(1, orderId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             System.out.println(sqlException.getMessage());
         }
         return complaints;

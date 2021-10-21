@@ -1,0 +1,8 @@
+INSERT INTO `ADDRESS`(
+    `COUNTRY`,
+    `TOWN`,
+    `POSTAL_CODE`,
+    `BUILDING_NO`,
+    `STREET`,
+    `APARTMENT_NO`)
+VALUES(?,?,?,?,?,?);

@@ -1,0 +1,8 @@
+UPDATE `ADDRESS`
+SET `COUNTRY` = ?,
+    `TOWN` = ?,
+    `POSTAL_CODE` = ?,
+    `BUILDING_NO` = ?,
+    `STREET` = ?,
+    `APARTMENT_NO` = ?
+WHERE `ADDRESS_ID` = ?;

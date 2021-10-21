@@ -7,6 +7,7 @@ import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.user.User;
 import foodwarehouse.database.rowmappers.CustomerResultSetMapper;
 import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
+import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.CustomerTable;
 import foodwarehouse.database.tables.EmployeeTable;
 import foodwarehouse.web.error.RestException;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,21 +39,21 @@ public class JdbcCustomerRepository implements CustomerRepository {
     @Override
     public Optional<Customer> createCustomer(User user, Address address, String name, String surname, String firmName, String phoneNumber, String taxId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.INSERT);
-            callableStatement.setInt(1, user.userId());
-            callableStatement.setInt(2, address.addressId());
-            callableStatement.setString(3, name);
-            callableStatement.setString(4, surname);
-            callableStatement.setString(5, firmName);
-            callableStatement.setString(6, phoneNumber);
-            callableStatement.setString(7, taxId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("customer"), Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, user.userId());
+            statement.setInt(2, address.addressId());
+            statement.setString(3, name);
+            statement.setString(4, surname);
+            statement.setString(5, firmName);
+            statement.setString(6, phoneNumber);
+            statement.setString(7, taxId);
 
-            callableStatement.executeQuery();
-            int customerId = callableStatement.getInt(8);
+            statement.executeUpdate();
+            int customerId = statement.getGeneratedKeys().getInt(1);
 
             return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, 0));
         }
-        catch (SQLException sqlException) {
+        catch (SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -69,20 +71,19 @@ public class JdbcCustomerRepository implements CustomerRepository {
             int discount) {
 
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.UPDATE);
-            callableStatement.setInt(1, customerId);
-            callableStatement.setString(2, name);
-            callableStatement.setString(3, surname);
-            callableStatement.setString(4, firmName);
-            callableStatement.setString(5, phoneNumber);
-            callableStatement.setString(6, taxId);
-            callableStatement.setInt(7, discount);
-
-            callableStatement.executeQuery();
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("customer"));
+            statement.setString(1, name);
+            statement.setString(2, surname);
+            statement.setString(3, firmName);
+            statement.setString(4, phoneNumber);
+            statement.setString(5, taxId);
+            statement.setInt(6, discount);
+            statement.setInt(7, customerId);
+            statement.executeUpdate();
 
             return Optional.of(new Customer(customerId, user, address, name, surname, firmName, phoneNumber, taxId, discount));
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -90,13 +91,13 @@ public class JdbcCustomerRepository implements CustomerRepository {
     @Override
     public boolean deleteCustomer(int customerId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.DELETE);
-            callableStatement.setInt(1, customerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("customer"));
+            statement.setInt(1, customerId);
 
-            callableStatement.executeQuery();
+            statement.executeUpdate();
             return true;
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             return false;
         }
     }
@@ -105,14 +106,14 @@ public class JdbcCustomerRepository implements CustomerRepository {
     public List<Customer> findAllCustomers() {
         List<Customer> customers = new LinkedList<>();
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_ALL);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("customer"));
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 customers.add(new CustomerResultSetMapper().resultSetMap(resultSet, ""));
             }
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             customers = null;
         }
         return customers;
@@ -121,10 +122,10 @@ public class JdbcCustomerRepository implements CustomerRepository {
     @Override
     public Optional<Customer> findCustomerById(int customerId) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_BY_ID);
-            callableStatement.setInt(1, customerId);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("customer_byId"));
+            statement.setInt(1, customerId);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Customer customer = null;
             if(resultSet.next()) {
                 customer = new CustomerResultSetMapper().resultSetMap(resultSet, "");
@@ -132,7 +133,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             return Optional.ofNullable(customer);
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
@@ -140,10 +141,10 @@ public class JdbcCustomerRepository implements CustomerRepository {
     @Override
     public Optional<Customer> findCustomerByUsername(String username) {
         try {
-            CallableStatement callableStatement = connection.prepareCall(CustomerTable.Procedures.READ_BY_USERNAME);
-            callableStatement.setString(1, username);
+            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("customer_byUsername"));
+            statement.setString(1, username);
 
-            ResultSet resultSet = callableStatement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             Customer customer = null;
             if(resultSet.next()) {
                 customer = new CustomerResultSetMapper().resultSetMap(resultSet, "");
@@ -151,7 +152,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             return Optional.ofNullable(customer);
         }
-        catch(SQLException sqlException) {
+        catch(SQLException | FileNotFoundException sqlException) {
             return Optional.empty();
         }
     }
