@@ -48,7 +48,7 @@ public class JdbcStorageRepository implements StorageRepository {
             statement.setInt(2, manager.employeeId());
             statement.setString(3, name);
             statement.setInt(4, capacity);
-            statement.setBoolean(5, isColdStorage);
+            statement.setString(5, isColdStorage?"Y" : "N");
 
             statement.executeUpdate();
             int storageId = statement.getGeneratedKeys().getInt(1);
@@ -74,7 +74,7 @@ public class JdbcStorageRepository implements StorageRepository {
             statement.setInt(1, manager.employeeId());
             statement.setString(2, name);
             statement.setInt(3, capacity);
-            statement.setBoolean(4, isColdStorage);
+            statement.setString(4, isColdStorage?"Y" : "N");
             statement.setInt(5, storageId);
 
             statement.executeUpdate();

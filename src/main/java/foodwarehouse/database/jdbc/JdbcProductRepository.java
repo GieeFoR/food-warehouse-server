@@ -55,7 +55,7 @@ public class JdbcProductRepository implements ProductRepository {
             statement.setString(3, shortDesc);
             statement.setString(4, longDesc);
             statement.setString(5, category);
-            statement.setBoolean(6, needColdStorage);
+            statement.setString(6, needColdStorage?"Y" : "N");
             statement.setFloat(7, buyPrice);
             statement.setFloat(8, sellPrice);
             statement.setBlob(9, blob);
@@ -92,7 +92,7 @@ public class JdbcProductRepository implements ProductRepository {
             statement.setString(2, shortDesc);
             statement.setString(3, longDesc);
             statement.setString(4, category);
-            statement.setBoolean(5, needColdStorage);
+            statement.setString(5, needColdStorage?"Y" : "N");
             statement.setFloat(6, buyPrice);
             statement.setFloat(7, sellPrice);
             statement.setBlob(8, blob);

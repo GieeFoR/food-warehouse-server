@@ -1,5 +1,5 @@
 CREATE TABLE `USER` (
-                        `USER_ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                        `USER_ID` INT NOT NULL AUTO_INCREMENT,
                         `USERNAME` VARCHAR(32) NOT NULL UNIQUE,
                         `PASSWORD` VARCHAR(64) NOT NULL,
                         `PERMISSION` VARCHAR(64) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE `EMPLOYEE` (
                             `SURNAME` VARCHAR(32) NOT NULL,
                             `POSITION` VARCHAR(32) NOT NULL,
                             `SALARY` FLOAT(2) NOT NULL,
-    PRIMARY KEY(`EMPLOYEE_ID`)
+                            PRIMARY KEY(`EMPLOYEE_ID`)
 );
 
 CREATE TABLE `CAR` (
@@ -51,8 +51,8 @@ CREATE TABLE `PAYMENT` (
                            `PAYMENT_ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                            `PAYMENT_TYPE_ID` INT UNSIGNED NOT NULL,
                            `PAYMENT_VALUE` FLOAT(2) NOT NULL,
-    `PAYMENT_STATE` VARCHAR(64) NOT NULL,
-    PRIMARY KEY(`PAYMENT_ID`)
+                            `PAYMENT_STATE` VARCHAR(64) NOT NULL,
+                            PRIMARY KEY(`PAYMENT_ID`)
 );
 
 CREATE TABLE `ADDRESS` (
@@ -104,7 +104,7 @@ CREATE TABLE `STORAGE` (
                            `MANAGER_ID` INT UNSIGNED NOT NULL,
                            `STORAGE_NAME` VARCHAR(32) NOT NULL,
                            `CAPACITY` INT UNSIGNED NOT NULL,
-                           `IS_COLD_STORAGE` BOOLEAN NOT NULL,
+                           `IS_COLD_STORAGE` VARCHAR(1) NOT NULL,
                            PRIMARY KEY(`STORAGE_ID`)
 );
 
@@ -122,10 +122,10 @@ CREATE TABLE `PRODUCT` (
                            `MAKER_ID` INT UNSIGNED NOT NULL,
                            `PRODUCT_NAME` VARCHAR(32) NOT NULL,
                            `CATEGORY` VARCHAR(32) NOT NULL,
-                           `NEED_COLD_STORAGE` BOOLEAN NOT NULL,
+                           `NEED_COLD_STORAGE` VARCHAR(1) NOT NULL,
                            `BUY_PRICE` FLOAT(2) NOT NULL,
-    `SELL_PRICE` FLOAT(2) NOT NULL,
-    PRIMARY KEY(`PRODUCT_ID`)
+                            `SELL_PRICE` FLOAT(2) NOT NULL,
+                            PRIMARY KEY(`PRODUCT_ID`)
 );
 
 CREATE TABLE `PRODUCT_BATCH` (
