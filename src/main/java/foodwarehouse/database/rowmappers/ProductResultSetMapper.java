@@ -11,6 +11,8 @@ final public class ProductResultSetMapper implements ResultSetMapper<Product> {
     @Override
     public Product resultSetMap(ResultSet rs, String prefix) throws SQLException {
         Blob blob = rs.getBlob(ProductTable.Columns.IMAGE);
+        System.out.println("Uwaga test");
+        System.out.println(rs.getLong("PRODUCT_BATCH_PRODUCT.PRODUCT_ID"));
 
         return new Product(
                 rs.getInt(prefix+ProductTable.NAME+"."+ProductTable.Columns.PRODUCT_ID),
@@ -19,7 +21,7 @@ final public class ProductResultSetMapper implements ResultSetMapper<Product> {
                 rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.SHORT_DESC),
                 rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.LONG_DESC),
                 rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.CATEGORY),
-                rs.getString(prefix+ProductTable.NAME+"."+ProductTable.Columns.NEED_COLD).equals("Y"),
+                rs.getBoolean(prefix+ProductTable.NAME+"."+ProductTable.Columns.NEED_COLD),
                 rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.BUY_PRICE),
                 rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.SELL_PRICE),
                 new String(blob.getBytes(1, (int) blob.length())));

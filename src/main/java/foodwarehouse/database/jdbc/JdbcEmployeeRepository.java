@@ -97,8 +97,16 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
             PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("employee"));
 
             ResultSet resultSet = statement.executeQuery();
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
 
             while(resultSet.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                System.out.println("");
                 employees.add(new EmployeeResultSetMapper().resultSetMap(resultSet, ""));
             }
         }

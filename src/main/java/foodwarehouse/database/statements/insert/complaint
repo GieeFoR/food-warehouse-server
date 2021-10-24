@@ -1,4 +1,4 @@
-INSERT INTO `foodwarehouse`.`COMPLAINT`(
+INSERT INTO `COMPLAINT`(
     `ORDER_ID`,
     `CONTENT`,
     `SEND_DATE`,

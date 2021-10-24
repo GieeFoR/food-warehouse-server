@@ -15,6 +15,6 @@ final public class StorageResultSetMapper implements ResultSetMapper<Storage>{
                 new EmployeeResultSetMapper().resultSetMap(rs,prefix + StorageTable.NAME + "_"),
                 rs.getString(prefix+StorageTable.NAME+"."+StorageTable.Columns.STORAGE_NAME),
                 rs.getInt(prefix+StorageTable.NAME+"."+StorageTable.Columns.CAPACITY),
-                rs.getString(prefix+StorageTable.NAME+"."+StorageTable.Columns.IS_COLD).equals("Y"));
+                rs.getBoolean(prefix+StorageTable.NAME+"."+StorageTable.Columns.IS_COLD));
     }
 }
