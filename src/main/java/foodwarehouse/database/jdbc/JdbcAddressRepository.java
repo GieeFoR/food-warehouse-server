@@ -19,34 +19,37 @@ import java.util.Optional;
 @Repository
 public class JdbcAddressRepository implements AddressRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    JdbcAddressRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    JdbcAddressRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("address"), Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, country);
-            statement.setString(2, town);
-            statement.setString(3, postalCode);
-            statement.setString(4, buildingNumber);
-            statement.setString(5, street);
-            statement.setString(6, apartmentNumber);
-            statement.executeUpdate();
-            int addressId = statement.getGeneratedKeys().getInt(1);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("address"), Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, country);
+                statement.setString(2, town);
+                statement.setString(3, postalCode);
+                statement.setString(4, buildingNumber);
+                statement.setString(5, street);
+                statement.setString(6, apartmentNumber);
+                statement.executeUpdate();
+                int addressId = statement.getGeneratedKeys().getInt(1);
+                statement.close();
 
-            return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -54,20 +57,23 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("address"));
-            statement.setString(1, country);
-            statement.setString(2, town);
-            statement.setString(3, postalCode);
-            statement.setString(4, buildingNumber);
-            statement.setString(5, street);
-            statement.setString(6, apartmentNumber);
-            statement.setInt(7, addressId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("address"));
+                statement.setString(1, country);
+                statement.setString(2, town);
+                statement.setString(3, postalCode);
+                statement.setString(4, buildingNumber);
+                statement.setString(5, street);
+                statement.setString(6, apartmentNumber);
+                statement.setInt(7, addressId);
 
-            statement.executeUpdate();
+                statement.executeUpdate();
+                statement.close();
 
-            return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                return Optional.of(new Address(addressId, country, town, postalCode, buildingNumber, street, apartmentNumber));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -75,13 +81,16 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public boolean deleteAddress(int addressId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("address"));
-            statement.setInt(1, addressId);
-            statement.executeUpdate();
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("address"));
+                statement.setInt(1, addressId);
+                statement.executeUpdate();
+                statement.close();
 
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -89,17 +98,21 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public Optional<Address> findAddressById(int addressId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("address_byId"));
-            statement.setInt(1, addressId);
-            ResultSet resultSet = statement.executeQuery();
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("address_byId"));
+                statement.setInt(1, addressId);
+                ResultSet resultSet = statement.executeQuery();
 
-            Address address = null;
-            if(resultSet.next()) {
-                address = new AddressResultSetMapper().resultSetMap(resultSet, "");
+                Address address = null;
+                if(resultSet.next()) {
+                    address = new AddressResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(address);
             }
-            return Optional.ofNullable(address);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }

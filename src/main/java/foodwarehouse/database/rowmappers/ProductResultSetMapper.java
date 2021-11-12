@@ -10,10 +10,7 @@ import java.sql.SQLException;
 final public class ProductResultSetMapper implements ResultSetMapper<Product> {
     @Override
     public Product resultSetMap(ResultSet rs, String prefix) throws SQLException {
-        Blob blob = rs.getBlob(ProductTable.Columns.IMAGE);
-        System.out.println("Uwaga test");
-        System.out.println(rs.getLong("PRODUCT_BATCH_PRODUCT.PRODUCT_ID"));
-
+        byte[] bytes = rs.getBytes(prefix+ProductTable.NAME+"."+ProductTable.Columns.IMAGE);
         return new Product(
                 rs.getInt(prefix+ProductTable.NAME+"."+ProductTable.Columns.PRODUCT_ID),
                 new MakerResultSetMapper().resultSetMap(rs, prefix + ProductTable.NAME + "_"),
@@ -24,7 +21,6 @@ final public class ProductResultSetMapper implements ResultSetMapper<Product> {
                 rs.getBoolean(prefix+ProductTable.NAME+"."+ProductTable.Columns.NEED_COLD),
                 rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.BUY_PRICE),
                 rs.getFloat(prefix+ProductTable.NAME+"."+ProductTable.Columns.SELL_PRICE),
-                new String(blob.getBytes(1, (int) blob.length())));
-                //new String(blob.toBy);
+                new String(bytes));
     }
 }

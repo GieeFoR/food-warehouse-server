@@ -9,7 +9,6 @@ import java.sql.SQLException;
 final public class EmployeeResultSetMapper implements ResultSetMapper<Employee> {
     @Override
     public Employee resultSetMap(ResultSet rs, String prefix) throws SQLException {
-        System.out.println(rs.getInt("EMPLOYEE.EMPLOYEE_ID"));
         return new Employee(
                 rs.getInt(prefix+EmployeeTable.NAME+"."+EmployeeTable.Columns.EMPLOYEE_ID),
                 new UserResultSetMapper().resultSetMap(rs, prefix + EmployeeTable.NAME + "_"),

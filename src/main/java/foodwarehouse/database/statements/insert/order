@@ -7,4 +7,4 @@ INSERT INTO `ORDER`(
     `ORDER_DATE`)
 VALUES(?,?,?,?
     "PENDING",
-    CURRENT_DATE());
+    CURRENT_DATE);

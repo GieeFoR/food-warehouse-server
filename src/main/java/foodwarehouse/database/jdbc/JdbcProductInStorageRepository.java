@@ -21,17 +21,17 @@ import java.util.Optional;
 @Repository
 public class JdbcProductInStorageRepository implements ProductInStorageRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    JdbcProductInStorageRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    JdbcProductInStorageRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<ProductInStorage> createProductInStorage(
@@ -40,16 +40,19 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
             int quantity) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("productInStorage"), Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, productBatch.batchId());
-            statement.setInt(2, storage.storageId());
-            statement.setInt(3, quantity);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("productInStorage"), Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, productBatch.batchId());
+                statement.setInt(2, storage.storageId());
+                statement.setInt(3, quantity);
 
-            statement.executeUpdate();
-            return Optional.of(new ProductInStorage(productBatch, storage, quantity));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                statement.close();
+
+                return Optional.of(new ProductInStorage(productBatch, storage, quantity));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -61,16 +64,19 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
             int quantity) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("productInStorage"));
-            statement.setInt(1, quantity);
-            statement.setInt(2, productBatch.batchId());
-            statement.setInt(3, storage.storageId());
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("productInStorage"));
+                statement.setInt(1, quantity);
+                statement.setInt(2, productBatch.batchId());
+                statement.setInt(3, storage.storageId());
 
-            statement.executeUpdate();
-            return Optional.of(new ProductInStorage(productBatch, storage, quantity));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                statement.close();
+
+                return Optional.of(new ProductInStorage(productBatch, storage, quantity));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -78,14 +84,18 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     @Override
     public boolean deleteProductInStorage(ProductBatch productBatch, Storage storage) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("productInStorage"));
-            statement.setInt(1, productBatch.batchId());
-            statement.setInt(2, storage.storageId());
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("productInStorage"));
+                statement.setInt(1, productBatch.batchId());
+                statement.setInt(2, storage.storageId());
 
-            statement.executeUpdate();
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                statement.executeUpdate();
+                statement.close();
+
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -94,15 +104,18 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     public List<ProductInStorage> findProductInStorageAll() {
         List<ProductInStorage> productInStorages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            sqlException.getMessage();
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            productInStorages = null;
         }
         return productInStorages;
     }
@@ -111,15 +124,18 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     public List<ProductInStorage> findExpiredProductInStorage() {
         List<ProductInStorage> productInStorages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_expired"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_expired"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            sqlException.getMessage();
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            productInStorages = null;
         }
         return productInStorages;
     }
@@ -127,18 +143,22 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     @Override
     public Optional<ProductInStorage> findProductInStorageById(ProductBatch productBatch, Storage storage) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_byId"));
-            statement.setInt(1, productBatch.batchId());
-            statement.setInt(2, storage.storageId());
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_byId"));
+                statement.setInt(1, productBatch.batchId());
+                statement.setInt(2, storage.storageId());
 
-            ResultSet resultSet = statement.executeQuery();
-            ProductInStorage productInStorage = null;
-            if(resultSet.next()) {
-                productInStorage = new ProductInStorageResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                ProductInStorage productInStorage = null;
+                if(resultSet.next()) {
+                    productInStorage = new ProductInStorageResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(productInStorage);
             }
-            return Optional.ofNullable(productInStorage);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -147,16 +167,19 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     public List<ProductInStorage> findProductInStorageAllByProductId(int productId) {
         List<ProductInStorage> productInStorages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_allByProductId"));
-            statement.setInt(1, productId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_allByProductId"));
+                statement.setInt(1, productId);
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            productInStorages = null;
         }
         return productInStorages;
     }
@@ -165,16 +188,19 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     public List<ProductInStorage> findProductInStorageAllByBatchId(int batchId) {
         List<ProductInStorage> productInStorages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_allByBatchId"));
-            statement.setInt(1, batchId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_allByBatchId"));
+                statement.setInt(1, batchId);
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    productInStorages.add(new ProductInStorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            productInStorages = null;
         }
         return productInStorages;
     }
@@ -182,18 +208,20 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
     @Override
     public float findProductPrice(int batchId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_productPrice"));
-            statement.setInt(1, batchId);
-            statement.setInt(2, batchId);
-            statement.setInt(3, batchId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_productPrice"));
+                statement.setInt(1, batchId);
+                statement.setInt(2, batchId);
+                statement.setInt(3, batchId);
 
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-                return resultSet.getFloat("RESULT");
+                ResultSet resultSet = statement.executeQuery();
+                if(resultSet.next()) {
+                    return resultSet.getFloat("RESULT");
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
         return 0;
     }

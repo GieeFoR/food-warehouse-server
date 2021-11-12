@@ -1,4 +1,3 @@
-DELETE `CUSTOMER`, `USER`
-FROM `CUSTOMER`
-JOIN `USER` ON `CUSTOMER`.`USER_ID` = `USER`.`USER_ID`
-WHERE `CUSTOMER`.`CUSTOMER_ID` = ?;
+delete from user where user_id = (
+select customer.user_id from customer
+where customer_id = ?);

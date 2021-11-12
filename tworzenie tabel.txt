@@ -1,0 +1,250 @@
+drop table if exists "COMPLAINT";
+drop table if exists "PRODUCT_ORDER";
+drop table if exists "PRODUCT_IN_STORAGE";
+drop table if exists "PRODUCT_BATCH";
+drop table if exists "PRODUCT";
+drop table if exists "MAKER";
+drop table if exists "STORAGE";
+drop table if exists "ORDER";
+drop table if exists "DELIVERY";
+drop table if exists "CUSTOMER";
+drop table if exists "ADDRESS";
+drop table if exists "PAYMENT";
+drop table if exists "PAYMENT_TYPE";
+drop table if exists "MESSAGE";
+drop table if exists "CAR";
+drop table if exists "EMPLOYEE";
+drop table if exists "USER";
+
+create table USER
+(
+    USER_ID    INT auto_increment
+        primary key,
+    USERNAME   VARCHAR(32) not null
+        unique,
+    PASSWORD   VARCHAR(64) not null,
+    PERMISSION VARCHAR(32) not null,
+    E_MAIL     VARCHAR(32) not null
+        unique,
+    unique (USERNAME, E_MAIL)
+);
+
+create table EMPLOYEE
+(
+    EMPLOYEE_ID INT auto_increment
+        primary key,
+    USER_ID     INT         not null,
+    NAME        VARCHAR(32) not null,
+    SURNAME     VARCHAR(32) not null,
+    POSITION    VARCHAR(32) not null,
+    SALARY      FLOAT       not null,
+    constraint FK_EMPLOYEE_USER
+        foreign key (USER_ID) references USER (USER_ID)
+);
+
+create table CAR
+(
+    CAR_ID          INT auto_increment
+        primary key,
+    DRIVER_ID       INT      not null,
+    BRAND           VARCHAR(32) not null,
+    MODEL           VARCHAR(32) not null,
+    YEAR_OF_PROD    INT      not null,
+    REGISTRATION_NO VARCHAR(16) not null,
+    INSURANCE_EXP   DATE        not null,
+    INSPECTION_EXP  DATE        not null,
+    constraint FK_CAR_DRIVER
+        foreign key (DRIVER_ID) references EMPLOYEE (EMPLOYEE_ID)
+);
+
+create table MESSAGE
+(
+    MESSAGE_ID    INT auto_increment
+        primary key,
+    SENDER_ID     INT      not null,
+    RECEIVER_ID   INT      not null,
+    CONTENT       CLOB        not null,
+    MESSAGE_STATE VARCHAR(32) not null,
+    SEND_DATE     DATE        not null,
+    READ_DATE     DATE,
+    constraint FK_MESSAGE_RECEIVER
+        foreign key (RECEIVER_ID) references EMPLOYEE (EMPLOYEE_ID),
+    constraint FK_MESSAGE_SENDER
+        foreign key (SENDER_ID) references EMPLOYEE (EMPLOYEE_ID)
+);
+
+create table PAYMENT_TYPE
+(
+    PAYMENT_TYPE_ID INT auto_increment
+        primary key,
+    PAYMENT_TYPE    VARCHAR(32) not null
+);
+
+create table PAYMENT
+(
+    PAYMENT_ID      INT auto_increment
+        primary key,
+    PAYMENT_TYPE_ID INT      not null,
+    PAYMENT_VALUE   FLOAT       not null,
+    PAYMENT_STATE   VARCHAR(32) not null,
+    constraint FK_PAYMENT_TYPE
+        foreign key (PAYMENT_TYPE_ID) references PAYMENT_TYPE (PAYMENT_TYPE_ID)
+);
+
+create table ADDRESS
+(
+    ADDRESS_ID   INT auto_increment
+        primary key,
+    COUNTRY      VARCHAR(32)  not null,
+    TOWN         VARCHAR(128) not null,
+    POSTAL_CODE  VARCHAR(16)  not null,
+    BUILDING_NO  VARCHAR(16)  not null,
+    STREET       VARCHAR(64),
+    APARTMENT_NO VARCHAR(16)
+);
+
+create table CUSTOMER
+(
+    CUSTOMER_ID  INT auto_increment
+        primary key,
+    USER_ID      INT      not null,
+    ADDRESS_ID   INT      not null,
+    NAME         VARCHAR(32) not null,
+    SURNAME      VARCHAR(64) not null,
+    FIRM_NAME    VARCHAR(256),
+    TELEPHONE_NO VARCHAR(32) not null,
+    TAX_ID       VARCHAR(32),
+    DISCOUNT     INT,
+    constraint FK_CUSTOMER_ADDRESS
+        foreign key (ADDRESS_ID) references ADDRESS (ADDRESS_ID),
+    constraint FK_CUSTOMER_USER
+        foreign key (USER_ID) references USER (USER_ID)
+);
+
+create table DELIVERY
+(
+    DELIVERY_ID               INT auto_increment
+        primary key,
+    ADDRESS_ID                INT not null,
+    SUPPLIER_ID               INT not null,
+    REMOVAL_FROM_STORAGE_DATE DATE,
+    DELIVERY_DATE             DATE,
+    constraint FK_DELIVER_ADDRESS
+        foreign key (ADDRESS_ID) references ADDRESS (ADDRESS_ID),
+    constraint FK_DELIVER_SUPPLIER
+        foreign key (SUPPLIER_ID) references EMPLOYEE (EMPLOYEE_ID)
+);
+
+create table "ORDER"
+(
+    ORDER_ID    INT auto_increment
+        primary key,
+    PAYMENT_ID  INT      not null,
+    CUSTOMER_ID INT      not null,
+    DELIVERY_ID INT      not null,
+    COMMENT     CLOB,
+    ORDER_STATE VARCHAR(32) not null,
+    ORDER_DATE  DATE        not null,
+    constraint FK_ORDER_CUSTOMER
+        foreign key (CUSTOMER_ID) references CUSTOMER (CUSTOMER_ID),
+    constraint FK_ORDER_DELIVERY
+        foreign key (DELIVERY_ID) references DELIVERY (DELIVERY_ID),
+    constraint FK_ORDER_PAYMENT
+        foreign key (PAYMENT_ID) references PAYMENT (PAYMENT_ID)
+);
+
+create table STORAGE
+(
+    STORAGE_ID      INT auto_increment
+        primary key,
+    ADDRESS_ID      INT      not null,
+    MANAGER_ID      INT      not null,
+    STORAGE_NAME    VARCHAR(32) not null,
+    CAPACITY        INT      not null,
+    IS_COLD_STORAGE BOOLEAN     not null,
+    constraint FK_STORAGE_ADDRESS
+        foreign key (ADDRESS_ID) references ADDRESS (ADDRESS_ID),
+    constraint FK_STORAGE_MANAGER
+        foreign key (MANAGER_ID) references EMPLOYEE (EMPLOYEE_ID)
+);
+
+create table MAKER
+(
+    MAKER_ID     INT auto_increment
+        primary key,
+    ADDRESS_ID   INT       not null,
+    FIRM_NAME    VARCHAR(256) not null,
+    TELEPHONE_NO VARCHAR(12)  not null,
+    E_MAIL       VARCHAR(32)  not null,
+    constraint FK_MAKER_ADDRESS
+        foreign key (ADDRESS_ID) references ADDRESS (ADDRESS_ID)
+);
+
+create table PRODUCT
+(
+    PRODUCT_ID        INT auto_increment
+        primary key,
+    MAKER_ID          INT      not null,
+    PRODUCT_NAME      VARCHAR(32) not null,
+    SHORT_DESCRIPTION VARCHAR(64),
+    LONG_DESCRIPTION  CLOB,
+    CATEGORY          VARCHAR(32) not null,
+    NEED_COLD_STORAGE BOOLEAN     not null,
+    BUY_PRICE         FLOAT       not null,
+    SELL_PRICE        FLOAT       not null,
+    IMAGE             CLOB        not null,
+    constraint FK_PRODUCT_MAKER
+        foreign key (MAKER_ID) references MAKER (MAKER_ID)
+);
+
+create table PRODUCT_BATCH
+(
+    BATCH_ID          INT auto_increment
+        primary key,
+    PRODUCT_ID        INT not null,
+    BATCH_NO          INT not null,
+    EAT_BY_DATE       DATE   not null,
+    DISCOUNT          INT,
+    PACKAGES_QUANTITY INT not null,
+    constraint FK_BATCH_PRODUCT
+        foreign key (PRODUCT_ID) references PRODUCT (PRODUCT_ID)
+);
+
+create table PRODUCT_IN_STORAGE
+(
+    BATCH_ID   INT not null,
+    STORAGE_ID INT not null,
+    QUANTITY   INT not null,
+    primary key (BATCH_ID, STORAGE_ID),
+    constraint FK_PRODUCT_IN_STORAGE_BATCH
+        foreign key (BATCH_ID) references PRODUCT_BATCH (BATCH_ID),
+    constraint FK_PRODUCT_IN_STORAGE_STORAGE
+        foreign key (STORAGE_ID) references STORAGE (STORAGE_ID)
+);
+
+create table PRODUCT_ORDER
+(
+    ORDER_ID INT not null,
+    BATCH_ID INT not null,
+    QUANTITY INT not null,
+    primary key (ORDER_ID, BATCH_ID),
+    constraint FK_PRODUCT_ORDER_BATCH
+        foreign key (BATCH_ID) references PRODUCT_BATCH (BATCH_ID),
+    constraint FK_PRODUCT_ORDER_ORDER
+        foreign key (ORDER_ID) references "ORDER" (ORDER_ID)
+);
+
+create table COMPLAINT
+(
+    COMPLAINT_ID    INT auto_increment
+        primary key,
+    ORDER_ID        INT      not null,
+    CONTENT         CLOB        not null,
+    SEND_DATE       DATE        not null,
+    COMPLAINT_STATE VARCHAR(32) not null,
+    DECISION        CLOB,
+    DECISION_DATE   DATE,
+    constraint FK_COMPLAINT_ORDER
+        foreign key (ORDER_ID) references "ORDER" (ORDER_ID)
+);
+

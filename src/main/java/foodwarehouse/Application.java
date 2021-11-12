@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 @SpringBootApplication
 @EnableScheduling
@@ -17,11 +18,11 @@ public class Application {
     }
 
     @Bean
-    public DataSource h2DataSource() {
+    public DataSource dataSource() throws SQLException {
 //        System.out.println(bCryptPasswordEncoder().encode("pass"));
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:file:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test");
+        dataSource.setDriverClassName("org.sqlite.JDBC");
+        dataSource.setUrl("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;

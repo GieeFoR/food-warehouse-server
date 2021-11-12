@@ -1,11 +1,6 @@
 UPDATE `USER`
 SET `USERNAME` = ?,
     `PERMISSION` = ?,
-    `E_MAIL` = ?
+    `E_MAIL` = ?,
+    `PASSWORD` = CASE WHEN ? = "" THEN ? END
 WHERE `USER_ID` = ?;
-
-IF `IN_PASSWORD` != "" THEN
-    UPDATE `USER`
-    SET	`PASSWORD` = ?
-    WHERE `USER_ID` = ?;
-END IF;

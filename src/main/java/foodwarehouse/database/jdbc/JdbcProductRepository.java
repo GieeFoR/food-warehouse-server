@@ -21,17 +21,17 @@ import java.util.Optional;
 @Repository
 public class JdbcProductRepository implements ProductRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    JdbcProductRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    JdbcProductRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<Product> createProduct(
@@ -46,26 +46,26 @@ public class JdbcProductRepository implements ProductRepository {
             String image) {
 
         try {
-            Blob blob = connection.createBlob();
-            blob.setBytes(1, image.getBytes());
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("product"), Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, maker.makerId());
+                statement.setString(2, name);
+                statement.setString(3, shortDesc);
+                statement.setString(4, longDesc);
+                statement.setString(5, category);
+                statement.setBoolean(6, needColdStorage);
+                statement.setFloat(7, buyPrice);
+                statement.setFloat(8, sellPrice);
+                statement.setBytes(9, image == null ? new byte[1] : image.getBytes());
 
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("product"), Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, maker.makerId());
-            statement.setString(2, name);
-            statement.setString(3, shortDesc);
-            statement.setString(4, longDesc);
-            statement.setString(5, category);
-            statement.setBoolean(6, needColdStorage);
-            statement.setFloat(7, buyPrice);
-            statement.setFloat(8, sellPrice);
-            statement.setBlob(9, blob);
+                statement.executeUpdate();
+                int productId = statement.getGeneratedKeys().getInt(1);
+                statement.close();
 
-            statement.executeUpdate();
-            int productId = statement.getGeneratedKeys().getInt(1);
-            return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -84,26 +84,26 @@ public class JdbcProductRepository implements ProductRepository {
             String image) {
 
         try {
-            Blob blob = connection.createBlob();
-            blob.setBytes(1, image.getBytes());
-
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("product"));
-            statement.setString(1, name);
-            statement.setString(2, shortDesc);
-            statement.setString(3, longDesc);
-            statement.setString(4, category);
-            statement.setBoolean(5, needColdStorage);
-            statement.setFloat(6, buyPrice);
-            statement.setFloat(7, sellPrice);
-            statement.setBlob(8, blob);
-            statement.setInt(9, productId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("product"));
+                statement.setString(1, name);
+                statement.setString(2, shortDesc);
+                statement.setString(3, longDesc);
+                statement.setString(4, category);
+                statement.setBoolean(5, needColdStorage);
+                statement.setFloat(6, buyPrice);
+                statement.setFloat(7, sellPrice);
+                statement.setBytes(8, image == null ? new byte[1] : image.getBytes());
+                statement.setInt(9, productId);
 
 
-            statement.executeUpdate();
-            return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                statement.close();
+
+                return Optional.of(new Product(productId, maker, name, shortDesc, longDesc, category, needColdStorage, buyPrice, sellPrice, image));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -111,14 +111,17 @@ public class JdbcProductRepository implements ProductRepository {
     @Override
     public boolean deleteProduct(int productId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("product"));
-            statement.setInt(1, productId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("product"));
+                statement.setInt(1, productId);
 
-            statement.executeUpdate();
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                statement.close();
+
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -126,18 +129,21 @@ public class JdbcProductRepository implements ProductRepository {
     @Override
     public Optional<Product> findProductById(int productId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_byId"));
-            statement.setInt(1, productId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_byId"));
+                statement.setInt(1, productId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Product product = null;
-            if(resultSet.next()) {
-                product = new ProductResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Product product = null;
+                if(resultSet.next()) {
+                    product = new ProductResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(product);
             }
-            return Optional.ofNullable(product);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -146,15 +152,18 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            products = null;
         }
         return products;
     }
@@ -163,15 +172,18 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findAvailableProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_available"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_available"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            products = null;
         }
         return products;
     }
@@ -180,16 +192,18 @@ public class JdbcProductRepository implements ProductRepository {
     public int countAmountOfProducts(int productId) {
         int result = 0;
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_quantityById"));
-            statement.setInt(1, productId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_quantityById"));
+                statement.setInt(1, productId);
 
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-                result = resultSet.getInt("RESULT");
+                ResultSet resultSet = statement.executeQuery();
+                if(resultSet.next()) {
+                    result = resultSet.getInt("RESULT");
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
         return result;
     }
@@ -198,15 +212,18 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findRunningOutProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_runningOut"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_runningOut"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            products = null;
         }
         return products;
     }
@@ -215,15 +232,18 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> topTenProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_topTen"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_topTen"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    products.add(new ProductResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            products = null;
         }
         return products;
     }

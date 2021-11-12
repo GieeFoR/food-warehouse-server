@@ -2,9 +2,11 @@ package foodwarehouse.database.jdbc;
 
 import foodwarehouse.core.data.address.Address;
 import foodwarehouse.core.data.car.Car;
+import foodwarehouse.core.data.employee.Employee;
 import foodwarehouse.core.data.maker.Maker;
 import foodwarehouse.core.data.maker.MakerRepository;
 import foodwarehouse.database.rowmappers.CarResultSetMapper;
+import foodwarehouse.database.rowmappers.EmployeeResultSetMapper;
 import foodwarehouse.database.rowmappers.MakerResultSetMapper;
 import foodwarehouse.database.statements.ReadStatement;
 import foodwarehouse.database.tables.CarTable;
@@ -23,17 +25,17 @@ import java.util.Optional;
 @Repository
 public class JdbcMakerRepository implements MakerRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    JdbcMakerRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    JdbcMakerRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<Maker> createMaker(
@@ -43,17 +45,21 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("maker"), Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, address.addressId());
-            statement.setString(2, name);
-            statement.setString(3, phone);
-            statement.setString(4, email);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("maker"), Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, address.addressId());
+                statement.setString(2, name);
+                statement.setString(3, phone);
+                statement.setString(4, email);
 
-            statement.executeUpdate();
-            int makerId = statement.getGeneratedKeys().getInt(1);
-            return Optional.of(new Maker(makerId, address, name, phone, email));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                statement.executeUpdate();
+                int makerId = statement.getGeneratedKeys().getInt(1);
+                statement.close();
+
+                return Optional.of(new Maker(makerId, address, name, phone, email));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -67,17 +73,20 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("maker"));
-            statement.setString(1, name);
-            statement.setString(2, phone);
-            statement.setString(3, email);
-            statement.setInt(4, makerId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("maker"));
+                statement.setString(1, name);
+                statement.setString(2, phone);
+                statement.setString(3, email);
+                statement.setInt(4, makerId);
 
-            statement.executeUpdate();
+                statement.executeUpdate();
+                statement.close();
 
-            return Optional.of(new Maker(makerId, address, name, phone, email));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                return Optional.of(new Maker(makerId, address, name, phone, email));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -85,13 +94,17 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public boolean deleteMaker(int makerId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("maker"));
-            statement.setInt(1, makerId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("maker"));
+                statement.setInt(1, makerId);
 
-            statement.executeUpdate();
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                statement.executeUpdate();
+                statement.close();
+
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -99,17 +112,21 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public Optional<Maker> findMakerById(int makerId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker_byId"));
-            statement.setInt(1, makerId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker_byId"));
+                statement.setInt(1, makerId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Maker maker = null;
-            if(resultSet.next()) {
-                maker = new MakerResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Maker maker = null;
+                if(resultSet.next()) {
+                    maker = new MakerResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(maker);
             }
-            return Optional.ofNullable(maker);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -118,15 +135,18 @@ public class JdbcMakerRepository implements MakerRepository {
     public List<Maker> findMakers() {
         List<Maker> makers = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                makers.add(new MakerResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    makers.add(new MakerResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            sqlException.getMessage();
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            makers = null;
         }
         return makers;
     }

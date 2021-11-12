@@ -57,7 +57,7 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
         System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
 
         System.out.println("Looking for storages running out space!");
-        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
+//        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
         System.out.println("Amount of found storages running out space: " + StoragesRunningOutOfSpace.getRunningOutOfSpace().size());
     }
 }

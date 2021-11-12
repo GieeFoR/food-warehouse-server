@@ -21,31 +21,34 @@ import java.util.Optional;
 @Repository
 public class JdbcPaymentRepository implements PaymentRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    JdbcPaymentRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    JdbcPaymentRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<Payment> createPayment(PaymentType paymentType, float value) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("payment"), Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, paymentType.paymentTypeId());
-            statement.setFloat(2, value);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("payment"), Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, paymentType.paymentTypeId());
+                statement.setFloat(2, value);
 
-            statement.executeUpdate();
-            int paymentId = statement.getGeneratedKeys().getInt(1);
-            return Optional.of(new Payment(paymentId, paymentType, value, PaymentState.IN_PROGRESS));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                int paymentId = statement.getGeneratedKeys().getInt(1);
+                statement.close();
+
+                return Optional.of(new Payment(paymentId, paymentType, value, PaymentState.IN_PROGRESS));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -53,20 +56,25 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> updatePaymentValue(int paymentId, float value) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_value"));
-            statement.setInt(1, paymentId);
-            statement.setInt(2, paymentId);
-            statement.setFloat(3, value);
-            statement.setInt(4, paymentId);
-            statement.setInt(5, paymentId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_value"));
+                statement.setInt(1, paymentId);
+                statement.setInt(2, paymentId);
+                statement.setFloat(3, value);
+                statement.setInt(4, paymentId);
+                statement.setInt(5, paymentId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Payment payment = null;
-            if (resultSet.next()) {
-                payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Payment payment = null;
+                if (resultSet.next()) {
+                    payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(payment);
             }
-            return Optional.ofNullable(payment);
-        } catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -74,22 +82,25 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> updatePaymentState(int paymentId, PaymentState state) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_state"));
-            statement.setInt(1, paymentId);
-            statement.setInt(2, paymentId);
-            statement.setObject(3, state.value());
-            statement.setInt(4, paymentId);
-            statement.setInt(5, paymentId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_state"));
+                statement.setInt(1, paymentId);
+                statement.setInt(2, paymentId);
+                statement.setObject(3, state.value());
+                statement.setInt(4, paymentId);
+                statement.setInt(5, paymentId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Payment payment = null;
-            if(resultSet.next()) {
-                payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Payment payment = null;
+                if(resultSet.next()) {
+                    payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(payment);
             }
-            return Optional.ofNullable(payment);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -97,13 +108,17 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public boolean deletePayment(int paymentId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("payment"));
-            statement.setInt(1, paymentId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("payment"));
+                statement.setInt(1, paymentId);
 
-            statement.executeUpdate();
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                statement.executeUpdate();
+                statement.close();
+
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -111,17 +126,21 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> findPaymentById(int paymentId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byId"));
-            statement.setInt(1, paymentId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byId"));
+                statement.setInt(1, paymentId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Payment payment = null;
-            if(resultSet.next()) {
-                payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Payment payment = null;
+                if(resultSet.next()) {
+                    payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(payment);
             }
-            return Optional.ofNullable(payment);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -130,15 +149,18 @@ public class JdbcPaymentRepository implements PaymentRepository {
     public List<Payment> findPayments() {
         List<Payment> payments = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment"));
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                payments.add(new PaymentResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    payments.add(new PaymentResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            payments = null;
         }
         return payments;
     }
@@ -147,16 +169,19 @@ public class JdbcPaymentRepository implements PaymentRepository {
     public List<Payment> findCustomerPayments(String username) {
         List<Payment> payments = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byUsername"));
-            statement.setString(1, username);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byUsername"));
+                statement.setString(1, username);
 
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                payments.add(new PaymentResultSetMapper().resultSetMap(resultSet, ""));
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()) {
+                    payments.add(new PaymentResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch(SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            payments = null;
         }
         return payments;
     }

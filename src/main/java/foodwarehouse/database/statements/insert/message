@@ -7,5 +7,5 @@ INSERT INTO `MESSAGE`(
     `READ_DATE`)
 VALUES(?,?,?,
     "SENT",
-    CURRENT_DATE(),
+    CURRENT_DATE,
     NULL);

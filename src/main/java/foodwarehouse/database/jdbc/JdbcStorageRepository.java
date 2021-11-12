@@ -22,17 +22,17 @@ import java.util.Optional;
 @Repository
 public class JdbcStorageRepository implements StorageRepository {
 
-    private final Connection connection;
-
-    @Autowired
-    public JdbcStorageRepository(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        }
-        catch(SQLException sqlException) {
-            throw new RestException("Cannot connect to database!");
-        }
-    }
+//    private final Connection connection;
+//
+//    @Autowired
+//    public JdbcStorageRepository(DataSource dataSource) {
+//        try {
+//            this.connection = dataSource.getConnection();
+//        }
+//        catch(SQLException sqlException) {
+//            throw new RestException("Cannot connect to database!");
+//        }
+//    }
 
     @Override
     public Optional<Storage> insertStorage(
@@ -43,19 +43,23 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("storage"), Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, address.addressId());
-            statement.setInt(2, manager.employeeId());
-            statement.setString(3, name);
-            statement.setInt(4, capacity);
-            statement.setBoolean(5, isColdStorage);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("storage"), Statement.RETURN_GENERATED_KEYS);
+                statement.setInt(1, address.addressId());
+                statement.setInt(2, manager.employeeId());
+                statement.setString(3, name);
+                statement.setInt(4, capacity);
+                statement.setBoolean(5, isColdStorage);
 
-            statement.executeUpdate();
-            int storageId = statement.getGeneratedKeys().getInt(1);
+                statement.executeUpdate();
+                statement.close();
 
-            return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                int storageId = statement.getGeneratedKeys().getInt(1);
+
+                return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -70,18 +74,21 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("storage"));
-            statement.setInt(1, manager.employeeId());
-            statement.setString(2, name);
-            statement.setInt(3, capacity);
-            statement.setBoolean(4, isColdStorage);
-            statement.setInt(5, storageId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("storage"));
+                statement.setInt(1, manager.employeeId());
+                statement.setString(2, name);
+                statement.setInt(3, capacity);
+                statement.setBoolean(4, isColdStorage);
+                statement.setInt(5, storageId);
 
-            statement.executeUpdate();
-            return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
-            System.out.println(sqlException.getMessage());
+                statement.executeUpdate();
+                statement.close();
+
+                return Optional.of(new Storage(storageId, address, manager, name, capacity, isColdStorage));
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -89,14 +96,17 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public boolean deleteStorage(int storageId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("storage"));
-            statement.setInt(1, storageId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("storage"));
+                statement.setInt(1, storageId);
 
-            statement.executeUpdate();
+                statement.executeUpdate();
+                statement.close();
 
-            return true;
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+                return true;
+            }
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -105,35 +115,41 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findAllStorages() {
         List<Storage> storages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage"));
 
-            ResultSet resultSet = statement.executeQuery();
+                ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()) {
-                storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
+                while(resultSet.next()) {
+                    storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             storages = null;
         }
-
         return storages;
     }
 
     @Override
     public Optional<Storage> findStorage(int storageId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byId"));
-            statement.setInt(1, storageId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byId"));
+                statement.setInt(1, storageId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Storage storage = null;
-            if(resultSet.next()) {
-                storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Storage storage = null;
+                if(resultSet.next()) {
+                    storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(storage);
             }
-            return Optional.ofNullable(storage);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -141,18 +157,22 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public Optional<Storage> findStorageByBatchId(int batchId) {
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byBatchId"));
-            statement.setInt(1, batchId);
-            statement.setInt(2, batchId);
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byBatchId"));
+                statement.setInt(1, batchId);
+                statement.setInt(2, batchId);
 
-            ResultSet resultSet = statement.executeQuery();
-            Storage storage = null;
-            if(resultSet.next()) {
-                storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
+                ResultSet resultSet = statement.executeQuery();
+                Storage storage = null;
+                if(resultSet.next()) {
+                    storage = new StorageResultSetMapper().resultSetMap(resultSet, "");
+                }
+                statement.close();
+
+                return Optional.ofNullable(storage);
             }
-            return Optional.ofNullable(storage);
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             return Optional.empty();
         }
     }
@@ -161,15 +181,18 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findStoragesRunningOutOfSpace() {
         List<Storage> storages = new LinkedList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_runningOutOfSpace"));
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_runningOutOfSpace"));
 
-            ResultSet resultSet = statement.executeQuery();
+                ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()) {
-                storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
+                while(resultSet.next()) {
+                    storages.add(new StorageResultSetMapper().resultSetMap(resultSet, ""));
+                }
+                statement.close();
             }
-        }
-        catch (SQLException | FileNotFoundException sqlException) {
+        } catch (SQLException | FileNotFoundException e) {
+            System.out.println(e.getMessage());
             storages = null;
         }
         return storages;
