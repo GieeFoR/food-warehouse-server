@@ -2,5 +2,5 @@ UPDATE `USER`
 SET `USERNAME` = ?,
     `PERMISSION` = ?,
     `E_MAIL` = ?,
-    `PASSWORD` = CASE WHEN ? = "" THEN ? END
+    `PASSWORD` = case when ? = '' then `PASSWORD` else ? end
 WHERE `USER_ID` = ?;
