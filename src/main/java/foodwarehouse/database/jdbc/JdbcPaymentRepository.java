@@ -58,13 +58,17 @@ public class JdbcPaymentRepository implements PaymentRepository {
         try {
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_value"));
-                statement.setInt(1, paymentId);
+                statement.setFloat(1, value);
                 statement.setInt(2, paymentId);
-                statement.setFloat(3, value);
-                statement.setInt(4, paymentId);
-                statement.setInt(5, paymentId);
+
+                statement.executeUpdate();
+
+
+                statement = connection.prepareStatement(ReadStatement.readSelect("payment_byId"));
+                statement.setInt(1, paymentId);
 
                 ResultSet resultSet = statement.executeQuery();
+
                 Payment payment = null;
                 if (resultSet.next()) {
                     payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");
@@ -84,13 +88,17 @@ public class JdbcPaymentRepository implements PaymentRepository {
         try {
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_state"));
-                statement.setInt(1, paymentId);
+                statement.setObject(1, state.value());
                 statement.setInt(2, paymentId);
-                statement.setObject(3, state.value());
-                statement.setInt(4, paymentId);
-                statement.setInt(5, paymentId);
+
+                statement.executeUpdate();
+
+
+                statement = connection.prepareStatement(ReadStatement.readSelect("payment_byId"));
+                statement.setInt(1, paymentId);
 
                 ResultSet resultSet = statement.executeQuery();
+
                 Payment payment = null;
                 if(resultSet.next()) {
                     payment = new PaymentResultSetMapper().resultSetMap(resultSet, "");

@@ -212,8 +212,6 @@ public class JdbcProductInStorageRepository implements ProductInStorageRepositor
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productInStorage_productPrice"));
                 statement.setInt(1, batchId);
-                statement.setInt(2, batchId);
-                statement.setInt(3, batchId);
 
                 ResultSet resultSet = statement.executeQuery();
                 if(resultSet.next()) {

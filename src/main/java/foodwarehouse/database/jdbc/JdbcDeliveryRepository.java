@@ -43,7 +43,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     public Optional<Delivery> createDelivery(Address address, Employee supplier) {
         try {
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("deliery"), Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("delivery"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, address.addressId());
                 statement.setInt(2, supplier.employeeId());
 
