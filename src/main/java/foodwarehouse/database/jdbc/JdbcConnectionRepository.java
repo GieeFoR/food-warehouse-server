@@ -32,7 +32,7 @@ public class JdbcConnectionRepository implements ConnectionRepository {
         final String CHECK_SQL_QUERY = "SELECT 1";
         boolean isConnected = true;
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 connection.prepareStatement(CHECK_SQL_QUERY).execute();
             }
         } catch (SQLException e) {

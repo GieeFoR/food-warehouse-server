@@ -19,10 +19,9 @@ public class Application {
 
     @Bean
     public DataSource dataSource() throws SQLException {
-//        System.out.println(bCryptPasswordEncoder().encode("pass"));
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
-        dataSource.setUrl("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db");
+        dataSource.setUrl("jdbc:sqlite:test.db");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;

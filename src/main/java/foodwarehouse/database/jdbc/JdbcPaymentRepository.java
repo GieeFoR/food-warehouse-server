@@ -36,7 +36,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> createPayment(PaymentType paymentType, float value) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("payment"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, paymentType.paymentTypeId());
                 statement.setFloat(2, value);
@@ -56,7 +56,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> updatePaymentValue(int paymentId, float value) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_value"));
                 statement.setInt(1, paymentId);
                 statement.setInt(2, paymentId);
@@ -82,7 +82,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> updatePaymentState(int paymentId, PaymentState state) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("payment_state"));
                 statement.setInt(1, paymentId);
                 statement.setInt(2, paymentId);
@@ -108,7 +108,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public boolean deletePayment(int paymentId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("payment"));
                 statement.setInt(1, paymentId);
 
@@ -126,7 +126,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     @Override
     public Optional<Payment> findPaymentById(int paymentId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byId"));
                 statement.setInt(1, paymentId);
 
@@ -149,7 +149,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     public List<Payment> findPayments() {
         List<Payment> payments = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -169,7 +169,7 @@ public class JdbcPaymentRepository implements PaymentRepository {
     public List<Payment> findCustomerPayments(String username) {
         List<Payment> payments = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("payment_byUsername"));
                 statement.setString(1, username);
 

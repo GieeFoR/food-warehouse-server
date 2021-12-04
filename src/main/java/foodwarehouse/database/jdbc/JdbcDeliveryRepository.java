@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> createDelivery(Address address, Employee supplier) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("deliery"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, address.addressId());
                 statement.setInt(2, supplier.employeeId());
@@ -60,7 +62,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateDelivery(int deliveryId, Address address, Employee supplier) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery"));
                 statement.setInt(1, address.addressId());
                 statement.setInt(2, supplier.employeeId());
@@ -80,9 +82,9 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateRemoveDate(int deliveryId, Address address, Employee supplier, Date date) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery_removeDate"));
-                statement.setDate(1, new java.sql.Date(date.getTime()));
+                statement.setString(1, new SimpleDateFormat("yyyy-MM-dd").format(date));
                 statement.setInt(2, deliveryId);
 
                 statement.executeUpdate();
@@ -99,9 +101,9 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> updateCompleteDate(int deliveryId, Address address, Employee supplier, Date date) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("delivery_completeDate"));
-                statement.setDate(1, new java.sql.Date(date.getTime()));
+                statement.setString(1, new SimpleDateFormat("yyyy-MM-dd").format(date));
                 statement.setInt(2, deliveryId);
 
                 statement.executeUpdate();
@@ -118,7 +120,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public boolean deleteDelivery(int deliveryId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("delivery"));
                 statement.setInt(1, deliveryId);
 
@@ -136,7 +138,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     @Override
     public Optional<Delivery> findDeliveryById(int deliveryId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("delivery_byId"));
                 statement.setInt(1, deliveryId);
 
@@ -148,7 +150,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
                 statement.close();
                 return Optional.ofNullable(delivery);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -158,7 +160,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
     public List<Delivery> findDeliveries() {
         List<Delivery> deliveries = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("delivery"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -167,7 +169,7 @@ public class JdbcDeliveryRepository implements DeliveryRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             deliveries = null;
         }

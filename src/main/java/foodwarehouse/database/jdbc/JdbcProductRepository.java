@@ -46,7 +46,7 @@ public class JdbcProductRepository implements ProductRepository {
             String image) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("product"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, maker.makerId());
                 statement.setString(2, name);
@@ -84,7 +84,7 @@ public class JdbcProductRepository implements ProductRepository {
             String image) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("product"));
                 statement.setString(1, name);
                 statement.setString(2, shortDesc);
@@ -111,7 +111,7 @@ public class JdbcProductRepository implements ProductRepository {
     @Override
     public boolean deleteProduct(int productId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("product"));
                 statement.setInt(1, productId);
 
@@ -129,7 +129,7 @@ public class JdbcProductRepository implements ProductRepository {
     @Override
     public Optional<Product> findProductById(int productId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_byId"));
                 statement.setInt(1, productId);
 
@@ -152,7 +152,7 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -172,7 +172,7 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findAvailableProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_available"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -192,7 +192,7 @@ public class JdbcProductRepository implements ProductRepository {
     public int countAmountOfProducts(int productId) {
         int result = 0;
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_quantityById"));
                 statement.setInt(1, productId);
 
@@ -212,7 +212,7 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> findRunningOutProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_runningOut"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -232,7 +232,7 @@ public class JdbcProductRepository implements ProductRepository {
     public List<Product> topTenProducts() {
         List<Product> products = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("product_topTen"));
 
                 ResultSet resultSet = statement.executeQuery();

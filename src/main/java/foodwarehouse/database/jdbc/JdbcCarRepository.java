@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,15 +49,15 @@ public class JdbcCarRepository implements CarRepository {
             Date inspection) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("car"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, employee.employeeId());
                 statement.setString(2, brand);
                 statement.setString(3, model);
                 statement.setInt(4, yearOfProd);
                 statement.setString(5, regNo);
-                statement.setDate(6, new java.sql.Date(insurance.getTime()));
-                statement.setDate(7, new java.sql.Date(inspection.getTime()));
+                statement.setString(6, new SimpleDateFormat("yyyy-MM-dd").format(insurance));
+                statement.setString(7, new SimpleDateFormat("yyyy-MM-dd").format(inspection));
                 statement.executeUpdate();
 
                 int carId = statement.getGeneratedKeys().getInt(1);
@@ -81,15 +83,15 @@ public class JdbcCarRepository implements CarRepository {
             Date inspection) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("car"));
                 statement.setInt(1, employee.employeeId());
                 statement.setString(2, brand);
                 statement.setString(3, model);
                 statement.setInt(4, yearOfProd);
                 statement.setString(5, regNo);
-                statement.setDate(6, new java.sql.Date(insurance.getTime()));
-                statement.setDate(7, new java.sql.Date(inspection.getTime()));
+                statement.setString(6, new SimpleDateFormat("yyyy-MM-dd").format(insurance));
+                statement.setString(7, new SimpleDateFormat("yyyy-MM-dd").format(inspection));
                 statement.setInt(8, carId);
 
                 statement.executeUpdate();
@@ -106,7 +108,7 @@ public class JdbcCarRepository implements CarRepository {
     @Override
     public boolean deleteCar(int carId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("car"));
                 statement.setInt(1, carId);
 
@@ -124,7 +126,7 @@ public class JdbcCarRepository implements CarRepository {
     @Override
     public Optional<Car> findCarById(int carId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("car_byId"));
                 statement.setInt(1, carId);
 
@@ -137,7 +139,7 @@ public class JdbcCarRepository implements CarRepository {
 
                 return Optional.ofNullable(car);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -147,7 +149,7 @@ public class JdbcCarRepository implements CarRepository {
     public List<Car> findCars() {
         List<Car> cars = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("car"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -156,7 +158,7 @@ public class JdbcCarRepository implements CarRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             cars = null;
         }

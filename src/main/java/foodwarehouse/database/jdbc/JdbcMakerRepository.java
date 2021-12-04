@@ -45,7 +45,7 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("maker"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, address.addressId());
                 statement.setString(2, name);
@@ -73,7 +73,7 @@ public class JdbcMakerRepository implements MakerRepository {
             String email) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("maker"));
                 statement.setString(1, name);
                 statement.setString(2, phone);
@@ -94,7 +94,7 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public boolean deleteMaker(int makerId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("maker"));
                 statement.setInt(1, makerId);
 
@@ -112,7 +112,7 @@ public class JdbcMakerRepository implements MakerRepository {
     @Override
     public Optional<Maker> findMakerById(int makerId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker_byId"));
                 statement.setInt(1, makerId);
 
@@ -135,7 +135,7 @@ public class JdbcMakerRepository implements MakerRepository {
     public List<Maker> findMakers() {
         List<Maker> makers = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("maker"));
 
                 ResultSet resultSet = statement.executeQuery();

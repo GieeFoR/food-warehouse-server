@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     @Override
     public Optional<ProductOrder> createProductOrder(Order order, ProductBatch productBatch, int quantity) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("productOrder"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, order.orderId());
                 statement.setInt(2, productBatch.batchId());
@@ -56,7 +57,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     @Override
     public Optional<ProductOrder> updateProductOrder(Order order, ProductBatch productBatch, int quantity) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("productOrder"));
                 statement.setInt(1, quantity);
                 statement.setInt(2, order.orderId());
@@ -76,7 +77,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     @Override
     public boolean deleteProductOrder(int orderId, int productBatchId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("productOrder"));
                 statement.setInt(1, orderId);
                 statement.setInt(2, productBatchId);
@@ -95,7 +96,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     @Override
     public Optional<ProductOrder> findProductOrderById(int orderId, int productBatchId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productOrder_byId"));
                 statement.setInt(1, orderId);
                 statement.setInt(2, productBatchId);
@@ -109,7 +110,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
 
                 return Optional.ofNullable(productOrder);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -119,7 +120,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     public List<ProductOrder> findProductOrderAll() {
         List<ProductOrder> productOrders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productOrder"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -128,7 +129,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             productOrders = null;
         }
@@ -139,7 +140,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
     public List<ProductOrder> findProductOrderByOrderId(int orderId) {
         List<ProductOrder> productOrders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productOrder_byOrderId"));
                 statement.setInt(1, orderId);
 
@@ -149,7 +150,7 @@ public class JdbcProductOrderRepository implements ProductOrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             productOrders = null;
         }

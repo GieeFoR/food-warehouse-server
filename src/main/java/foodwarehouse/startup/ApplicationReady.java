@@ -43,6 +43,7 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
             if(productEatByDate.isBefore(endDiscount) && productEatByDate.isAfter(startDiscount)) {
                 long temp = productEatByDate.toEpochDay() - now.toEpochDay() - 4L;
                 int discount = 20 + 5 * (10 - (int) temp);
+                if(discount < 0) discount = 0;
                 productBatchService.updateProductBatch(pb.batchId(), pb.product(), pb.batchNumber(), pb.eatByDate(), discount, pb.packagesQuantity());
             }
         }
@@ -57,7 +58,7 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
         System.out.println("Amount of found running out products: " + RunningOutProducts.getRunningOutProducts().size());
 
         System.out.println("Looking for storages running out space!");
-//        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
+        StoragesRunningOutOfSpace.storeRunningOutOfSpace(storageService.findStoragesRunningOutOfSpace());
         System.out.println("Amount of found storages running out space: " + StoragesRunningOutOfSpace.getRunningOutOfSpace().size());
     }
 }

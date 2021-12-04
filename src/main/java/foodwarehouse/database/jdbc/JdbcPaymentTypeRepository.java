@@ -34,7 +34,7 @@ public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     @Override
     public Optional<PaymentType> createPaymentType(String type) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("paymentType"), Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, type);
 
@@ -53,7 +53,7 @@ public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     @Override
     public Optional<PaymentType> updatePaymentType(int paymentTypeId, String type) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("paymentType"));
                 statement.setString(1, type);
                 statement.setInt(2, paymentTypeId);
@@ -72,7 +72,7 @@ public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     @Override
     public boolean deletePaymentType(int paymentTypeId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("paymentType"));
                 statement.setInt(1, paymentTypeId);
 
@@ -90,7 +90,7 @@ public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     @Override
     public Optional<PaymentType> findPaymentTypeById(int paymentTypeId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("paymentType_byId"));
                 statement.setInt(1, paymentTypeId);
 
@@ -113,7 +113,7 @@ public class JdbcPaymentTypeRepository implements PaymentTypeRepository {
     public List<PaymentType> findPayments() {
         List<PaymentType> paymentTypes = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("paymentType"));
 
                 ResultSet resultSet = statement.executeQuery();

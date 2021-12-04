@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,11 +45,11 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
             int quantity) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("productBatch"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, product.productId());
                 statement.setInt(2, batchNo);
-                statement.setDate(3, new java.sql.Date(eatByDate.getTime()));
+                statement.setString(3, new SimpleDateFormat("yyyy-MM-dd").format(eatByDate));
                 statement.setInt(4, quantity);
 
                 statement.executeUpdate();
@@ -72,11 +74,11 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
             int quantity) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("productBatch"));
                 statement.setInt(1, batchNo);
-                statement.setInt(2, discount);
-                statement.setDate(3, new java.sql.Date(eatByDate.getTime()));
+                statement.setString(2, new SimpleDateFormat("yyyy-MM-dd").format(eatByDate));
+                statement.setInt(3, discount);
                 statement.setInt(4, quantity);
                 statement.setInt(5, productBatchId);
 
@@ -95,7 +97,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     @Override
     public boolean deleteProductBatch(int productBatchId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("productBatch"));
                 statement.setInt(1, productBatchId);
 
@@ -113,7 +115,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     @Override
     public Optional<ProductBatch> findProductBatchById(int productBatchId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byId"));
                 statement.setInt(1, productBatchId);
 
@@ -126,7 +128,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
 
                 return Optional.ofNullable(productBatch);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -136,7 +138,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatches() {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -145,7 +147,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             productBatches = null;
         }
@@ -156,7 +158,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatchesByProductId(int productId) {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byProductId"));
                 statement.setInt(1, productId);
 
@@ -166,7 +168,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             productBatches = null;
         }
@@ -177,7 +179,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public List<ProductBatch> findProductBatchesWithDiscountAndProductId(int productId) {
         List<ProductBatch> productBatches = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_byProductIdWithDiscount"));
                 statement.setInt(1, productId);
 
@@ -187,7 +189,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             productBatches = null;
         }
@@ -198,7 +200,7 @@ public class JdbcProductBatchRepository implements ProductBatchRepository {
     public int countProductBatchAmount(int productBatchId) {
         int result = 0;
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("productBatch_quantityById"));
                 statement.setInt(1, productBatchId);
 

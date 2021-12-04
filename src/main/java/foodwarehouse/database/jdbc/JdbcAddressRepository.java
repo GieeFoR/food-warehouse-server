@@ -34,7 +34,7 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public Optional<Address> createAddress(String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("address"), Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, country);
                 statement.setString(2, town);
@@ -57,7 +57,7 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public Optional<Address> updateAddress(int addressId, String country, String town, String postalCode, String buildingNumber, String street, String apartmentNumber) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("address"));
                 statement.setString(1, country);
                 statement.setString(2, town);
@@ -81,7 +81,7 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public boolean deleteAddress(int addressId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("address"));
                 statement.setInt(1, addressId);
                 statement.executeUpdate();
@@ -98,7 +98,7 @@ public class JdbcAddressRepository implements AddressRepository {
     @Override
     public Optional<Address> findAddressById(int addressId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("address_byId"));
                 statement.setInt(1, addressId);
                 ResultSet resultSet = statement.executeQuery();

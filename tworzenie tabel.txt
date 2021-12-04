@@ -18,8 +18,8 @@ drop table if exists "USER";
 
 create table USER
 (
-    USER_ID    INT auto_increment
-        primary key,
+    USER_ID    INTEGER
+        primary key autoincrement,
     USERNAME   VARCHAR(32) not null
         unique,
     PASSWORD   VARCHAR(64) not null,
@@ -31,8 +31,8 @@ create table USER
 
 create table EMPLOYEE
 (
-    EMPLOYEE_ID INT auto_increment
-        primary key,
+    EMPLOYEE_ID INTEGER
+                        primary key autoincrement,
     USER_ID     INT         not null,
     NAME        VARCHAR(32) not null,
     SURNAME     VARCHAR(32) not null,
@@ -44,29 +44,29 @@ create table EMPLOYEE
 
 create table CAR
 (
-    CAR_ID          INT auto_increment
-        primary key,
+    CAR_ID          INTEGER
+                            primary key autoincrement,
     DRIVER_ID       INT      not null,
     BRAND           VARCHAR(32) not null,
     MODEL           VARCHAR(32) not null,
     YEAR_OF_PROD    INT      not null,
     REGISTRATION_NO VARCHAR(16) not null,
-    INSURANCE_EXP   DATE        not null,
-    INSPECTION_EXP  DATE        not null,
+    INSURANCE_EXP   INTEGER        not null,
+    INSPECTION_EXP  INTEGER        not null,
     constraint FK_CAR_DRIVER
         foreign key (DRIVER_ID) references EMPLOYEE (EMPLOYEE_ID)
 );
 
 create table MESSAGE
 (
-    MESSAGE_ID    INT auto_increment
-        primary key,
+    MESSAGE_ID    INTEGER
+                          primary key autoincrement,
     SENDER_ID     INT      not null,
     RECEIVER_ID   INT      not null,
     CONTENT       CLOB        not null,
     MESSAGE_STATE VARCHAR(32) not null,
-    SEND_DATE     DATE        not null,
-    READ_DATE     DATE,
+    SEND_DATE     INTEGER        not null,
+    READ_DATE     INTEGER,
     constraint FK_MESSAGE_RECEIVER
         foreign key (RECEIVER_ID) references EMPLOYEE (EMPLOYEE_ID),
     constraint FK_MESSAGE_SENDER
@@ -75,15 +75,15 @@ create table MESSAGE
 
 create table PAYMENT_TYPE
 (
-    PAYMENT_TYPE_ID INT auto_increment
-        primary key,
+    PAYMENT_TYPE_ID INTEGER
+                            primary key autoincrement,
     PAYMENT_TYPE    VARCHAR(32) not null
 );
 
 create table PAYMENT
 (
-    PAYMENT_ID      INT auto_increment
-        primary key,
+    PAYMENT_ID      INTEGER
+                            primary key autoincrement,
     PAYMENT_TYPE_ID INT      not null,
     PAYMENT_VALUE   FLOAT       not null,
     PAYMENT_STATE   VARCHAR(32) not null,
@@ -93,8 +93,8 @@ create table PAYMENT
 
 create table ADDRESS
 (
-    ADDRESS_ID   INT auto_increment
-        primary key,
+    ADDRESS_ID   INTEGER
+                         primary key autoincrement,
     COUNTRY      VARCHAR(32)  not null,
     TOWN         VARCHAR(128) not null,
     POSTAL_CODE  VARCHAR(16)  not null,
@@ -105,8 +105,8 @@ create table ADDRESS
 
 create table CUSTOMER
 (
-    CUSTOMER_ID  INT auto_increment
-        primary key,
+    CUSTOMER_ID  INTEGER
+                         primary key autoincrement,
     USER_ID      INT      not null,
     ADDRESS_ID   INT      not null,
     NAME         VARCHAR(32) not null,
@@ -123,12 +123,12 @@ create table CUSTOMER
 
 create table DELIVERY
 (
-    DELIVERY_ID               INT auto_increment
-        primary key,
+    DELIVERY_ID               INTEGER
+                                      primary key autoincrement,
     ADDRESS_ID                INT not null,
     SUPPLIER_ID               INT not null,
-    REMOVAL_FROM_STORAGE_DATE DATE,
-    DELIVERY_DATE             DATE,
+    REMOVAL_FROM_STORAGE_DATE INTEGER,
+    DELIVERY_DATE             INTEGER,
     constraint FK_DELIVER_ADDRESS
         foreign key (ADDRESS_ID) references ADDRESS (ADDRESS_ID),
     constraint FK_DELIVER_SUPPLIER
@@ -137,14 +137,14 @@ create table DELIVERY
 
 create table "ORDER"
 (
-    ORDER_ID    INT auto_increment
-        primary key,
+    ORDER_ID    INTEGER
+                        primary key autoincrement,
     PAYMENT_ID  INT      not null,
     CUSTOMER_ID INT      not null,
     DELIVERY_ID INT      not null,
     COMMENT     CLOB,
     ORDER_STATE VARCHAR(32) not null,
-    ORDER_DATE  DATE        not null,
+    ORDER_DATE  TEXT        not null,
     constraint FK_ORDER_CUSTOMER
         foreign key (CUSTOMER_ID) references CUSTOMER (CUSTOMER_ID),
     constraint FK_ORDER_DELIVERY
@@ -155,8 +155,8 @@ create table "ORDER"
 
 create table STORAGE
 (
-    STORAGE_ID      INT auto_increment
-        primary key,
+    STORAGE_ID      INTEGER
+                            primary key autoincrement,
     ADDRESS_ID      INT      not null,
     MANAGER_ID      INT      not null,
     STORAGE_NAME    VARCHAR(32) not null,
@@ -170,8 +170,8 @@ create table STORAGE
 
 create table MAKER
 (
-    MAKER_ID     INT auto_increment
-        primary key,
+    MAKER_ID     INTEGER
+                         primary key autoincrement,
     ADDRESS_ID   INT       not null,
     FIRM_NAME    VARCHAR(256) not null,
     TELEPHONE_NO VARCHAR(12)  not null,
@@ -182,8 +182,8 @@ create table MAKER
 
 create table PRODUCT
 (
-    PRODUCT_ID        INT auto_increment
-        primary key,
+    PRODUCT_ID        INTEGER
+                              primary key autoincrement,
     MAKER_ID          INT      not null,
     PRODUCT_NAME      VARCHAR(32) not null,
     SHORT_DESCRIPTION VARCHAR(64),
@@ -199,11 +199,11 @@ create table PRODUCT
 
 create table PRODUCT_BATCH
 (
-    BATCH_ID          INT auto_increment
-        primary key,
+    BATCH_ID          INTEGER
+                              primary key autoincrement,
     PRODUCT_ID        INT not null,
     BATCH_NO          INT not null,
-    EAT_BY_DATE       DATE   not null,
+    EAT_BY_DATE       INTEGER   not null,
     DISCOUNT          INT,
     PACKAGES_QUANTITY INT not null,
     constraint FK_BATCH_PRODUCT
@@ -236,14 +236,14 @@ create table PRODUCT_ORDER
 
 create table COMPLAINT
 (
-    COMPLAINT_ID    INT auto_increment
-        primary key,
+    COMPLAINT_ID    INTEGER
+                            primary key autoincrement,
     ORDER_ID        INT      not null,
     CONTENT         CLOB        not null,
-    SEND_DATE       DATE        not null,
+    SEND_DATE       INTEGER        not null,
     COMPLAINT_STATE VARCHAR(32) not null,
     DECISION        CLOB,
-    DECISION_DATE   DATE,
+    DECISION_DATE   TEXT,
     constraint FK_COMPLAINT_ORDER
         foreign key (ORDER_ID) references "ORDER" (ORDER_ID)
 );

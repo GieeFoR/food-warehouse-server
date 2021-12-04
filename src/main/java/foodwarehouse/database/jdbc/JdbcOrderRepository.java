@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public Optional<Order> createOrder(Payment payment, Customer customer, Delivery delivery, String comment) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("order"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, payment.paymentId());
                 statement.setInt(2, customer.customerId());
@@ -70,7 +71,7 @@ public class JdbcOrderRepository implements OrderRepository {
             String comment,
             OrderState orderState) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("order_state"));
                 statement.setString(1, orderState.value());
                 statement.setInt(2, orderId);
@@ -92,7 +93,7 @@ public class JdbcOrderRepository implements OrderRepository {
             String comment,
             OrderState orderState) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("order_payment"));
                 statement.setInt(1, payment.paymentId());
                 statement.setInt(2, orderId);
@@ -108,7 +109,7 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public boolean deleteOrder(int orderId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("order"));
                 statement.setInt(1, orderId);
 
@@ -126,7 +127,7 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public Optional<Order> findOrderById(int orderId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_byId"));
                 statement.setInt(1, orderId);
 
@@ -139,7 +140,7 @@ public class JdbcOrderRepository implements OrderRepository {
 
                 return Optional.ofNullable(order);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -149,7 +150,7 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findOrders() {
         List<Order> orders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -158,7 +159,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             orders = null;
         }
@@ -169,7 +170,7 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findCustomerOrders(int customerId) {
         List<Order> orders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_byCustomerId"));
                 statement.setInt(1, customerId);
 
@@ -179,7 +180,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             orders = null;
         }
@@ -189,7 +190,7 @@ public class JdbcOrderRepository implements OrderRepository {
     @Override
     public int amountOfOrdersBetween(String startDate, String endDate) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_amountBetween"));
                 statement.setString(1, startDate);
                 statement.setString(2, endDate);
@@ -210,7 +211,7 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findOrdersBetweenDates(String startDate, String endDate) {
         List<Order> orders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_between"));
                 statement.setString(1, startDate);
                 statement.setString(2, endDate);
@@ -221,7 +222,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             orders = null;
         }
@@ -232,7 +233,7 @@ public class JdbcOrderRepository implements OrderRepository {
     public List<Order> findSupplierActiveOrders(int employeeId) {
         List<Order> orders = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("order_supplierActive"));
                 statement.setInt(1, employeeId);
 
@@ -242,7 +243,7 @@ public class JdbcOrderRepository implements OrderRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             orders = null;
         }

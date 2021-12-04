@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> createMessage(Employee sender, Employee receiver, String content) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("message"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, sender.employeeId());
                 statement.setInt(2, receiver.employeeId());
@@ -60,7 +61,7 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> updateMessageContent(int messageId, Employee sender, Employee receiver, String content, Date sendDate) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("message"));
                 statement.setString(1, content);
                 statement.setInt(2, messageId);
@@ -79,7 +80,7 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public void updateMessageRead(int messageId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("message_read"));
                 statement.setInt(1, messageId);
 
@@ -94,7 +95,7 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public boolean deleteMessage(int messageId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("message"));
                 statement.setInt(1, messageId);
 
@@ -112,7 +113,7 @@ public class JdbcMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> findMessageById(int messageId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_byId"));
                 statement.setInt(1, messageId);
 
@@ -125,7 +126,7 @@ public class JdbcMessageRepository implements MessageRepository {
 
                 return Optional.ofNullable(message);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -135,7 +136,7 @@ public class JdbcMessageRepository implements MessageRepository {
     public List<Message> findAllMessages() {
         List<Message> messages = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message"));
                 ResultSet resultSet = statement.executeQuery();
 
@@ -144,7 +145,7 @@ public class JdbcMessageRepository implements MessageRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             messages = null;
         }
@@ -155,7 +156,7 @@ public class JdbcMessageRepository implements MessageRepository {
     public List<Message> findEmployeeMessages(int employeeId) {
         List<Message> messages = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_byEmployeeId"));
                 statement.setInt(1, employeeId);
                 statement.setInt(2, employeeId);
@@ -166,7 +167,7 @@ public class JdbcMessageRepository implements MessageRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             messages = null;
         }
@@ -177,7 +178,7 @@ public class JdbcMessageRepository implements MessageRepository {
     public int countUnreadReceivedMessages(int employeeId) {
         int result = 0;
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("message_countEmployeeUnread"));
                 statement.setInt(1, employeeId);
                 ResultSet resultSet = statement.executeQuery();

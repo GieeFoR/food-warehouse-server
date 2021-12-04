@@ -41,7 +41,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public Optional<Employee> createEmployee(User user, String name, String surname, String position, Float salary) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("employee"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, user.userId());
                 statement.setString(2, name);
@@ -64,7 +64,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public Optional<Employee> updateEmployee(int employeeId, User user, String name, String surname, String position, Float salary) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("employee"));
                 statement.setString(1, name);
                 statement.setString(2, surname);
@@ -86,7 +86,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public boolean deleteEmployee(int employeeId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("employee"));
                 statement.setInt(1, employeeId);
 
@@ -105,7 +105,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     public List<Employee> findAllEmployees() {
         List<Employee> employees = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("employee"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -125,7 +125,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public Optional<Employee> findEmployeeById(int employeeId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("employee_byId"));
                 statement.setInt(1, employeeId);
 
@@ -147,7 +147,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public Optional<Employee> findEmployeeByUsername(String username) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("employee_byUsername"));
                 statement.setString(1, username);
 
@@ -169,7 +169,7 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
     @Override
     public Optional<Employee> findSupplierWithMinDelivery() {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("employee_withMinDeliveries"));
 
                 ResultSet resultSet = statement.executeQuery();

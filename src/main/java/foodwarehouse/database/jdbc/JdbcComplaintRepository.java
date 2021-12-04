@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public Optional<Complaint> createComplaint(Order order, String content) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("complaint"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, order.orderId());
                 statement.setString(2, content);
@@ -59,7 +60,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public Optional<Complaint> findComplaintById(int complaintId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byId"));
                 statement.setInt(1, complaintId);
 
@@ -72,7 +73,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
 
                 return Optional.ofNullable(complaint);
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
@@ -82,7 +83,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findComplaints() {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -91,7 +92,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             complaints = null;
         }
@@ -102,7 +103,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findCustomerComplaints(int customerId) {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byCustomerId"));
                 statement.setInt(1, customerId);
 
@@ -112,7 +113,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
                 }
                 statement.close();
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
         }
         return complaints;
@@ -121,7 +122,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public void cancelComplaint(int complaintId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_cancel"));
                 statement.setInt(1, complaintId);
                 statement.setInt(2, complaintId);
@@ -137,7 +138,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     @Override
     public void addDecisionToComplaint(int complaintId, String decision, ComplaintState complaintState) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_decision"));
                 statement.setInt(1, complaintId);
                 statement.setString(2, decision);
@@ -155,7 +156,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
     public List<Complaint> findOrderComplaints(int orderId) {
         List<Complaint> complaints = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("complaint_byOrderId"));
                 statement.setInt(1, orderId);
 
@@ -164,7 +165,7 @@ public class JdbcComplaintRepository implements ComplaintRepository {
                     complaints.add(new ComplaintResultSetMapper().resultSetMap(resultSet, ""));
                 }
             }
-        } catch (SQLException | FileNotFoundException e) {
+        } catch (SQLException | FileNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
             complaints = null;
         }

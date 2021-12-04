@@ -13,7 +13,7 @@ public class ExpiredBatches {
     private final static List<ProductInStorage> expiredBatches = new LinkedList<>();
 
     public static void storeExpiredBatches(List<ProductInStorage> productsInStorages) {
-        expiredBatches.addAll(productsInStorages);
+        if(productsInStorages != null) expiredBatches.addAll(productsInStorages);
     }
 
     public static void removeExpiredBatches(ProductInStorage product) {

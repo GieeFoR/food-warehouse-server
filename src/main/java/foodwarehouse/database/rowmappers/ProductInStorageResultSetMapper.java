@@ -5,10 +5,11 @@ import foodwarehouse.database.tables.ProductInStorageTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 final public class ProductInStorageResultSetMapper implements ResultSetMapper<ProductInStorage> {
     @Override
-    public ProductInStorage resultSetMap(ResultSet rs, String prefix) throws SQLException {
+    public ProductInStorage resultSetMap(ResultSet rs, String prefix) throws SQLException, ParseException {
         return new ProductInStorage(
                 new ProductBatchResultSetMapper().resultSetMap(rs, prefix + ProductInStorageTable.NAME + "_"),
                 new StorageResultSetMapper().resultSetMap(rs, prefix + ProductInStorageTable.NAME + "_"),

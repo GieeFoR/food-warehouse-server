@@ -33,7 +33,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> createUser(String username, String password, String email, Permission permission) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("user"), Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, username);
                 statement.setString(2, password);
@@ -55,7 +55,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> updateUser(int userId, String username, String password, String email, Permission permission) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("user"));
                 statement.setString(1, username);
                 statement.setString(2, permission.value());
@@ -78,7 +78,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public boolean deleteUser(int userId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("user"));
                 statement.setInt(1, userId);
 
@@ -97,7 +97,7 @@ public class JdbcUserRepository implements UserRepository {
     public List<User> findAllUsers() {
         List<User> users = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("user"));
                 ResultSet resultSet = statement.executeQuery();
 
@@ -116,7 +116,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> findUserById(int userId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("user_byId"));
                 statement.setInt(1, userId);
 
@@ -138,7 +138,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> findUserByUsername(String username) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("user_byUsername"));
                 statement.setString(1, username);
 
@@ -160,7 +160,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> findUserByEmail(String email) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("user_byEmail"));
                 statement.setString(1, email);
 

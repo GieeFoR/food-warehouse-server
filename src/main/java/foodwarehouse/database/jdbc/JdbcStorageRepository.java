@@ -43,7 +43,7 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readInsert("storage"), Statement.RETURN_GENERATED_KEYS);
                 statement.setInt(1, address.addressId());
                 statement.setInt(2, manager.employeeId());
@@ -74,7 +74,7 @@ public class JdbcStorageRepository implements StorageRepository {
             boolean isColdStorage) {
 
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("storage"));
                 statement.setInt(1, manager.employeeId());
                 statement.setString(2, name);
@@ -96,7 +96,7 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public boolean deleteStorage(int storageId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readDelete("storage"));
                 statement.setInt(1, storageId);
 
@@ -115,7 +115,7 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findAllStorages() {
         List<Storage> storages = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage"));
 
                 ResultSet resultSet = statement.executeQuery();
@@ -135,7 +135,7 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public Optional<Storage> findStorage(int storageId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byId"));
                 statement.setInt(1, storageId);
 
@@ -157,7 +157,7 @@ public class JdbcStorageRepository implements StorageRepository {
     @Override
     public Optional<Storage> findStorageByBatchId(int batchId) {
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_byBatchId"));
                 statement.setInt(1, batchId);
                 statement.setInt(2, batchId);
@@ -181,7 +181,7 @@ public class JdbcStorageRepository implements StorageRepository {
     public List<Storage> findStoragesRunningOutOfSpace() {
         List<Storage> storages = new LinkedList<>();
         try {
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/GieeF/IdeaProjects/food-warehouse-server/test.db")) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readSelect("storage_runningOutOfSpace"));
 
                 ResultSet resultSet = statement.executeQuery();
