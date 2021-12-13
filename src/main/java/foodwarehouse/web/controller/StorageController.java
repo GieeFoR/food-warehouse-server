@@ -38,7 +38,7 @@ public class StorageController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
     public SuccessResponse<List<StorageResponse>> getStorages() {
         //check if database is reachable
         if(!connectionService.isReachable()) {

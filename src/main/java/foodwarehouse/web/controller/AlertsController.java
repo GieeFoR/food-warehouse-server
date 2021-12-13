@@ -77,7 +77,7 @@ public class AlertsController {
     }
 
     @GetMapping("/employee")
-    @PreAuthorize("hasRole('Employee')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Employee') || hasRole('Manager')")
     public SuccessResponse<EmployeeAlertResponse> getEmployeeAlerts() {
         //check if database is reachable
         if(!connectionService.isReachable()) {

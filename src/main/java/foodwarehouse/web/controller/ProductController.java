@@ -36,7 +36,7 @@ public class ProductController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
     public SuccessResponse<List<ProductResponse>> getProducts() {
         //check if database is reachable
         if(!connectionService.isReachable()) {

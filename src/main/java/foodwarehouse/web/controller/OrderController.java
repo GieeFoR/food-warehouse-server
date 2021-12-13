@@ -251,7 +251,7 @@ public class OrderController {
     }
 
     @GetMapping("/order")
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
     public SuccessResponse<List<EntireOrderResponse>> getOrders() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
