@@ -48,7 +48,7 @@ public class BatchController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('Admin') || hasRole('Manager')")
+    @PreAuthorize("hasRole('Admin') || hasRole('Manager') || hasRole('Employee')")
     public SuccessResponse<List<BatchResponse>> getProductsInStorages() {
         //check if database is reachable
         if(!connectionService.isReachable()) {
