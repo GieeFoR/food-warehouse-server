@@ -20,7 +20,7 @@ final public class ComplaintResultSetMapper implements ResultSetMapper<Complaint
                 rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.CONTENT),
                 rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.SEND_DATE) == null ? null : new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.SEND_DATE)),
                 ComplaintState.valueOf(rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.STATE)),
-                rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION),
+                rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION).equals("") ? null : rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION),
                 rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION_DATE) == null ? null : new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(prefix+ComplaintTable.NAME+"."+ComplaintTable.Columns.DECISION_DATE)));
     }
 }

@@ -125,7 +125,6 @@ public class JdbcComplaintRepository implements ComplaintRepository {
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_cancel"));
                 statement.setInt(1, complaintId);
-                statement.setInt(2, complaintId);
 
                 statement.executeUpdate();
                 statement.close();
@@ -140,10 +139,9 @@ public class JdbcComplaintRepository implements ComplaintRepository {
         try {
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
                 PreparedStatement statement = connection.prepareStatement(ReadStatement.readUpdate("complaint_decision"));
-                statement.setInt(1, complaintId);
+                statement.setString(1, complaintState.value());
                 statement.setString(2, decision);
-                statement.setString(3, complaintState.value());
-                statement.setInt(4, complaintId);
+                statement.setInt(3, complaintId);
 
                 statement.executeUpdate();
             }
